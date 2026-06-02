@@ -89,7 +89,9 @@
 <!-- Gmap Start -->
 
 @push('js-view')
-<script src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyBf4UvvTN2QLWT4BiewE_3fEzK3QrRsLJE"></script>
+@if(config('services.google_maps.key'))
+<script src="https://maps.googleapis.com/maps/api/js?v=3&key={{ config('services.google_maps.key') }}"></script>
+@endif
 @endpush
 </x-app-layout>
 
