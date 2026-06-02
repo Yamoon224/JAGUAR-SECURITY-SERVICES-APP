@@ -8,7 +8,6 @@ use App\Models\Bill;
 use App\Models\Leaf;
 use App\Models\Meet;
 use App\Models\Dotation;
-use App\Models\Logistic;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Employee;
@@ -551,7 +550,6 @@ class PrintController extends Controller
         self::$obj->Cell(190, 6, utf8_decode('Filtre contrat: ' . $contractType), 0, 1, 'C');
         self::$obj->Ln(2);
 
-        $logistics = Logistic::orderByDesc('id')->get();
         $categories = Category::orderBy('name')->get();
         $dotations = Dotation::with('employee', 'equipment')->orderByDesc('id')->get();
         $equipments = Equipment::with('category')->orderBy('name')->get();
@@ -578,21 +576,6 @@ class PrintController extends Controller
 
         $cddContracts = $contracts->where('contract', 'CDD');
         $cdiContracts = $contracts->where('contract', 'CDI');
-
-        self::renderTableSection(
-            'Logistique',
-            ['#', 'Date', 'Type', 'Transaction', 'Montant', 'Motif'],
-            [8, 24, 22, 46, 30, 60],
-            $logistics->map(fn ($item) => [
-                $item->id,
-                optional($item->created_at)->format('d/m/Y'),
-                $item->type,
-                $item->transaction,
-                moneyFormat((float) $item->amount),
-                $item->reason,
-            ])->toArray(),
-            'Aucune donnee logistique disponible.'
-        );
 
         self::renderTableSection(
             'Categories',
