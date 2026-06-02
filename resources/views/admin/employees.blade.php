@@ -4,6 +4,7 @@
     <div class="d-none d-sm-flex align-items-center">
         <h6 class="mb-0 text-uppercase">@lang('lang.employee_management')</h6>
         <div class="ms-auto">
+            <a class="btn btn-sm btn-danger" href="{{ route('prints.operations.report') }}" target="_blank"><i class="bx bx-printer"></i> @lang('lang.download') PDF RH</a>
             @if(isRightAccess([1, 3]))
             <a class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#employee-add"><i class="bx bx-user-plus"></i> @lang('lang.new_employee')</a>
             @endif
@@ -55,6 +56,15 @@
                             <div class="tab-icon"><i class='bx bx-user-minus font-18 me-1'></i>
                             </div>
                             <div class="tab-title">@lang('lang.suspension', ['param'=>'s'])</div>
+                        </div>
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" data-bs-toggle="tab" href="#contracts" role="tab" aria-selected="false">
+                        <div class="d-flex align-items-center">
+                            <div class="tab-icon"><i class='bx bx-file font-18 me-1'></i>
+                            </div>
+                            <div class="tab-title">@lang('lang.contract', ['param' => 's'])</div>
                         </div>
                     </a>
                 </li>
@@ -227,6 +237,78 @@
                         </div>
                     </div>      
                 </div>
+
+                <div class="tab-pane fade" id="contracts" role="tabpanel">
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <button class="btn btn-sm btn-outline-dark contract-filter" data-filter="all">Tous</button>
+                        <button class="btn btn-sm btn-outline-primary contract-filter" data-filter="CDD">CDD</button>
+                        <button class="btn btn-sm btn-outline-success contract-filter" data-filter="CDI">CDI</button>
+                        <button class="btn btn-sm btn-outline-warning contract-filter" data-filter="stagiaire">Stagiaires</button>
+                        <button class="btn btn-sm btn-outline-danger contract-filter" data-filter="expired">Expirés</button>
+                        <a class="btn btn-sm btn-dark" href="{{ route('prints.operations.report') }}" target="_blank">
+                            <i class="bx bx-download"></i> @lang('lang.download') PDF
+                        </a>
+                        <a class="btn btn-sm btn-outline-primary" href="{{ route('prints.operations.report', ['contract_type' => 'CDD']) }}" target="_blank">
+                            PDF CDD
+                        </a>
+                        <a class="btn btn-sm btn-outline-success" href="{{ route('prints.operations.report', ['contract_type' => 'CDI']) }}" target="_blank">
+                            PDF CDI
+                        </a>
+                    </div>
+
+                    <div class="alert alert-light border mb-3">
+                        <strong>Total:</strong> {{ $contracts->count() }} |
+                        <strong>CDD:</strong> {{ $cddContracts->count() }} |
+                        <strong>CDI:</strong> {{ $cdiContracts->count() }} |
+                        <strong>Stagiaires:</strong> {{ $internContracts->count() }} |
+                        <strong>Expirés:</strong> {{ $expiredContracts->count() }}
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered w-100">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>@lang('lang.employee', ['param'=>''])</th>
+                                    <th>@lang('lang.contract_type')</th>
+                                    <th>@lang('lang.start_date')</th>
+                                    <th>@lang('lang.end_date')</th>
+                                    <th>@lang('lang.status')</th>
+                                    <th>@lang('lang.action', ['param' => ''])</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($contracts as $item)
+                                @php
+                                    $isExpired = !empty($item->contract_end_at) && \Carbon\Carbon::parse($item->contract_end_at)->lt(\Carbon\Carbon::today());
+                                    $contractType = stripos((string) $item->contract, 'stagiaire') !== false ? 'stagiaire' : strtoupper((string) $item->contract);
+                                @endphp
+                                <tr class="contract-row"
+                                    data-contract="{{ $contractType }}"
+                                    data-expired="{{ $isExpired ? '1' : '0' }}">
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $item->firstname.' '.$item->name.' | '.$item->matricule }}</td>
+                                    <td>{{ $item->contract }}</td>
+                                    <td>{{ !empty($item->contract_start_at) ? \Carbon\Carbon::parse($item->contract_start_at)->format('d/m/Y') : '-' }}</td>
+                                    <td>{{ !empty($item->contract_end_at) ? \Carbon\Carbon::parse($item->contract_end_at)->format('d/m/Y') : '-' }}</td>
+                                    <td>
+                                        @if($isExpired)
+                                            <span class="badge bg-danger">@lang('lang.expired')</span>
+                                        @else
+                                            <span class="badge bg-success">@lang('lang.ongoing')</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-sm btn-outline-dark" href="{{ route('prints.contract.employee', $item->id) }}" target="_blank">
+                                            <i class="bx bx-download"></i> PDF
+                                        </a>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -256,6 +338,27 @@
             $("#no-search").show();
         }
     })
+
+    $('.contract-filter').on('click', function () {
+        const filter = $(this).data('filter');
+
+        $('.contract-row').each(function () {
+            const contract = ($(this).data('contract') || '').toString();
+            const isExpired = ($(this).data('expired') || '').toString() === '1';
+
+            if (filter === 'all') {
+                $(this).show();
+                return;
+            }
+
+            if (filter === 'expired') {
+                isExpired ? $(this).show() : $(this).hide();
+                return;
+            }
+
+            contract === filter.toString() ? $(this).show() : $(this).hide();
+        });
+    });
 </script>
 @endpush
 </x-admin-layout>

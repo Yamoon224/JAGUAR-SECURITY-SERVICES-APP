@@ -10,6 +10,7 @@ use App\Models\Applicant;
 use App\Models\Equipment;
 use App\Models\Suspension;
 use App\Models\Affectation;
+use Carbon\Carbon;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -34,7 +35,42 @@ class EmployeeController extends Controller
         $dotations = Dotation::with('employee', 'equipment')->get();
         $customers = Customer::where('deleted', 0)->get();
         $affectations = Affectation::all();
-        return view('admin.employees', compact('employees', 'count', 'customers', 'affectations', 'applicants', 'equipments', 'leaves', 'dotations', 'suspensions'));
+
+        $contracts = Employee::where('deleted', 0)
+            ->orderByDesc('id')
+            ->get();
+
+        $expiredContracts = $contracts->filter(function ($employee) {
+            if (empty($employee->contract_end_at)) {
+                return false;
+            }
+
+            return Carbon::parse($employee->contract_end_at)->lt(Carbon::today());
+        });
+
+        $cddContracts = $contracts->where('contract', 'CDD');
+        $cdiContracts = $contracts->where('contract', 'CDI');
+        $internContracts = $contracts->filter(fn ($employee) => stripos((string) $employee->contract, 'stagiaire') !== false);
+
+        return view(
+            'admin.employees',
+            compact(
+                'employees',
+                'count',
+                'customers',
+                'affectations',
+                'applicants',
+                'equipments',
+                'leaves',
+                'dotations',
+                'suspensions',
+                'contracts',
+                'expiredContracts',
+                'cddContracts',
+                'cdiContracts',
+                'internContracts'
+            )
+        );
     }
 
     /**

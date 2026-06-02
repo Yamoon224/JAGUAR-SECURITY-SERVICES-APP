@@ -45,6 +45,8 @@ class Employee extends Model
 	protected $casts = [
 		'salary' => 'float',
 		'prime' => 'float',
+		'contract_start_at' => 'date',
+		'contract_end_at' => 'date',
 		'isleaved' => 'int',
 		'issuspended' => 'int',
 		'deleted' => 'int'

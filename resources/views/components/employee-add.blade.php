@@ -61,6 +61,14 @@
                                 <option>Vacataire | Stagiaire</option>
                             </select>
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label mb-1">@lang('lang.start_date')</label>
+                            <input type="date" class="form-control" name="contract_start_at">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label mb-1">@lang('lang.end_date')</label>
+                            <input type="date" class="form-control" name="contract_end_at">
+                        </div>
                         <div class="col-12">
                             <div class="position-relative input-icon mb-3">
                                 <input type="number" class="form-control" name="salary" placeholder="@lang('lang.salary') *" min="600000" required>

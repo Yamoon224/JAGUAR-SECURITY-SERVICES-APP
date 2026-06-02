@@ -27,6 +27,8 @@ class StoreEmployeeRequest extends FormRequest
             'studygrade' => ['required', 'string', 'max:50'],
             'familystatus' => ['required', 'string', 'max:50'],
             'contract' => ['required', 'string', 'max:30'],
+            'contract_start_at' => ['nullable', 'date'],
+            'contract_end_at' => ['nullable', 'date', 'after_or_equal:contract_start_at'],
             'emergency_name' => ['required', 'string', 'max:100'],
             'emergency_phone' => ['required', 'string', 'max:20'],
             'salary' => ['required'],
