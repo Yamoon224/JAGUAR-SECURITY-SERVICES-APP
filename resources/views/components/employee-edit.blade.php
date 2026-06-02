@@ -142,16 +142,15 @@
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
                             </div>
                         </div>
-                        <div class="col-12 text-center text-uppercase"><h6>@lang('lang.emergency')</h6></div>
                         <div class="col-md-6">
-                            <label class="form-label mb-1">@lang('lang.firstname') & @lang('lang.name')</label>
+                            <label class="form-label mb-1">@lang('lang.emergency') : @lang('lang.firstname') & @lang('lang.name')</label>
                             <div class="position-relative input-icon">
                                 <input type="text" class="form-control" name="emergency_name" placeholder="@lang('lang.firstname') & @lang('lang.name') *" value="{{ $employee->emergency_name }}" required>
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-user'></i></span>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label mb-1">@lang('lang.phone_id')</label>
+                            <label class="form-label mb-1">@lang('lang.emergency') : @lang('lang.phone_id')</label>
                             <div class="position-relative input-icon">
                                 <input type="tel" class="form-control" name="emergency_phone" placeholder="@lang('lang.phone_id') *" value="{{ $employee->emergency_phone }}">
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-phone'></i></span>

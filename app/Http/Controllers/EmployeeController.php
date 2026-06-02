@@ -117,6 +117,13 @@ class EmployeeController extends Controller
         return view('admin.employee', compact('employee', 'equipments'));
     }
 
+    public function printProfileCard(int $id)
+    {
+        $employee = Employee::findOrFail($id);
+
+        return view('admin.employee-profile-card-print', compact('employee'));
+    }
+
     /**
      * Show the form for editing the specified resource.
      */

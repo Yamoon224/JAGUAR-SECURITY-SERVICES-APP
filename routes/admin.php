@@ -78,6 +78,7 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'lang'])->group(function
     Route::get('/agents', [Controller::class, 'getAgents'])->name('agents');
     Route::get('/lang/{locale}', [Controller::class, 'language'])->name('lang');
     Route::get('/employees/notAffected/{id}', [EmployeeController::class, 'employeeNotAffected'])->name('employees.notaffected');
+    Route::get('/employees/{id}/profile-card/print', [EmployeeController::class, 'printProfileCard'])->name('employees.profile-card.print');
 
     Route::post('/bills/monthly', [BillController::class, 'getByMonthly'])->name('bills.monthly');
     Route::post('/payments/monthly', [PaymentController::class, 'getByMonthly'])->name('payments.monthly');

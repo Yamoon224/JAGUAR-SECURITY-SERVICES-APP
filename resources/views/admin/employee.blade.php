@@ -30,41 +30,7 @@
 					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 				</div>
                 @endif
-                <div class="card border-dark border-bottom">
-                    <div class="card-body">
-                        <div class="d-flex flex-column align-items-center text-center">
-                            <img src="{{ asset('images/employee.png') }}" alt="Photo" class="rounded-circle p-1 bg-dark" width="110">
-                            <div class="mt-3">
-                                <h4>{{ $employee->firstname." ".$employee->name }}</h4>
-                                <p class="text-secondary mb-1">{{ $employee->gender." | ".$employee->position }}</p>
-                                <p class="text-muted font-size-sm">{{ $employee->studygrade." | ".$employee->familystatus." | ".$employee->contract }}</p>
-                            </div>
-                        </div>
-                        <hr class="my-3" />
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                                <h6 class="mb-0"><i class="bx bx-phone"></i> @lang('lang.phone_id')</h6>
-                                <span class="text-secondary">{{ $employee->phone }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                                <h6 class="mb-0"><i class="bx bx-envelope"></i> @lang('lang.email')</h6>
-                                <span class="text-secondary">{{ $employee->email }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                                <h6 class="mb-0"><i class="bx bx-money"></i> @lang('lang.salary')</h6>
-                                <span class="text-secondary">{{ $employee->salary }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                                <h6 class="mb-0"><i class="bx bx-money"></i> @lang('lang.prime')</h6>
-                                <span class="text-secondary">{{ $employee->prime }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                                <h6 class="mb-0"><i class="bx bx-user"></i> @lang('lang.emergency')</h6>
-                                <span class="text-secondary">{{ $employee->emergency_name." | ".$employee->emergency_phone }}</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                @include('admin.partials.employee-profile-card', ['employee' => $employee, 'showPrintButton' => true])
             </div>
             <div class="col-lg-8">
                 <div class="card border-dark border-bottom">
@@ -210,61 +176,57 @@
                                     </div>
                                 </div>
                                 @endif
-                                <div class="col-12 text-center text-uppercase"><h6>@lang('lang.emergency')</h6></div>
                                 <div class="col-md-6">
-                                    <label class="form-label mb-1">@lang('lang.firstname') & @lang('lang.name')</label>
+                                    <label class="form-label mb-1">@lang('lang.emergency') : @lang('lang.firstname') & @lang('lang.name')</label>
                                     <div class="position-relative input-icon">
                                         <input type="text" class="form-control" name="emergency_name" placeholder="@lang('lang.firstname') & @lang('lang.name') *" value="{{ $employee->emergency_name }}" required>
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-user'></i></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label mb-1">@lang('lang.phone_id')</label>
+                                    <label class="form-label mb-1">@lang('lang.emergency') : @lang('lang.phone_id')</label>
                                     <div class="position-relative input-icon">
                                         <input type="tel" class="form-control" name="emergency_phone" placeholder="@lang('lang.phone_id') *" value="{{ $employee->emergency_phone }}">
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-phone'></i></span>
                                     </div>
                                 </div>
-                                <div class="col-12 text-center text-uppercase"><h6>@lang('lang.bank')</h6></div>
                                 <div class="col-md-6">
-                                    <label class="form-label mb-1">@lang('lang.rib')</label>
+                                    <label class="form-label mb-1">@lang('lang.bank') : @lang('lang.rib')</label>
                                     <div class="position-relative input-icon">
                                         <input type="text" class="form-control" name="rib" placeholder="@lang('lang.rib')" value="{{ $employee->rib }}">
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-credit-card'></i></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label mb-1">@lang('lang.bank_name')</label>
+                                    <label class="form-label mb-1">@lang('lang.bank') : @lang('lang.bank_name')</label>
                                     <div class="position-relative input-icon">
                                         <input type="text" class="form-control" name="bank" placeholder="@lang('lang.bank_name')" value="{{ $employee->bank }}">
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-building'></i></span>
                                     </div>
                                 </div>
-                                <div class="col-12 text-center text-uppercase"><h6>@lang('lang.tax')</h6></div>
                                 <div class="col-md-6">
-                                    <label class="form-label mb-1">@lang('lang.cnss')</label>
+                                    <label class="form-label mb-1">@lang('lang.tax') : @lang('lang.cnss')</label>
                                     <div class="position-relative input-icon">
                                         <input type="number" class="form-control" name="cnss" placeholder="@lang('lang.cnss')" value="{{ $employee->cnss }}">
                                         <span class="position-absolute top-50 translate-middle-y">%</span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label mb-1">@lang('lang.rts')</label>
+                                    <label class="form-label mb-1">@lang('lang.tax') : @lang('lang.rts')</label>
                                     <div class="position-relative input-icon">
                                         <input type="number" class="form-control" name="rts" placeholder="@lang('lang.rts')" value="{{ $employee->rts }}">
                                         <span class="position-absolute top-50 translate-middle-y">%</span>
                                     </div>
                                 </div>
-                                <div class="col-12 text-center text-uppercase"><h6>@lang('lang.acompte')</h6></div>
                                 <div class="col-md-6">
-                                    <label class="form-label mb-1">@lang('lang.acompte')</label>
+                                    <label class="form-label mb-1">@lang('lang.acompte') : @lang('lang.amount')</label>
                                     <div class="position-relative input-icon">
                                         <input type="number" class="form-control" name="acompte" placeholder="@lang('lang.acompte')" value="{{ $employee->acompte }}">
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label mb-1">@lang('lang.sanction')</label>
+                                    <label class="form-label mb-1">@lang('lang.acompte') : @lang('lang.sanction')</label>
                                     <div class="position-relative input-icon">
                                         <input type="text" class="form-control" name="sanction" placeholder="@lang('lang.sanction')" value="{{ $employee->sanction }}">
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
