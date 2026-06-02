@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Group extends Model
+class Group extends BaseModel
 {
 	public $timestamps = false;
 	protected $guarded = [];

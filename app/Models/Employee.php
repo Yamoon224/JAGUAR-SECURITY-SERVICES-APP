@@ -40,7 +40,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Employee extends Model
+class Employee extends BaseModel
 {
 	protected $casts = [
 		'salary' => 'float',

@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Licenciement extends Model
+class Licenciement extends BaseModel
 {
 	protected $casts = [
 		'employee_id' => 'int'

@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Leaf extends Model
+class Leaf extends BaseModel
 {
 	protected $casts = ['employee_id' => 'int'];
 

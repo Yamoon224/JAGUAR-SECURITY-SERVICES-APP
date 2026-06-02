@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Appointment extends Model
+class Appointment extends BaseModel
 {
 	protected $guarded = [];
 }

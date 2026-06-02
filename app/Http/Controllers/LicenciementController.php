@@ -35,7 +35,7 @@ class LicenciementController extends Controller
         $data = $request->except('_token');
         $employee = Employee::find($data['employee_id']);
         $employee->update(['deleted'=>1]);
-        Affectation::where('employee_id', $employee->id)->delete();
+        Affectation::where('employee_id', $employee->id)->get()->each->delete();
         Licenciement::create($data);
         return back();
     }

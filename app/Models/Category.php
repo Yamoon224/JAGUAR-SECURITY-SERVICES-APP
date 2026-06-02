@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *
  * @package App\Models
  */
-class Category extends Model
+class Category extends BaseModel
 {
     use HasFactory;
 	protected $guarded = [];

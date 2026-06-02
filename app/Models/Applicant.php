@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Applicant extends Model
+class Applicant extends BaseModel
 {
 	protected $casts = [
 		'deleted' => 'int'

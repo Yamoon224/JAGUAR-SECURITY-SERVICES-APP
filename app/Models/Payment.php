@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Payment extends Model
+class Payment extends BaseModel
 {
 	protected $casts = [
 		'amount' => 'float',

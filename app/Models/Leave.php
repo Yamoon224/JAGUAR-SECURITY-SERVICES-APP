@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Leave extends Model
+class Leave extends BaseModel
 {
 	protected $casts = [
 		'employee_id' => 'int'

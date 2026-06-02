@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Meet extends Model
+class Meet extends BaseModel
 {
 	protected $guarded = [];
 }

@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @package App\Models
  */
-class Mail extends Model
+class Mail extends BaseModel
 {
     use SoftDeletes;
 	protected $guarded = [];

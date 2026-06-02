@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Logistic extends Model
+class Logistic extends BaseModel
 {
 	protected $casts = [
 		'amount' => 'float'

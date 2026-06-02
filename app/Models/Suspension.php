@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Suspension extends Model
+class Suspension extends BaseModel
 {
 	protected $casts = ['duration' => 'int', 'employee_id' => 'int'];
 	protected $guarded = [];

@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Galery extends Model
+class Galery extends BaseModel
 {
 	protected $guarded = [];
 }

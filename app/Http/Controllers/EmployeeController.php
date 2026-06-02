@@ -152,7 +152,7 @@ class EmployeeController extends Controller
     public function destroy(int $employee)
     {
         $employee = Employee::find($employee);
-        Affectation::where('employee_id', $employee->id)->delete();
+        Affectation::where('employee_id', $employee->id)->get()->each->delete();
         $employee->delete();
         return back();
     }
@@ -163,7 +163,7 @@ class EmployeeController extends Controller
     public function employeeNotAffected(int $id)
     {
         $employee = Employee::find($id);
-        Affectation::where('employee_id', $employee->id)->delete();
+        Affectation::where('employee_id', $employee->id)->get()->each->delete();
         $employee->delete();
         
         return back();

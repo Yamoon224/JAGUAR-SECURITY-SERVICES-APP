@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Recruitment extends Model
+class Recruitment extends BaseModel
 {
 	protected $guarded = [];
 }
