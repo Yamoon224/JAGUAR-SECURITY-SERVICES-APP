@@ -4,6 +4,7 @@
     <h6 class="breadcrumb-title pe-3 text-uppercase">@lang('lang.licenciement', ['param'=>'s'])</h6>
     <div class="ms-auto">
         <a class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#licenciement-add"><i class="bx bx-user-plus"></i> @lang('lang.new_licenciement')</a>
+        <a class="btn btn-sm btn-danger" href="{{ route('prints.licenciements.report') }}" target="_blank"><i class="bx bx-printer"></i> PDF @lang('lang.licenciement', ['param'=>'s'])</a>
     </div>
 </div>
 <hr/>

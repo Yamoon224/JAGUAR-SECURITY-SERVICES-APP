@@ -4,6 +4,7 @@
     <h6 class="breadcrumb-title pe-3 text-uppercase">@lang('lang.dotation', ['param'=>'s'])</h6>
     <div class="ms-auto">
         <a class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#dotation-add"><i class="bx bx-user-plus"></i> @lang('lang.new_dotation')</a>
+        <a class="btn btn-sm btn-danger" href="{{ route('prints.dotations.report') }}" target="_blank"><i class="bx bx-printer"></i> PDF @lang('lang.dotation', ['param'=>'s'])</a>
     </div>
 </div>
 <hr/>

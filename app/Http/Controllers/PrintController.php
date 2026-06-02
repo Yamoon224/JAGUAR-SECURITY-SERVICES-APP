@@ -533,6 +533,194 @@ class PrintController extends Controller
         }
     }
 
+    private static function initSimpleReport(string $title): void
+    {
+        self::$obj = new PDF('P', 'mm', 'A4');
+        self::$obj->SetTitle(utf8_decode($title));
+        self::$obj->AddPage();
+        self::$obj->SetFont('Arial', 'B', 12);
+        self::$obj->Cell(190, 8, utf8_decode(strtoupper($title)), 0, 1, 'C');
+        self::$obj->SetFont('Arial', 'I', 9);
+        self::$obj->Cell(190, 6, utf8_decode('Date: ' . date('d/m/Y H:i')), 0, 1, 'C');
+        self::$obj->Ln(2);
+    }
+
+    private static function normalizeContractType(?string $contract): string
+    {
+        $value = strtoupper(trim((string) $contract));
+
+        if ($value === 'CDD') {
+            return 'CDD';
+        }
+
+        if ($value === 'CDI') {
+            return 'CDI';
+        }
+
+        if (stripos((string) $contract, 'stag') !== false) {
+            return 'Stage';
+        }
+
+        return 'Autres';
+    }
+
+    public static function getCategoriesReport()
+    {
+        $categories = Category::orderBy('name')->get();
+
+        self::initSimpleReport('Rapport Categories');
+        self::renderTableSection(
+            'Categories',
+            ['#', 'Nom', 'Date creation'],
+            [20, 110, 60],
+            $categories->map(fn ($item) => [
+                $item->id,
+                $item->name,
+                optional($item->created_at)->format('d/m/Y'),
+            ])->toArray(),
+            'Aucune categorie disponible.'
+        );
+
+        self::$obj->Output();
+        exit;
+    }
+
+    public static function getDotationsReport()
+    {
+        $dotations = Dotation::with('employee', 'equipment')->orderByDesc('id')->get();
+
+        self::initSimpleReport('Rapport Dotations');
+        self::renderTableSection(
+            'Dotations',
+            ['#', 'Employe', 'Equipement', 'Quantite', 'Date'],
+            [10, 68, 50, 22, 40],
+            $dotations->map(fn ($item) => [
+                $item->id,
+                trim((optional($item->employee)->firstname ?? '') . ' ' . (optional($item->employee)->name ?? '')),
+                optional($item->equipment)->name,
+                $item->qty,
+                optional($item->created_at)->format('d/m/Y'),
+            ])->toArray(),
+            'Aucune dotation disponible.'
+        );
+
+        self::$obj->Output();
+        exit;
+    }
+
+    public static function getEquipmentsReport()
+    {
+        $equipments = Equipment::with('category', 'dotations')->orderBy('name')->get();
+
+        self::initSimpleReport('Rapport Equipements');
+        self::renderTableSection(
+            'Equipements',
+            ['#', 'Nom', 'Categorie', 'Qte totale', 'Qte dispo'],
+            [10, 64, 52, 32, 32],
+            $equipments->map(fn ($item) => [
+                $item->id,
+                $item->name,
+                optional($item->category)->name,
+                (int) $item->qty,
+                (int) ($item->qty - $item->dotations->sum('qty')),
+            ])->toArray(),
+            'Aucun equipement disponible.'
+        );
+
+        self::$obj->Output();
+        exit;
+    }
+
+    public static function getLeavesReport()
+    {
+        $leaves = Leaf::with('employee')->orderByDesc('id')->get();
+
+        self::initSimpleReport('Rapport Conges');
+        self::renderTableSection(
+            'Conges',
+            ['#', 'Employe', 'Debut', 'Fin', 'Motif'],
+            [10, 64, 28, 28, 60],
+            $leaves->map(fn ($item) => [
+                $item->id,
+                trim((optional($item->employee)->firstname ?? '') . ' ' . (optional($item->employee)->name ?? '')),
+                !empty($item->begin) ? Carbon::parse($item->begin)->format('d/m/Y') : '-',
+                !empty($item->end) ? Carbon::parse($item->end)->format('d/m/Y') : '-',
+                $item->reason,
+            ])->toArray(),
+            'Aucun conge disponible.'
+        );
+
+        self::$obj->Output();
+        exit;
+    }
+
+    public static function getSuspensionsReport()
+    {
+        $suspensions = Suspension::with('employee')->orderByDesc('id')->get();
+
+        self::initSimpleReport('Rapport Suspensions');
+        self::renderTableSection(
+            'Suspensions',
+            ['#', 'Employe', 'Duree', 'Unite', 'Motif'],
+            [10, 64, 24, 22, 70],
+            $suspensions->map(fn ($item) => [
+                $item->id,
+                trim((optional($item->employee)->firstname ?? '') . ' ' . (optional($item->employee)->name ?? '')),
+                $item->duration,
+                $item->unit,
+                $item->reason,
+            ])->toArray(),
+            'Aucune suspension disponible.'
+        );
+
+        self::$obj->Output();
+        exit;
+    }
+
+    public static function getLicenciementsReport()
+    {
+        $licenciements = Licenciement::with('employee')->orderByDesc('id')->get();
+
+        self::initSimpleReport('Rapport Licenciements');
+        self::renderTableSection(
+            'Licenciements',
+            ['#', 'Employe', 'Motif', 'Date'],
+            [10, 70, 75, 35],
+            $licenciements->map(fn ($item) => [
+                $item->id,
+                trim((optional($item->employee)->firstname ?? '') . ' ' . (optional($item->employee)->name ?? '')),
+                $item->reason,
+                optional($item->created_at)->format('d/m/Y'),
+            ])->toArray(),
+            'Aucun licenciement disponible.'
+        );
+
+        self::$obj->Output();
+        exit;
+    }
+
+    public static function getMeetsReport()
+    {
+        $meets = Meet::orderByDesc('id')->get();
+
+        self::initSimpleReport('Rapport Reunions');
+        self::renderTableSection(
+            'Reunions',
+            ['#', 'Objet', 'Points', 'Date'],
+            [10, 70, 75, 35],
+            $meets->map(fn ($item) => [
+                $item->id,
+                $item->objet ?? $item->object,
+                $item->points,
+                optional($item->created_at)->format('d/m/Y'),
+            ])->toArray(),
+            'Aucune reunion disponible.'
+        );
+
+        self::$obj->Output();
+        exit;
+    }
+
     public static function getOperationsReport(Request $request)
     {
         $contractType = strtoupper((string) $request->query('contract_type', 'ALL'));
@@ -611,7 +799,7 @@ class PrintController extends Controller
                 $item->id,
                 $item->name,
                 optional($item->category)->name,
-                $item->qty . ' ' . $item->unit,
+                (int) $item->qty,
                 moneyFormat((float) $item->price),
             ])->toArray(),
             'Aucun equipement disponible.'
@@ -754,11 +942,19 @@ class PrintController extends Controller
         self::$obj->SetFont('Arial', 'I', 9);
         self::$obj->Cell(190, 6, utf8_decode('Date d\'edition: ' . $today->format('d/m/Y H:i')), 0, 1, 'C');
         self::$obj->Ln(2);
-        $contractType = $employee->contract ?? '-';
+        $contractTypeLabel = self::normalizeContractType($employee->contract);
+        $contractTypeRaw = trim((string) ($employee->contract ?? ''));
+        $contractType = $contractTypeRaw !== '' ? $contractTypeLabel . ' (' . $contractTypeRaw . ')' : $contractTypeLabel;
         $startDate = !empty($employee->contract_start_at) ? Carbon::parse($employee->contract_start_at)->format('d/m/Y') : '-';
         $endDate = !empty($employee->contract_end_at) ? Carbon::parse($employee->contract_end_at)->format('d/m/Y') : '-';
         $isExpired = !empty($employee->contract_end_at) && Carbon::parse($employee->contract_end_at)->lt(Carbon::today());
         $status = $isExpired ? 'Expire' : 'En cours';
+
+        self::$obj->SetFont('Arial', 'B', 10);
+        self::$obj->Cell(190, 7, utf8_decode('Type de contrat: ' . $contractTypeLabel), 0, 1, 'L');
+        self::$obj->Cell(190, 7, utf8_decode('Date de debut: ' . $startDate), 0, 1, 'L');
+        self::$obj->Cell(190, 7, utf8_decode('Date de fin: ' . $endDate), 0, 1, 'L');
+        self::$obj->Ln(1);
 
         self::$obj->SetFont('Arial', 'B', 10);
         self::$obj->Cell(190, 7, utf8_decode('Entre les soussignes :'), 0, 1, 'L');

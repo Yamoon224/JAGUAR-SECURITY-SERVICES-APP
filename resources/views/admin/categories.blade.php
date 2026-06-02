@@ -3,6 +3,7 @@
 <div class="page-breadcrumb d-none d-sm-flex align-items-center">
     <div class="ms-auto">
         <a class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#category-add"><i class="bx bx-user-plus"></i> @lang('lang.new_category')</a>
+        <a class="btn btn-sm btn-danger" href="{{ route('prints.categories.report') }}" target="_blank"><i class="bx bx-printer"></i> PDF @lang('lang.category', ['param'=>'s'])</a>
     </div>
 </div>
 <hr/>

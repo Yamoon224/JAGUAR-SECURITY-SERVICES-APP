@@ -59,6 +59,13 @@ Route::get('/prints/wifi', [PrintController::class, 'getQrcodeWifi'])->name('pri
 
 Route::prefix('admin')->middleware(['auth', 'verified', 'lang'])->group(function () {
     Route::get('/prints/operations/report', [PrintController::class, 'getOperationsReport'])->name('prints.operations.report');
+    Route::get('/prints/categories/report', [PrintController::class, 'getCategoriesReport'])->name('prints.categories.report');
+    Route::get('/prints/dotations/report', [PrintController::class, 'getDotationsReport'])->name('prints.dotations.report');
+    Route::get('/prints/equipments/report', [PrintController::class, 'getEquipmentsReport'])->name('prints.equipments.report');
+    Route::get('/prints/leaves/report', [PrintController::class, 'getLeavesReport'])->name('prints.leaves.report');
+    Route::get('/prints/suspensions/report', [PrintController::class, 'getSuspensionsReport'])->name('prints.suspensions.report');
+    Route::get('/prints/licenciements/report', [PrintController::class, 'getLicenciementsReport'])->name('prints.licenciements.report');
+    Route::get('/prints/meets/report', [PrintController::class, 'getMeetsReport'])->name('prints.meets.report');
     Route::get('/prints/contracts/{id}', [PrintController::class, 'getEmployeeContract'])->name('prints.contract.employee');
 
     Route::get('/dashboard', [Controller::class, 'admin'])->name('dashboard')->middleware('admin');
