@@ -1,67 +1,88 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# JAGUAR SECURITY SERVICES APP
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Application web Laravel dédiée à la gestion des activités d’une société de sécurité et de services associés. Le projet regroupe un site public multilingue et un espace d’administration pour piloter les ressources humaines, les clients, la facturation, les paiements, la logistique et les recrutements.
 
-## About Laravel
+## Aperçu
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Le projet s’appuie sur Laravel 10, Livewire, Tailwind CSS et Sanctum. Il expose plusieurs parcours métiers visibles dans les routes du projet :
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- site public avec pages d’accueil, à propos, services, équipe, boutiques et contact
+- dépôt de candidatures et module de recrutement
+- espace admin avec tableaux de bord et rôles métiers
+- gestion des employés, clients, factures, paiements et dotations
+- gestion de la logistique, des équipements, des affectations et des absences
+- génération de documents et impressions PDF
+- QR codes pour documents et usages internes
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Fonctionnalités principales
 
-## Learning Laravel
+- authentification et gestion des accès
+- gestion des employés et des candidats
+- gestion commerciale avec clients, factures et paiements
+- suivi RH avec affectations, suspensions, licenciements et congés
+- gestion de matériel, de logistique et de dotations
+- vues publiques en français avec prise en charge de la langue
+- génération de rapports et documents imprimables
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Stack technique
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- PHP 8.1+
+- Laravel 10
+- Livewire 3
+- Tailwind CSS
+- Vite
+- Laravel Sanctum
+- FPDF / QR Code
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Installation
 
-## Laravel Sponsors
+```bash
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+Configure ensuite la base de données dans le fichier `.env`, puis lance les migrations :
 
-### Premium Partners
+```bash
+php artisan migrate
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+## Lancement en local
 
-## Contributing
+Dans deux terminaux séparés :
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+php artisan serve
+```
 
-## Code of Conduct
+```bash
+npm run dev
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Compilation front-end
 
-## Security Vulnerabilities
+```bash
+npm run build
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Structure fonctionnelle
 
-## License
+- `routes/web.php` : pages publiques et dépôt de candidature
+- `routes/admin.php` : espace d’administration et modules métiers
+- `routes/recrutement.php` : parcours de recrutement
+- `app/Models/` : modèles métier de l’application
+- `resources/views/` : vues Blade
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# JAGUAR-SECURITY-SERVICES-APP
+## Description GitHub
+
+Application Laravel de gestion pour une société de sécurité : clients, employés, recrutement, facturation, paiements, logistique, dotations et documents PDF.
+
+## Topics GitHub
+
+`laravel`, `php`, `security-services`, `hr-management`, `recruitment`, `billing`, `payments`, `logistics`, `pdf-generation`, `qr-code`, `livewire`, `tailwind-css`
+
+## Licence
+
+Ce projet est distribué sous licence MIT.
