@@ -12,18 +12,21 @@
                     <div class="row g-3">
                         <div class="col-12 text-center text-uppercase"><h6>@lang('lang.employee', ['param'=>''])</h6></div>
                         <div class="col-md-6">
+                            <label class="form-label mb-1">@lang('lang.firstname')</label>
                             <div class="position-relative input-icon">
                                 <input type="text" class="form-control" name="firstname" placeholder="@lang('lang.firstname') *" value="{{ $employee->firstname }}" required>
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-user'></i></span>
                             </div>
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label mb-1">@lang('lang.name')</label>
                             <div class="position-relative input-icon">
                                 <input type="text" class="form-control" name="name" placeholder="@lang('lang.name') *" value="{{ $employee->name }}" required>
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-user'></i></span>
                             </div>
                         </div>
                         <div class="col-md-12">
+                            <label class="form-label mb-1">@lang('lang.gender')</label>
                             <select class="form-select" name="gender" required>
                                 <option>@lang('lang.gender') *</option>
                                 <option {{ $employee->gender == 'Homme' ? 'selected' : '' }}>Homme</option>
@@ -31,24 +34,28 @@
                             </select>
                         </div>
                         <div class="col-md-12">
+                            <label class="form-label mb-1">@lang('lang.phone_id')</label>
                             <div class="position-relative input-icon">
                                 <input type="tel" class="form-control" name="phone" placeholder="@lang('lang.phone_id') *" value="{{ $employee->phone }}" required>
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-phone'></i></span>
                             </div>
                         </div>
                         <div class="col-md-12">
+                            <label class="form-label mb-1">@lang('lang.email')</label>
                             <div class="position-relative input-icon">
                                 <input type="email" class="form-control" name="email" placeholder="@lang('lang.email')" value="{{ $employee->email }}">
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-envelope'></i></span>
                             </div>
                         </div>
                         <div class="col-md-12">
+                            <label class="form-label mb-1">@lang('lang.position')</label>
                             <div class="position-relative input-icon">
                                 <input type="text" class="form-control" name="position" placeholder="@lang('lang.position') *" value="{{ $employee->position }}" required>
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-user'></i></span>
                             </div>
                         </div>
                         <div class="col-md-12">
+                            <label class="form-label mb-1">@lang('lang.familystatus')</label>
                             <select class="form-select" name="familystatus" required>
                                 <option>@lang('lang.familystatus') *</option>
                                 <option {{ $employee->familystatus == 'Célibataire' ? 'selected' : '' }}>Célibataire</option>
@@ -57,6 +64,7 @@
                             </select>
                         </div>
                         <div class="col-md-12">
+                            <label class="form-label mb-1">@lang('lang.studygrade')</label>
                             <select class="form-select" name="studygrade" required>
                                 <option>@lang('lang.studygrade') *</option>
                                 <option {{ $employee->studygrade == 'C.E.P' ? 'selected' : '' }}>C.E.P</option>
@@ -68,6 +76,7 @@
                             </select>
                         </div>
                         <div class="col-md-12">
+                            <label class="form-label mb-1">@lang('lang.contract_type')</label>
                             <select class="form-select" name="contract" required>
                                 <option>@lang('lang.contract_type') *</option>
                                 <option {{ $employee->contract == 'CDD' ? 'selected' : '' }}>CDD</option>
@@ -94,6 +103,7 @@
                             >
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label mb-1">@lang('lang.salary')</label>
                             <div class="position-relative input-icon">
                                 <input type="number" class="form-control" name="salary" placeholder="@lang('lang.salary') *" min="600000" value="{{ $employee->salary }}" required>
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
@@ -126,6 +136,7 @@
                         @endif
                         
                         <div class="col-md-6">
+                            <label class="form-label mb-1">@lang('lang.prime')</label>
                             <div class="position-relative input-icon">
                                 <input type="number" class="form-control" name="prime" placeholder="@lang('lang.prime')" min="0" value="{{ $employee->prime }}">
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
@@ -133,12 +144,14 @@
                         </div>
                         <div class="col-12 text-center text-uppercase"><h6>@lang('lang.emergency')</h6></div>
                         <div class="col-md-6">
+                            <label class="form-label mb-1">@lang('lang.firstname') & @lang('lang.name')</label>
                             <div class="position-relative input-icon">
                                 <input type="text" class="form-control" name="emergency_name" placeholder="@lang('lang.firstname') & @lang('lang.name') *" value="{{ $employee->emergency_name }}" required>
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-user'></i></span>
                             </div>
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label mb-1">@lang('lang.phone_id')</label>
                             <div class="position-relative input-icon">
                                 <input type="tel" class="form-control" name="emergency_phone" placeholder="@lang('lang.phone_id') *" value="{{ $employee->emergency_phone }}">
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-phone'></i></span>

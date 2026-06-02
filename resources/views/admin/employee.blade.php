@@ -75,18 +75,21 @@
                             <div class="row g-2">
                                 <div class="col-12 text-center text-uppercase"><h6>@lang('lang.employee', ['param'=>''])</h6></div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.firstname')</label>
                                     <div class="position-relative input-icon">
                                         <input type="text" class="form-control" name="firstname" placeholder="@lang('lang.firstname') *" value="{{ $employee->firstname }}" required>
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-user'></i></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.name')</label>
                                     <div class="position-relative input-icon">
                                         <input type="text" class="form-control" name="name" placeholder="@lang('lang.name') *" value="{{ $employee->name }}" required>
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-user'></i></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.gender')</label>
                                     <select class="form-select" name="gender" required>
                                         <option value=''>@lang('lang.gender') *</option>
                                         <option {{ $employee->gender == 'Homme' ? 'selected' : '' }}>Homme</option>
@@ -94,24 +97,28 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.phone_id')</label>
                                     <div class="position-relative input-icon">
                                         <input type="tel" class="form-control" name="phone" placeholder="@lang('lang.phone_id') *" value="{{ $employee->phone }}" required>
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-phone'></i></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.email')</label>
                                     <div class="position-relative input-icon">
                                         <input type="email" class="form-control" name="email" placeholder="@lang('lang.email')" value="{{ $employee->email }}">
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-envelope'></i></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.position')</label>
                                     <div class="position-relative input-icon">
                                         <input type="text" class="form-control" name="position" placeholder="@lang('lang.position') *" value="{{ $employee->position }}" required>
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-user'></i></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.familystatus')</label>
                                     <select class="form-select" name="familystatus" required>
                                         <option value=''>@lang('lang.familystatus') *</option>
                                         <option {{ $employee->familystatus == 'Célibataire' ? 'selected' : '' }}>Célibataire</option>
@@ -120,6 +127,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.studygrade')</label>
                                     <select class="form-select" name="studygrade" required>
                                         <option value=''>@lang('lang.studygrade') *</option>
                                         <option {{ $employee->studygrade == 'C.E.P' ? 'selected' : '' }}>C.E.P</option>
@@ -131,6 +139,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.contract_type')</label>
                                     <select class="form-select" name="contract" required>
                                         <option value=''>@lang('lang.contract_type') *</option>
                                         <option {{ $employee->contract == 'CDD' ? 'selected' : '' }}>CDD</option>
@@ -157,18 +166,21 @@
                                     >
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.matricule')</label>
                                     <div class="position-relative input-icon">
                                         <input type="text" class="form-control" name="matricule" placeholder="@lang('lang.matricule') *" value="{{ $employee->matricule }}" required>
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-id-card'></i></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.salary')</label>
                                     <div class="position-relative input-icon">
                                         <input type="number" class="form-control" name="salary" placeholder="@lang('lang.salary') *" min="600000" value="{{ $employee->salary }}" required>
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.prime')</label>
                                     <div class="position-relative input-icon">
                                         <input type="number" class="form-control" name="prime" placeholder="@lang('lang.prime')" min="0" value="{{ $employee->prime }}">
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
@@ -200,12 +212,14 @@
                                 @endif
                                 <div class="col-12 text-center text-uppercase"><h6>@lang('lang.emergency')</h6></div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.firstname') & @lang('lang.name')</label>
                                     <div class="position-relative input-icon">
                                         <input type="text" class="form-control" name="emergency_name" placeholder="@lang('lang.firstname') & @lang('lang.name') *" value="{{ $employee->emergency_name }}" required>
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-user'></i></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.phone_id')</label>
                                     <div class="position-relative input-icon">
                                         <input type="tel" class="form-control" name="emergency_phone" placeholder="@lang('lang.phone_id') *" value="{{ $employee->emergency_phone }}">
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-phone'></i></span>
@@ -213,12 +227,14 @@
                                 </div>
                                 <div class="col-12 text-center text-uppercase"><h6>@lang('lang.bank')</h6></div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.rib')</label>
                                     <div class="position-relative input-icon">
                                         <input type="text" class="form-control" name="rib" placeholder="@lang('lang.rib')" value="{{ $employee->rib }}">
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-credit-card'></i></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.bank_name')</label>
                                     <div class="position-relative input-icon">
                                         <input type="text" class="form-control" name="bank" placeholder="@lang('lang.bank_name')" value="{{ $employee->bank }}">
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-building'></i></span>
@@ -226,12 +242,14 @@
                                 </div>
                                 <div class="col-12 text-center text-uppercase"><h6>@lang('lang.tax')</h6></div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.cnss')</label>
                                     <div class="position-relative input-icon">
                                         <input type="number" class="form-control" name="cnss" placeholder="@lang('lang.cnss')" value="{{ $employee->cnss }}">
                                         <span class="position-absolute top-50 translate-middle-y">%</span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.rts')</label>
                                     <div class="position-relative input-icon">
                                         <input type="number" class="form-control" name="rts" placeholder="@lang('lang.rts')" value="{{ $employee->rts }}">
                                         <span class="position-absolute top-50 translate-middle-y">%</span>
@@ -239,12 +257,14 @@
                                 </div>
                                 <div class="col-12 text-center text-uppercase"><h6>@lang('lang.acompte')</h6></div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.acompte')</label>
                                     <div class="position-relative input-icon">
                                         <input type="number" class="form-control" name="acompte" placeholder="@lang('lang.acompte')" value="{{ $employee->acompte }}">
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.sanction')</label>
                                     <div class="position-relative input-icon">
                                         <input type="text" class="form-control" name="sanction" placeholder="@lang('lang.sanction')" value="{{ $employee->sanction }}">
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
