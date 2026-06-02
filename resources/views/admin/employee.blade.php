@@ -139,6 +139,24 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.start_date')</label>
+                                    <input
+                                        type="date"
+                                        class="form-control"
+                                        name="contract_start_at"
+                                        value="{{ !empty($employee->contract_start_at) ? \Carbon\Carbon::parse($employee->contract_start_at)->format('Y-m-d') : '' }}"
+                                    >
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.end_date')</label>
+                                    <input
+                                        type="date"
+                                        class="form-control"
+                                        name="contract_end_at"
+                                        value="{{ !empty($employee->contract_end_at) ? \Carbon\Carbon::parse($employee->contract_end_at)->format('Y-m-d') : '' }}"
+                                    >
+                                </div>
+                                <div class="col-md-6">
                                     <div class="position-relative input-icon">
                                         <input type="text" class="form-control" name="matricule" placeholder="@lang('lang.matricule') *" value="{{ $employee->matricule }}" required>
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-id-card'></i></span>
