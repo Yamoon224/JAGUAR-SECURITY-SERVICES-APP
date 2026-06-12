@@ -1004,10 +1004,11 @@ class PrintController extends Controller
         self::$obj->Cell(95, 6, utf8_decode('Moussa TOURE'), 0, 1, 'R');
 
         self::$obj->Ln(10);
-        self::$obj->Image('images/signature_pdg.png', 14, self::$obj->GetY() + 1, 45, 0);
+        self::$obj->SetX(145);
+        self::$obj->Image('images/signature_pdg.png', 145, self::$obj->GetY() + 1, 45, 0);
         self::$obj->Ln(18);
         self::$obj->SetFont('Arial', '', 9);
-        self::$obj->Cell(95, 6, utf8_decode('Président Directeur Général (PDG)'), 0, 0, 'L');
+        self::$obj->Cell(190, 6, utf8_decode('Président Directeur Général (PDG)'), 0, 1, 'R');
 
         self::$obj->Output();
         exit;
