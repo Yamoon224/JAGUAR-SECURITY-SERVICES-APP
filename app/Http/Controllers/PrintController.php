@@ -202,6 +202,63 @@ class PrintController extends Controller
     //     exit;
     // }
     
+    public static function salaryReceipt(int $id, int $month = NULL)
+    {
+        $month = is_null($month) ? (int) date('m') : (int) $month;
+        $employee = Employee::findOrFail($id);
+
+        $baseSalary = (float) $employee->salary;
+        $transport = (float) ($employee->transport_indemnity ?? 0);
+        $meal = (float) ($employee->meal_allowance ?? 0);
+        $housing = (float) ($employee->housing_indemnity ?? 0);
+        $punctuality = (float) ($employee->punctuality_allowance ?? 0);
+        $responsibility = (float) ($employee->responsibility_allowance ?? 0);
+        $gross = $baseSalary + $transport + $meal + $housing + $punctuality + $responsibility;
+        $tax = $gross * ((float) ($employee->cnss ?? 0) + (float) ($employee->rts ?? 0)) * 0.01;
+        $net = $gross - $tax - ((float) ($employee->acompte ?? 0) + (float) ($employee->sanction ?? 0));
+
+        self::$obj = new PDF('P', 'mm', 'A4');
+        self::$obj->SetTitle(utf8_decode('BULLETIN DE SALAIRE - ' . $employee->matricule . ' - ' . __('lang.' . getMonthName($month))));
+        self::$obj->AddPage();
+        self::$obj->SetFont('Arial', 'B', 14);
+        self::$obj->Cell(190, 9, utf8_decode('BULLETIN DE SALAIRE'), 0, 1, 'C');
+        self::$obj->SetFont('Arial', '', 10);
+        self::$obj->Cell(190, 6, utf8_decode('Mois : ' . __('lang.' . getMonthName($month)) . ' / Matricule : ' . $employee->matricule), 0, 1, 'L');
+        self::$obj->Ln(2);
+
+        $items = [
+            ['label' => 'Salaire de base', 'amount' => $baseSalary],
+            ['label' => 'Indemnité de transport', 'amount' => $transport],
+            ['label' => 'Prime de repas', 'amount' => $meal],
+            ['label' => 'Indemnité de logement', 'amount' => $housing],
+            ['label' => 'Prime de ponctualité et d’assiduité', 'amount' => $punctuality],
+            ['label' => 'Prime de responsabilité', 'amount' => $responsibility],
+        ];
+
+        self::$obj->SetFont('Arial', 'B', 10);
+        self::$obj->Cell(110, 7, utf8_decode('Éléments'), 1, 0, 'L');
+        self::$obj->Cell(80, 7, utf8_decode('Montant'), 1, 1, 'C');
+        self::$obj->SetFont('Arial', '', 10);
+        foreach ($items as $item) {
+            self::$obj->Cell(110, 7, utf8_decode($item['label']), 1, 0, 'L');
+            self::$obj->Cell(80, 7, utf8_decode(moneyFormat($item['amount'])), 1, 1, 'C');
+        }
+        self::$obj->SetFont('Arial', 'B', 10);
+        self::$obj->Cell(110, 7, utf8_decode('Salaire brut total'), 1, 0, 'L');
+        self::$obj->Cell(80, 7, utf8_decode(moneyFormat($gross)), 1, 1, 'C');
+        self::$obj->Cell(110, 7, utf8_decode('Retenues (CNSS/RTS)'), 1, 0, 'L');
+        self::$obj->Cell(80, 7, utf8_decode(moneyFormat($tax)), 1, 1, 'C');
+        self::$obj->Cell(110, 7, utf8_decode('Avances / sanctions'), 1, 0, 'L');
+        self::$obj->Cell(80, 7, utf8_decode(moneyFormat((float) ($employee->acompte ?? 0) + (float) ($employee->sanction ?? 0))), 1, 1, 'C');
+        self::$obj->Cell(110, 7, utf8_decode('Net à payer'), 1, 0, 'L');
+        self::$obj->Cell(80, 7, utf8_decode(moneyFormat($net)), 1, 1, 'C');
+
+        self::$obj->Ln(6);
+        self::$obj->MultiCell(190, 6, utf8_decode('Sauf erreur ou omission, le montant de ce bulletin de salaire s’élève à ' . moneyFormat($net) . ' pour le mois de ' . __('lang.' . getMonthName($month)) . '.'));
+        self::$obj->Output();
+        exit;
+    }
+
     public static function paymentReceipt(int $id, int $month = NULL)
     {
         $month = is_null($month) ? date('m') : $month;
@@ -923,6 +980,28 @@ class PrintController extends Controller
             'Aucun contrat CDI.'
         );
 
+        self::$obj->Output();
+        exit;
+    }
+
+    public static function workAttestation(int $id)
+    {
+        $employee = Employee::where('deleted', 0)->findOrFail($id);
+        $today = Carbon::now();
+
+        self::$obj = new PDF('P', 'mm', 'A4');
+        self::$obj->SetTitle(utf8_decode('Attestation de travail - ' . $employee->matricule));
+        self::$obj->AddPage();
+        self::$obj->SetFont('Arial', 'B', 14);
+        self::$obj->Cell(190, 9, utf8_decode('ATTESTATION DE TRAVAIL'), 0, 1, 'C');
+        self::$obj->SetFont('Arial', '', 11);
+        self::$obj->Ln(4);
+        self::$obj->MultiCell(190, 7, utf8_decode('Je soussigne, Monsieur TOURE Moussa, PDG de JAGUAR SECURITY SERVICES SARL, certifie que M./Mme ' . $employee->firstname . ' ' . $employee->name . ', matricule ' . $employee->matricule . ', a occupe le poste de ' . $employee->position . ' au sein de notre entreprise depuis le ' . (!empty($employee->contract_start_at) ? Carbon::parse($employee->contract_start_at)->format('d/m/Y') : 'date non renseignée') . '.'));
+        self::$obj->Ln(4);
+        self::$obj->MultiCell(190, 7, utf8_decode('La presente attestation est delivree a titre informatif pour servir et valoir ce que de droit.'));
+        self::$obj->Ln(12);
+        self::$obj->Cell(95, 6, utf8_decode('Fait a Conakry, le ' . $today->format('d/m/Y')), 0, 0, 'L');
+        self::$obj->Cell(95, 6, utf8_decode('Le Gerant'), 0, 1, 'R');
         self::$obj->Output();
         exit;
     }

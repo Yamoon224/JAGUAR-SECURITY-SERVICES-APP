@@ -146,7 +146,42 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label mb-1">@lang('lang.prime')</label>
+                                    <label class="form-label mb-1">Indemnité de transport</label>
+                                    <div class="position-relative input-icon">
+                                        <input type="number" class="form-control" name="transport_indemnity" min="0" value="{{ $employee->transport_indemnity ?? 0 }}">
+                                        <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label mb-1">Prime de repas</label>
+                                    <div class="position-relative input-icon">
+                                        <input type="number" class="form-control" name="meal_allowance" min="0" value="{{ $employee->meal_allowance ?? 0 }}">
+                                        <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label mb-1">Indemnité de logement</label>
+                                    <div class="position-relative input-icon">
+                                        <input type="number" class="form-control" name="housing_indemnity" min="0" value="{{ $employee->housing_indemnity ?? 0 }}">
+                                        <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label mb-1">Prime de ponctualité et d’assiduité</label>
+                                    <div class="position-relative input-icon">
+                                        <input type="number" class="form-control" name="punctuality_allowance" min="0" value="{{ $employee->punctuality_allowance ?? 0 }}">
+                                        <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label mb-1">Prime de responsabilité</label>
+                                    <div class="position-relative input-icon">
+                                        <input type="number" class="form-control" name="responsibility_allowance" min="0" value="{{ $employee->responsibility_allowance ?? 0 }}">
+                                        <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label mb-1"></label>@lang('lang.prime')</label>
                                     <div class="position-relative input-icon">
                                         <input type="number" class="form-control" name="prime" placeholder="@lang('lang.prime')" min="0" value="{{ $employee->prime }}">
                                         <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
@@ -283,6 +318,14 @@
                                     </div>
                                 </a>
                             </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" data-bs-toggle="pill" href="#salaryTab" role="tab" aria-selected="false">
+                                    <div class="d-flex align-items-center">
+                                        <div class="tab-icon"><i class='bx bx-file font-18 me-1'></i></div>
+                                        <div class="tab-title">Bulletin de salaire</div>
+                                    </div>
+                                </a>
+                            </li>
                         </ul>
                         <div class="tab-content" id="pills-tabContent">
                             <div class="tab-pane fade show active" id="affectationTab" role="tabpanel">
@@ -415,6 +458,14 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="salaryTab" role="tabpanel">
+                                <h6 class="mb-0 text-uppercase">Bulletin de salaire & Attestation</h6>
+                                <hr/>
+                                <div class="d-grid gap-2 col-lg-6">
+                                    <a href="{{ route('prints.salary.receipt', $employee->id) }}" target="_blank" class="btn btn-dark"><i class='bx bx-file'></i> Générer le bulletin de salaire</a>
+                                    <a href="{{ route('prints.work.attestation', $employee->id) }}" target="_blank" class="btn btn-outline-dark"><i class='bx bx-certification'></i> Générer l’attestation de travail</a>
                                 </div>
                             </div>
                         </div>

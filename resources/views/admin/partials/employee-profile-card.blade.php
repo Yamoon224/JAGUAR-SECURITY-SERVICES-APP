@@ -33,9 +33,18 @@
         </ul>
 
         @if(($showPrintButton ?? false) === true)
-        <div class="d-grid mt-3">
+        <div class="d-grid mt-3 gap-2">
             <a href="{{ route('employees.profile-card.print', $employee->id) }}" target="_blank" class="btn btn-dark">
                 <i class="bx bx-printer"></i> Exporter ce card en PDF
+            </a>
+            <a href="{{ route('prints.salary.receipt', $employee->id) }}" target="_blank" class="btn btn-outline-dark">
+                <i class="bx bx-file"></i> Bulletin de salaire
+            </a>
+            <a href="{{ route('prints.contract.employee', $employee->id) }}" target="_blank" class="btn btn-outline-secondary">
+                <i class="bx bx-file-blank"></i> Contrat de travail
+            </a>
+            <a href="{{ route('prints.work.attestation', $employee->id) }}" target="_blank" class="btn btn-outline-success">
+                <i class="bx bx-certification"></i> Attestation de travail
             </a>
         </div>
         @endif

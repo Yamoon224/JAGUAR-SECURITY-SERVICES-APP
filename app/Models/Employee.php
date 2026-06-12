@@ -45,6 +45,11 @@ class Employee extends BaseModel
 	protected $casts = [
 		'salary' => 'float',
 		'prime' => 'float',
+		'transport_indemnity' => 'float',
+		'meal_allowance' => 'float',
+		'housing_indemnity' => 'float',
+		'punctuality_allowance' => 'float',
+		'responsibility_allowance' => 'float',
 		'contract_start_at' => 'date',
 		'contract_end_at' => 'date',
 		'isleaved' => 'int',

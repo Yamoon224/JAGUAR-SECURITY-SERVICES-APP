@@ -33,6 +33,11 @@ class UpdateEmployeeRequest extends FormRequest
             'emergency_name' => ['required', 'string', 'max:100'],
             'emergency_phone' => ['required', 'string', 'max:20'],
             'salary' => ['required'],
+            'transport_indemnity' => ['nullable', 'numeric'],
+            'meal_allowance' => ['nullable', 'numeric'],
+            'housing_indemnity' => ['nullable', 'numeric'],
+            'punctuality_allowance' => ['nullable', 'numeric'],
+            'responsibility_allowance' => ['nullable', 'numeric'],
             'phone' => ['required', 'string', 'max:20'],
         ];
     }
