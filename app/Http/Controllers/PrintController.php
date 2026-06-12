@@ -1001,7 +1001,14 @@ class PrintController extends Controller
         self::$obj->MultiCell(190, 7, utf8_decode('La presente attestation est delivree a titre informatif pour servir et valoir ce que de droit.'));
         self::$obj->Ln(12);
         self::$obj->Cell(95, 6, utf8_decode('Fait a Conakry, le ' . $today->format('d/m/Y')), 0, 0, 'L');
-        self::$obj->Cell(95, 6, utf8_decode('Le Gerant'), 0, 1, 'R');
+        self::$obj->Cell(95, 6, utf8_decode('Moussa TOURE'), 0, 1, 'R');
+
+        self::$obj->Ln(10);
+        self::$obj->Image('images/signature_pdg.png', 14, self::$obj->GetY() + 1, 45, 0);
+        self::$obj->Ln(18);
+        self::$obj->SetFont('Arial', '', 9);
+        self::$obj->Cell(95, 6, utf8_decode('Président Directeur Général (PDG)'), 0, 0, 'L');
+
         self::$obj->Output();
         exit;
     }
@@ -1096,7 +1103,7 @@ class PrintController extends Controller
         self::$obj->Ln(14);
 
         self::$obj->SetFont('Arial', 'B', 10);
-        self::$obj->Cell(95, 6, utf8_decode('L\'Employeur'), 0, 0, 'L');
+        self::$obj->Cell(95, 6, utf8_decode('Moussa TOURE'), 0, 0, 'L');
         self::$obj->Cell(95, 6, utf8_decode('L\'Employe(e)'), 0, 1, 'R');
 
         // Signature de l'employeur
@@ -1104,7 +1111,7 @@ class PrintController extends Controller
 
         self::$obj->Ln(16);
         self::$obj->SetFont('Arial', '', 9);
-        self::$obj->Cell(95, 6, utf8_decode('Nom & Signature'), 0, 0, 'L');
+        self::$obj->Cell(95, 6, utf8_decode('Président Directeur Général (PDG)'), 0, 0, 'L');
         self::$obj->Cell(95, 6, utf8_decode('Nom & Signature'), 0, 1, 'R');
 
         self::$obj->Output();
