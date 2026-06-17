@@ -231,7 +231,7 @@ class PrintController extends Controller
             ['label' => 'Indemnité de transport', 'amount' => $transport],
             ['label' => 'Prime de repas', 'amount' => $meal],
             ['label' => 'Indemnité de logement', 'amount' => $housing],
-            ['label' => 'Prime de ponctualité et d’assiduité', 'amount' => $punctuality],
+            ['label' => "Prime de ponctualité et d'assiduité", 'amount' => $punctuality],
             ['label' => 'Prime de responsabilité', 'amount' => $responsibility],
         ];
 
@@ -254,7 +254,7 @@ class PrintController extends Controller
         self::$obj->Cell(80, 7, utf8_decode(moneyFormat($net)), 1, 1, 'C');
 
         self::$obj->Ln(6);
-        self::$obj->MultiCell(190, 6, utf8_decode('Sauf erreur ou omission, le montant de ce bulletin de salaire s’élève à ' . moneyFormat($net) . ' pour le mois de ' . __('lang.' . getMonthName($month)) . '.'));
+        self::$obj->MultiCell(190, 6, utf8_decode('Sauf erreur ou omission, le montant de ce bulletin de salaire s\'élève à ' . moneyFormat($net) . ' pour le mois de ' . __('lang.' . getMonthName($month)) . '.'));
         self::$obj->Output();
         exit;
     }
@@ -1105,7 +1105,7 @@ class PrintController extends Controller
 
         self::$obj->SetFont('Arial', 'B', 10);
         self::$obj->Cell(95, 6, utf8_decode('Moussa TOURE'), 0, 0, 'L');
-        self::$obj->Cell(95, 6, utf8_decode('L\'Employe(e)'), 0, 1, 'R');
+        self::$obj->Cell(95, 6, utf8_decode("L'Employe(e)"), 0, 1, 'R');
 
         // Signature de l'employeur
         self::$obj->Image('images/signature_pdg.png', 14, self::$obj->GetY() + 1, 45, 0);
@@ -1113,7 +1113,7 @@ class PrintController extends Controller
         self::$obj->Ln(16);
         self::$obj->SetFont('Arial', '', 9);
         self::$obj->Cell(95, 6, utf8_decode('Président Directeur Général (PDG)'), 0, 0, 'L');
-        self::$obj->Cell(95, 6, utf8_decode('Nom & Signature'), 0, 1, 'R');
+        self::$obj->Cell(95, 6, utf8_decode($employee->firstname . ' ' . $employee->name), 0, 1, 'R');
 
         self::$obj->Output();
         exit;
