@@ -366,10 +366,10 @@ class PrintController extends Controller
         // Double border frame
         self::$obj->SetDrawColor(150, 0, 0);
         self::$obj->SetLineWidth(1.0);
-        self::$obj->Rect(5, 5, 200, 287);
+        self::$obj->Rect(5, 19, 200, 254);
         self::$obj->SetDrawColor(50, 50, 50);
         self::$obj->SetLineWidth(0.3);
-        self::$obj->Rect(7.5, 7.5, 195, 282);
+        self::$obj->Rect(7.5, 21, 195, 250);
         self::$obj->SetDrawColor(0, 0, 0);
         self::$obj->SetLineWidth(0.2);
 
@@ -1177,10 +1177,10 @@ class PrintController extends Controller
         // === DOUBLE BORDER FRAME ===
         self::$obj->SetDrawColor(150, 0, 0);
         self::$obj->SetLineWidth(1.2);
-        self::$obj->Rect(5, 5, 200, 287);
+        self::$obj->Rect(5, 19, 200, 254);
         self::$obj->SetDrawColor(50, 50, 50);
         self::$obj->SetLineWidth(0.4);
-        self::$obj->Rect(7.5, 7.5, 195, 282);
+        self::$obj->Rect(7.5, 21, 195, 250);
         self::$obj->SetDrawColor(0, 0, 0);
         self::$obj->SetLineWidth(0.2);
 
@@ -1271,10 +1271,10 @@ class PrintController extends Controller
         // Double border frame
         self::$obj->SetDrawColor(150, 0, 0);
         self::$obj->SetLineWidth(1.0);
-        self::$obj->Rect(5, 5, 200, 287);
+        self::$obj->Rect(5, 19, 200, 254);
         self::$obj->SetDrawColor(50, 50, 50);
         self::$obj->SetLineWidth(0.3);
-        self::$obj->Rect(7.5, 7.5, 195, 282);
+        self::$obj->Rect(7.5, 21, 195, 250);
         self::$obj->SetDrawColor(0, 0, 0);
         self::$obj->SetLineWidth(0.2);
 

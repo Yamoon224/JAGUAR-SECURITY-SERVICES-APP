@@ -50,6 +50,11 @@
                                 </div>
                                 <h6 class="mb-0 text-dark">{{ $item->name }}</h6>
                                 <small><i class="bx bx-group"></i> {{ $item->affectations_count }} @lang('lang.employee', ['param'=>'s']) | <i class="bx bx-phone"></i> {{ $item->phone }}</small>
+                                <div class="mt-2">
+                                    <a href="{{ route('prints.bill.annual', [$item->id, date('Y')]) }}" class="btn btn-xs btn-warning" title="Facture annuelle {{ date('Y') }}">
+                                        <i class="bx bx-calendar-check me-1"></i> Facture Annuelle {{ date('Y') }}
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -92,7 +97,9 @@
                                             <i class="bx bx-edit-alt"></i>
                                         </a>
                                         <x-customer-edit :customer="$item" />
-            
+                                        <a href="{{ route('prints.bill.annual', [$item->id, date('Y')]) }}" class="btn btn-xs btn-warning" title="Facture annuelle {{ date('Y') }}" style="display: inline-block">
+                                            <i class="bx bx-calendar-check"></i>
+                                        </a>
                                         <form action="{{ route('customers.destroy', $item->id) }}" method="POST" style="display: inline-block">
                                             @csrf
                                             @method('DELETE')
