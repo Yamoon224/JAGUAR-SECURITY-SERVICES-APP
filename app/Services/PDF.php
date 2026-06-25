@@ -8,6 +8,7 @@ use Imagick;
 class PDF extends Fpdf
 {
     private static ?string $watermarkTilePath = null;
+    public bool $borderOnEachPage = false;
 
     private function buildWatermarkTile(): ?string
     {
@@ -89,10 +90,25 @@ class PDF extends Fpdf
         }
     }
 
+    public function drawPageBorder(): void
+    {
+        $this->SetDrawColor(150, 0, 0);
+        $this->SetLineWidth(1.0);
+        $this->Rect(5, 19, 200, 254);
+        $this->SetDrawColor(50, 50, 50);
+        $this->SetLineWidth(0.3);
+        $this->Rect(7.5, 21, 195, 250);
+        $this->SetDrawColor(0, 0, 0);
+        $this->SetLineWidth(0.2);
+    }
+
     // En-tête
     function Header()
     {
         $this->drawWatermark();
+        if ($this->borderOnEachPage) {
+            $this->drawPageBorder();
+        }
 
         // Logo
         $this->Image('images/logo-icon.jpg', 10, 4, 12);

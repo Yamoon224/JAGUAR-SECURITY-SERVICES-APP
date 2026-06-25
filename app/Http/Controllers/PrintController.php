@@ -1266,17 +1266,8 @@ class PrintController extends Controller
 
         self::$obj = new PDF('P', 'mm', 'A4');
         self::$obj->SetTitle(utf8_decode('Contrat de Travail - ' . $employee->matricule));
+        self::$obj->borderOnEachPage = true;
         self::$obj->AddPage();
-
-        // Double border frame
-        self::$obj->SetDrawColor(150, 0, 0);
-        self::$obj->SetLineWidth(1.0);
-        self::$obj->Rect(5, 19, 200, 254);
-        self::$obj->SetDrawColor(50, 50, 50);
-        self::$obj->SetLineWidth(0.3);
-        self::$obj->Rect(7.5, 21, 195, 250);
-        self::$obj->SetDrawColor(0, 0, 0);
-        self::$obj->SetLineWidth(0.2);
 
         // Company statutory info
         self::$obj->SetFont('Arial', 'I', 7);
@@ -1313,70 +1304,70 @@ class PrintController extends Controller
         $status = $isExpired ? 'Expire' : 'En cours';
 
         self::$obj->SetFont('Arial', 'B', 10);
-        self::$obj->Cell(190, 7, utf8_decode('Type de contrat: ' . $contractTypeLabel), 0, 1, 'L');
-        self::$obj->Cell(190, 7, utf8_decode('Date de debut: ' . $startDate), 0, 1, 'L');
-        self::$obj->Cell(190, 7, utf8_decode('Date de fin: ' . $endDate), 0, 1, 'L');
+        self::$obj->Cell(190, 6, utf8_decode('Type de contrat: ' . $contractTypeLabel), 0, 1, 'L');
+        self::$obj->Cell(190, 6, utf8_decode('Date de debut: ' . $startDate), 0, 1, 'L');
+        self::$obj->Cell(190, 6, utf8_decode('Date de fin: ' . $endDate), 0, 1, 'L');
         self::$obj->Ln(1);
 
         self::$obj->SetFont('Arial', 'B', 10);
-        self::$obj->Cell(190, 7, utf8_decode('Entre les soussignes :'), 0, 1, 'L');
+        self::$obj->Cell(190, 6, utf8_decode('Entre les soussignes :'), 0, 1, 'L');
         self::$obj->SetFont('Arial', '', 10);
-        self::$obj->MultiCell(190, 6, utf8_decode('Jaguar Security Services SARL, representee par Monsieur TOURE Moussa, agissant en qualite de Gerant, ci-apres denommee l\'Employeur.'));
+        self::$obj->MultiCell(190, 5, utf8_decode('Jaguar Security Services SARL, representee par Monsieur TOURE Moussa, agissant en qualite de Gerant, ci-apres denommee l\'Employeur.'));
         self::$obj->Ln(1);
-        self::$obj->MultiCell(190, 6, utf8_decode('Et M./Mme ' . $employee->firstname . ' ' . $employee->name . ', matricule ' . ($employee->matricule ?? '-') . ', telephone ' . ($employee->phone ?? '-') . ', domicilie(e) a ' . ($employee->address ?? '-') . ', ci-apres denomme(e) l\'Employe(e).'));
+        self::$obj->MultiCell(190, 5, utf8_decode('Et M./Mme ' . $employee->firstname . ' ' . $employee->name . ', matricule ' . ($employee->matricule ?? '-') . ', telephone ' . ($employee->phone ?? '-') . ', domicilie(e) a ' . ($employee->address ?? '-') . ', ci-apres denomme(e) l\'Employe(e).'));
         self::$obj->Ln(1);
-        self::$obj->MultiCell(190, 6, utf8_decode('A ete etabli le present contrat regi par le Code du travail de la Republique de Guinee (L/2014/072/CNT du 10 janvier 2014) et les textes d\'application.'));
+        self::$obj->MultiCell(190, 5, utf8_decode('A ete etabli le present contrat regi par le Code du travail de la Republique de Guinee (L/2014/072/CNT du 10 janvier 2014) et les textes d\'application.'));
 
         self::$obj->SetFont('Arial', 'B', 10);
-        self::$obj->Cell(190, 7, utf8_decode('Article 1 : Nature et duree du contrat'), 0, 1, 'L');
+        self::$obj->Cell(190, 6, utf8_decode('Article 1 : Nature et duree du contrat'), 0, 1, 'L');
         self::$obj->SetFont('Arial', '', 10);
-        self::$obj->MultiCell(190, 6, utf8_decode('Le present contrat est de type ' . $contractType . ', a compter du ' . $startDate . '. Date de fin : ' . $endDate . '. Statut actuel : ' . $status . '. Lieu de recrutement : Conakry. Lieu de travail : ' . ($affectation->location ?? 'Jaguar Security Services') . '.'));
+        self::$obj->MultiCell(190, 5, utf8_decode('Le present contrat est de type ' . $contractType . ', a compter du ' . $startDate . '. Date de fin : ' . $endDate . '. Statut actuel : ' . $status . '. Lieu de recrutement : Conakry. Lieu de travail : ' . ($affectation->location ?? 'Jaguar Security Services') . '.'));
 
         self::$obj->SetFont('Arial', 'B', 10);
-        self::$obj->Cell(190, 7, utf8_decode('Article 2 : Fonction'), 0, 1, 'L');
+        self::$obj->Cell(190, 6, utf8_decode('Article 2 : Fonction'), 0, 1, 'L');
         self::$obj->SetFont('Arial', '', 10);
-        self::$obj->MultiCell(190, 6, utf8_decode('L\'employe(e) est engage(e) pour assumer la fonction : ' . ($employee->position ?? '-') . '. L\'employeur se reserve le droit, pour necessite de service, de confier d\'autres taches conformement a la loi.'));
+        self::$obj->MultiCell(190, 5, utf8_decode('L\'employe(e) est engage(e) pour assumer la fonction : ' . ($employee->position ?? '-') . '. L\'employeur se reserve le droit, pour necessite de service, de confier d\'autres taches conformement a la loi.'));
 
         self::$obj->SetFont('Arial', 'B', 10);
-        self::$obj->Cell(190, 7, utf8_decode('Article 3 : Obligation de l\'employe'), 0, 1, 'L');
+        self::$obj->Cell(190, 6, utf8_decode('Article 3 : Obligation de l\'employe'), 0, 1, 'L');
         self::$obj->SetFont('Arial', '', 10);
-        self::$obj->MultiCell(190, 6, utf8_decode('Durant la validite du present contrat, l\'employe(e) s\'engage a ne pas exercer une autre activite professionnelle susceptible de nuire a la bonne marche de l\'entreprise.'));
+        self::$obj->MultiCell(190, 5, utf8_decode('Durant la validite du present contrat, l\'employe(e) s\'engage a ne pas exercer une autre activite professionnelle susceptible de nuire a la bonne marche de l\'entreprise.'));
 
         self::$obj->SetFont('Arial', 'B', 10);
-        self::$obj->Cell(190, 7, utf8_decode('Article 4 : Remuneration'), 0, 1, 'L');
+        self::$obj->Cell(190, 6, utf8_decode('Article 4 : Remuneration'), 0, 1, 'L');
         self::$obj->SetFont('Arial', '', 10);
-        self::$obj->MultiCell(190, 6, utf8_decode('Pour une duree de 40 heures par semaine, la remuneration mensuelle comprend : Salaire de base : ' . moneyFormat((float) $employee->salary) . ' ; Prime : ' . moneyFormat((float) ($employee->prime ?? 0)) . '. Les autres indemnites applicables sont fixees selon les regles internes en vigueur.'));
+        self::$obj->MultiCell(190, 5, utf8_decode('Pour une duree de 40 heures par semaine, la remuneration mensuelle comprend : Salaire de base : ' . moneyFormat((float) $employee->salary) . ' ; Prime : ' . moneyFormat((float) ($employee->prime ?? 0)) . '. Les autres indemnites applicables sont fixees selon les regles internes en vigueur.'));
 
         self::$obj->SetFont('Arial', 'B', 10);
-        self::$obj->Cell(190, 7, utf8_decode('Article 5 : Conges'), 0, 1, 'L');
+        self::$obj->Cell(190, 6, utf8_decode('Article 5 : Conges'), 0, 1, 'L');
         self::$obj->SetFont('Arial', '', 10);
-        self::$obj->MultiCell(190, 6, utf8_decode('L\'employe(e) beneficie annuellement d\'un conge dont la duree est determinee conformement a la legislation en vigueur, avec maintien des droits prevus par la loi.'));
+        self::$obj->MultiCell(190, 5, utf8_decode('L\'employe(e) beneficie annuellement d\'un conge dont la duree est determinee conformement a la legislation en vigueur, avec maintien des droits prevus par la loi.'));
 
         self::$obj->SetFont('Arial', 'B', 10);
-        self::$obj->Cell(190, 7, utf8_decode('Article 6 : Avantages sociaux'), 0, 1, 'L');
+        self::$obj->Cell(190, 6, utf8_decode('Article 6 : Avantages sociaux'), 0, 1, 'L');
         self::$obj->SetFont('Arial', '', 10);
-        self::$obj->MultiCell(190, 6, utf8_decode('L\'employe(e) beneficie du regime des assurances sociales guineennes (frais medicaux, accident de travail, maladie professionnelle, prestations familiales, retraite), conformement a la legislation en vigueur.'));
+        self::$obj->MultiCell(190, 5, utf8_decode('L\'employe(e) beneficie du regime des assurances sociales guineennes (frais medicaux, accident de travail, maladie professionnelle, prestations familiales, retraite), conformement a la legislation en vigueur.'));
 
         self::$obj->SetFont('Arial', 'B', 10);
-        self::$obj->Cell(190, 7, utf8_decode('Article 7 : Periode d\'essai - Preavis'), 0, 1, 'L');
+        self::$obj->Cell(190, 6, utf8_decode('Article 7 : Periode d\'essai - Preavis'), 0, 1, 'L');
         self::$obj->SetFont('Arial', '', 10);
-        self::$obj->MultiCell(190, 6, utf8_decode('Pendant la periode d\'essai, le contrat peut etre resilie par l\'une des parties. Apres engagement definitif, un preavis de 30 jours est requis en cas de rupture, sous reserve des dispositions legales applicables.'));
+        self::$obj->MultiCell(190, 5, utf8_decode('Pendant la periode d\'essai, le contrat peut etre resilie par l\'une des parties. Apres engagement definitif, un preavis de 30 jours est requis en cas de rupture, sous reserve des dispositions legales applicables.'));
 
         self::$obj->SetFont('Arial', 'B', 10);
-        self::$obj->Cell(190, 7, utf8_decode('Article 8 : Differends'), 0, 1, 'L');
+        self::$obj->Cell(190, 6, utf8_decode('Article 8 : Differends'), 0, 1, 'L');
         self::$obj->SetFont('Arial', '', 10);
-        self::$obj->MultiCell(190, 6, utf8_decode('L\'Inspection du Travail du lieu de travail est competente pour examiner tout differend lie a l\'execution du present contrat. En cas de non-conciliation, le Tribunal du Travail de Conakry est competent.'));
+        self::$obj->MultiCell(190, 5, utf8_decode('L\'Inspection du Travail du lieu de travail est competente pour examiner tout differend lie a l\'execution du present contrat. En cas de non-conciliation, le Tribunal du Travail de Conakry est competent.'));
 
         self::$obj->SetFont('Arial', 'B', 10);
-        self::$obj->Cell(190, 7, utf8_decode('Reference RH'), 0, 1, 'L');
+        self::$obj->Cell(190, 6, utf8_decode('Reference RH'), 0, 1, 'L');
         self::$obj->SetFont('Arial', '', 10);
-        self::$obj->MultiCell(190, 6, utf8_decode('Contact urgence : ' . ($employee->emergency_name ?? '-') . ' | Telephone : ' . ($employee->emergency_phone ?? '-')));
+        self::$obj->MultiCell(190, 5, utf8_decode('Contact urgence : ' . ($employee->emergency_name ?? '-') . ' | Telephone : ' . ($employee->emergency_phone ?? '-')));
 
-        self::$obj->Ln(8);
+        self::$obj->Ln(4);
         self::$obj->SetFont('Arial', '', 10);
         self::$obj->Cell(95, 6, utf8_decode('Fait a Conakry, le ' . $today->format('d/m/Y')), 0, 0, 'L');
         self::$obj->Cell(95, 6, utf8_decode('Pour approbation'), 0, 1, 'R');
-        self::$obj->Ln(14);
+        self::$obj->Ln(10);
 
         self::$obj->SetFont('Arial', 'B', 10);
         self::$obj->Cell(95, 6, utf8_decode('Moussa TOURE'), 0, 0, 'L');
@@ -1385,7 +1376,7 @@ class PrintController extends Controller
         // Signature de l'employeur
         self::$obj->Image('images/signature_pdg.png', 14, self::$obj->GetY() + 1, 45, 0);
 
-        self::$obj->Ln(16);
+        self::$obj->Ln(12);
         self::$obj->SetFont('Arial', '', 9);
         self::$obj->Cell(95, 6, utf8_decode('Président Directeur Général (PDG)'), 0, 0, 'L');
         self::$obj->Cell(95, 6, utf8_decode($employee->firstname . ' ' . $employee->name), 0, 1, 'R');
