@@ -81,9 +81,9 @@
                     <div class="row search-result"></div>
                     <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-4" id="no-search">
                         @foreach ($employees->items() as $item)
-                        <div class="col">
-                            <div class="card border-bottom border-dark radius-15">
-                                <div class="card-body p-3 text-center">
+                        <div class="col d-flex">
+                            <div class="card border-bottom border-dark radius-15 h-100 w-100">
+                                <div class="card-body p-3 text-center d-flex flex-column align-items-center">
                                     <img src="{{ asset($item->photo ?? 'images/avatar.png') }}" width="110" height="110" class="rounded-circle shadow" alt="">
                                     <h6 class="mb-0 mt-2">{{ $item->firstname." ".$item->name }}</h6>
                                     <p class="mb-1">{{ $item->position." ".$item->matricule }}</p>
@@ -93,7 +93,7 @@
                                         <a href="{{ route('employees.notaffected', $item->id) }}" onclick="if(!confirm('Confirmez-Vous cette suppression')) return false" class="list-inline-item text-danger"><i class="bx bx-trash"></i></a>
                                         @endif
                                     </div>
-                                    <div class="d-grid"> 
+                                    <div class="d-grid mt-auto w-100">
                                         @if(isRightAccess([1, 2]))
                                         <a href="{{ route('employees.show', $item->id) }}" class="btn btn-outline-dark radius-15">@lang('lang.see_more')</a>
                                         @endif

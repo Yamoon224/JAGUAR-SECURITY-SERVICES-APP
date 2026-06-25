@@ -93,17 +93,17 @@
                                     <td>{{ $item->start_date." - ".$item->end_date }}</td>
                                     <td>{{ $item->affectations_count }} @lang('lang.employee', ['param'=>'s'])</td>
                                     <td>
-                                        <a data-bs-toggle="modal" data-bs-target="#customer{{ $item->id }}" class="btn btn-xs btn-primary" title="Editer les informations" style="display: inline-block">
+                                        <a data-bs-toggle="modal" data-bs-target="#customer{{ $item->id }}" class="btn btn-sm btn-primary" title="Editer les informations" style="display: inline-block">
                                             <i class="bx bx-edit-alt"></i>
                                         </a>
                                         <x-customer-edit :customer="$item" />
-                                        <a href="{{ route('prints.bill.annual', [$item->id, date('Y')]) }}" class="btn btn-xs btn-info" title="Facture annuelle {{ date('Y') }}" style="display: inline-block">
+                                        <a href="{{ route('prints.bill.annual', [$item->id, date('Y')]) }}" class="btn btn-sm btn-info" title="Facture annuelle {{ date('Y') }}" style="display: inline-block">
                                             <i class="bx bx-calendar-check"></i>
                                         </a>
                                         <form action="{{ route('customers.destroy', $item->id) }}" method="POST" style="display: inline-block">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="btn btn-xs btn-danger" title="Supprimer cet Employé">
+                                            <button class="btn btn-sm btn-danger" title="Supprimer cet Employé">
                                                 <i class="bx bx-trash"></i>
                                             </button>
                                         </form>
