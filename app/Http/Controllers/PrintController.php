@@ -139,6 +139,148 @@ class PrintController extends Controller
         exit;
     }
 
+    public static function billAnnual(int $id, int $year)
+    {
+        $customer = Customer::find($id);
+
+        self::$obj->SetTitle(utf8_decode('Facture Annuelle - ' . $customer->name . ' - ' . $year));
+        self::$obj->SetFont('Arial', 'IB', 8);
+        self::$obj->AddPage();
+
+        // Company statutory info
+        self::$obj->setXY(10, self::$obj->getY() - 3);
+        self::$obj->SetFont('Arial', 'I', 8);
+        self::$obj->Cell(100, 3, utf8_decode('CAPITAL SOCIAL: 10.000.000 GNF'), 0, 1);
+        self::$obj->Cell(100, 3, utf8_decode('N°ENTREPRISE/RCCM/GN.TCC.2020.B.07295'), 0, 1);
+        self::$obj->Cell(100, 3, utf8_decode('NIF:655987501; CLE TVA:9K | BP: 2024 Conakry'), 0, 1);
+        self::$obj->Cell(100, 3, utf8_decode('TELEPHONE: +224 625 12 32 32 | EMAIL: jaguar28jss@gmail.com'), 0, 1);
+
+        self::$obj->setXY(100, self::$obj->getY() - 12);
+        self::$obj->SetFont('Arial', 'IB', 8);
+        self::$obj->Cell(100, 4, utf8_decode($customer->name), 0, 1);
+        self::$obj->SetFont('Arial', 'I', 8);
+        self::$obj->setX(100);
+        self::$obj->MultiCell(100, 4, utf8_decode($customer->address ?? ''), 0, 1);
+        self::$obj->setX(100);
+        self::$obj->Cell(100, 4, utf8_decode('Tel: ' . $customer->phone), 0, 1);
+        self::$obj->setX(100);
+        self::$obj->Cell(100, 4, utf8_decode('Responsable: ' . $customer->responsible), 0, 1);
+
+        self::$obj->Ln(3);
+        self::$obj->setX(10);
+        self::$obj->SetFont('Arial', 'IB', 8);
+        self::$obj->Cell(50, 4, utf8_decode('N° FACTURE:'), 0);
+        self::$obj->setX(35);
+        self::$obj->Cell(80, 4, utf8_decode('JSS' . $customer->id . $year . 'ANN'), 0, 0);
+        self::$obj->setX(130);
+        self::$obj->Cell(30, 4, utf8_decode('ANNEE:'), 0);
+        self::$obj->Cell(40, 4, utf8_decode($year), 0, 1);
+        self::$obj->Ln(2);
+
+        // Monthly summary table
+        $headers = ['MOIS', 'NB AGENTS', 'MONTANT HT', 'TVA', 'ORASPC', 'TOTAL TTC'];
+        $widths  = [28, 24, 36, 30, 24, 48];
+
+        self::$obj->SetFillColor(150, 0, 0);
+        self::$obj->SetTextColor(255, 255, 255);
+        self::$obj->SetFont('Arial', 'B', 8);
+        foreach ($headers as $i => $h) {
+            self::$obj->Cell($widths[$i], 7, utf8_decode($h), 1, 0, 'C', true);
+        }
+        self::$obj->Ln();
+        self::$obj->SetFillColor(224, 215, 215);
+        self::$obj->SetTextColor(0, 0, 0);
+        self::$obj->SetFont('Arial', 'I', 8);
+
+        $grandHT = 0; $grandTVA = 0; $grandOraspc = 0; $fill = false;
+        $allAffectations = collect();
+
+        for ($m = 1; $m <= 12; $m++) {
+            $firstDay = Carbon::createFromDate($year, $m, 1)->startOfMonth()->format('Y-m-d');
+            $lastDay  = Carbon::createFromDate($year, $m, 1)->endOfMonth()->format('Y-m-d');
+
+            $affectations = Affectation::with(['employee' => fn($q) => $q->where('deleted', 0)])
+                ->whereDate('begin', '<=', $lastDay)
+                ->whereDate('end', '>=', $firstDay)
+                ->where('customer_id', $id)
+                ->orderBy('location')
+                ->get();
+
+            if ($affectations->isEmpty()) continue;
+
+            $ht     = $affectations->sum('price');
+            $tva    = $affectations->sum(fn($a) => $a->tva * 0.01 * $a->price);
+            $oraspc = $affectations->sum('oraspc');
+            $ttc    = $ht + $tva + $oraspc;
+
+            self::$obj->Cell($widths[0], 6, utf8_decode(strtoupper(__('lang.' . getMonthName($m)))), 'LR', 0, 'C', $fill);
+            self::$obj->Cell($widths[1], 6, $affectations->count(), 'LR', 0, 'C', $fill);
+            self::$obj->Cell($widths[2], 6, moneyFormat($ht), 'LR', 0, 'C', $fill);
+            self::$obj->Cell($widths[3], 6, moneyFormat($tva), 'LR', 0, 'C', $fill);
+            self::$obj->Cell($widths[4], 6, moneyFormat($oraspc), 'LR', 0, 'C', $fill);
+            self::$obj->Cell($widths[5], 6, moneyFormat($ttc), 'LR', 0, 'C', $fill);
+            self::$obj->Ln();
+            $fill = !$fill;
+
+            $grandHT += $ht; $grandTVA += $tva; $grandOraspc += $oraspc;
+            $allAffectations = $allAffectations->merge($affectations);
+        }
+
+        // Totals row
+        $grandTTC = $grandHT + $grandTVA + $grandOraspc;
+        self::$obj->SetFont('Arial', 'B', 8);
+        self::$obj->SetFillColor(200, 200, 200);
+        self::$obj->Cell($widths[0] + $widths[1], 7, utf8_decode('TOTAL ANNUEL'), 'LRB', 0, 'C', true);
+        self::$obj->Cell($widths[2], 7, moneyFormat($grandHT), 'LRB', 0, 'C', true);
+        self::$obj->Cell($widths[3], 7, moneyFormat($grandTVA), 'LRB', 0, 'C', true);
+        self::$obj->Cell($widths[4], 7, moneyFormat($grandOraspc), 'LRB', 0, 'C', true);
+        self::$obj->Cell($widths[5], 7, moneyFormat($grandTTC), 'LRB', 0, 'C', true);
+        self::$obj->Ln(10);
+
+        // Effectif affecté complet
+        self::$obj->SetFont('Arial', 'B', 9);
+        self::$obj->SetFillColor(50, 50, 50);
+        self::$obj->SetTextColor(255, 255, 255);
+        self::$obj->Cell(190, 8, utf8_decode('EFFECTIF AFFECTE - ANNEE ' . $year), 1, 1, 'C', true);
+        self::$obj->SetTextColor(0, 0, 0);
+        self::$obj->SetFillColor(150, 0, 0);
+        self::$obj->SetTextColor(255, 255, 255);
+        self::$obj->SetFont('Arial', 'B', 8);
+        foreach (['#', 'MATRICULE', 'NOM & PRENOM', 'SITE', 'TARIF MENSUEL'] as $i => $h) {
+            self::$obj->Cell([8, 28, 60, 60, 34][$i], 7, utf8_decode($h), 1, 0, 'C', true);
+        }
+        self::$obj->Ln();
+        self::$obj->SetFillColor(224, 215, 215);
+        self::$obj->SetTextColor(0, 0, 0);
+        self::$obj->SetFont('Arial', 'I', 8);
+
+        $unique = $allAffectations->unique(fn($a) => $a->employee_id);
+        $fill = false;
+        foreach ($unique->values() as $key => $aff) {
+            $emp = $aff->employee;
+            if (!$emp) continue;
+            self::$obj->Cell(8,  6, $key + 1, 'LR', 0, 'C', $fill);
+            self::$obj->Cell(28, 6, utf8_decode($emp->matricule ?? ''), 'LR', 0, 'C', $fill);
+            self::$obj->Cell(60, 6, utf8_decode(($emp->firstname ?? '') . ' ' . ($emp->name ?? '')), 'LR', 0, 'L', $fill);
+            self::$obj->Cell(60, 6, utf8_decode($aff->location ?? ''), 'LR', 0, 'L', $fill);
+            self::$obj->Cell(34, 6, moneyFormat($aff->price), 'LR', 0, 'C', $fill);
+            self::$obj->Ln();
+            $fill = !$fill;
+        }
+        self::$obj->Cell(190, 0, '', 'T', 1);
+
+        self::$obj->Ln(8);
+        self::$obj->SetFont('Arial', 'I', 9);
+        self::$obj->MultiCell(190, 5, utf8_decode(
+            'Sauf Erreur ou Omission, le montant total de cette facture annuelle s\'eleve a ' .
+            moneyFormat($grandTTC) . ' GNF pour l\'annee ' . $year .
+            ' payable en liquidite, par cheque ou virement bancaire a l\'ordre de JAGUAR SECURITY SERVICES SARL.'
+        ));
+
+        self::$obj->Output();
+        exit;
+    }
+
     // public static function bill(int $id, int $year, int $month = NULL, $isReceipt = 0)
     // {
     //     $month = is_null($month) ? date('m') : $month;
@@ -220,11 +362,50 @@ class PrintController extends Controller
         self::$obj = new PDF('P', 'mm', 'A4');
         self::$obj->SetTitle(utf8_decode('BULLETIN DE SALAIRE - ' . $employee->matricule . ' - ' . __('lang.' . getMonthName($month))));
         self::$obj->AddPage();
+
+        // Double border frame
+        self::$obj->SetDrawColor(150, 0, 0);
+        self::$obj->SetLineWidth(1.0);
+        self::$obj->Rect(5, 5, 200, 287);
+        self::$obj->SetDrawColor(50, 50, 50);
+        self::$obj->SetLineWidth(0.3);
+        self::$obj->Rect(7.5, 7.5, 195, 282);
+        self::$obj->SetDrawColor(0, 0, 0);
+        self::$obj->SetLineWidth(0.2);
+
+        // Company statutory info
+        self::$obj->SetFont('Arial', 'I', 7);
+        self::$obj->Cell(47, 4, utf8_decode('Capital social: 10.000.000 GNF'), 0, 0, 'L');
+        self::$obj->Cell(58, 4, utf8_decode('RCCM: GN.TCC.2020.B.07295'), 0, 0, 'C');
+        self::$obj->Cell(45, 4, utf8_decode('NIF: 655987501 | CLE TVA: 9K'), 0, 0, 'C');
+        self::$obj->Cell(40, 4, utf8_decode('Tel: +224 625 12 32 32'), 0, 1, 'R');
+        self::$obj->SetDrawColor(150, 0, 0);
+        self::$obj->SetLineWidth(0.5);
+        self::$obj->Line(10, self::$obj->GetY() + 1, 200, self::$obj->GetY() + 1);
+        self::$obj->SetDrawColor(0, 0, 0);
+        self::$obj->SetLineWidth(0.2);
+        self::$obj->Ln(7);
+
+        // Title box
+        self::$obj->SetX(25);
+        self::$obj->SetFillColor(150, 0, 0);
+        self::$obj->SetTextColor(255, 255, 255);
         self::$obj->SetFont('Arial', 'B', 14);
-        self::$obj->Cell(190, 9, utf8_decode('BULLETIN DE SALAIRE'), 0, 1, 'C');
-        self::$obj->SetFont('Arial', '', 10);
-        self::$obj->Cell(190, 6, utf8_decode('Mois : ' . __('lang.' . getMonthName($month)) . ' / Matricule : ' . $employee->matricule), 0, 1, 'L');
-        self::$obj->Ln(2);
+        self::$obj->Cell(160, 11, utf8_decode('BULLETIN DE SALAIRE'), 0, 1, 'C', true);
+        self::$obj->SetTextColor(0, 0, 0);
+        self::$obj->SetFillColor(255, 255, 255);
+        self::$obj->Ln(4);
+
+        // Employee info row
+        self::$obj->SetFont('Arial', 'B', 9);
+        self::$obj->SetFillColor(230, 230, 230);
+        self::$obj->Cell(95, 6, utf8_decode('Employe : ' . $employee->firstname . ' ' . $employee->name), 1, 0, 'L', true);
+        self::$obj->Cell(95, 6, utf8_decode('Matricule : ' . $employee->matricule), 1, 1, 'L', true);
+        self::$obj->SetFillColor(240, 240, 240);
+        self::$obj->Cell(95, 6, utf8_decode('Poste : ' . $employee->position), 1, 0, 'L', true);
+        self::$obj->Cell(95, 6, utf8_decode('Mois : ' . __('lang.' . getMonthName($month))), 1, 1, 'L', true);
+        self::$obj->SetFillColor(255, 255, 255);
+        self::$obj->Ln(4);
 
         $items = [
             ['label' => 'Salaire de base', 'amount' => $baseSalary],
@@ -987,28 +1168,91 @@ class PrintController extends Controller
     public static function workAttestation(int $id)
     {
         $employee = Employee::where('deleted', 0)->findOrFail($id);
-        $today = Carbon::now();
+        $today    = Carbon::now();
 
         self::$obj = new PDF('P', 'mm', 'A4');
         self::$obj->SetTitle(utf8_decode('Attestation de travail - ' . $employee->matricule));
         self::$obj->AddPage();
-        self::$obj->SetFont('Arial', 'B', 14);
-        self::$obj->Cell(190, 9, utf8_decode('ATTESTATION DE TRAVAIL'), 0, 1, 'C');
-        self::$obj->SetFont('Arial', '', 11);
-        self::$obj->Ln(4);
-        self::$obj->MultiCell(190, 7, utf8_decode('Je soussigne, Monsieur TOURE Moussa, PDG de JAGUAR SECURITY SERVICES SARL, certifie que M./Mme ' . $employee->firstname . ' ' . $employee->name . ', matricule ' . $employee->matricule . ', a occupe le poste de ' . $employee->position . ' au sein de notre entreprise depuis le ' . (!empty($employee->contract_start_at) ? Carbon::parse($employee->contract_start_at)->format('d/m/Y') : 'date non renseignée') . '.'));
-        self::$obj->Ln(4);
-        self::$obj->MultiCell(190, 7, utf8_decode('La presente attestation est delivree a titre informatif pour servir et valoir ce que de droit.'));
-        self::$obj->Ln(12);
-        self::$obj->Cell(75, 6, utf8_decode('Fait a Conakry, le ' . $today->format('d/m/Y')), 0, 0, 'L');
-        self::$obj->Cell(95, 6, utf8_decode('Moussa TOURE'), 0, 1, 'R');
 
-        self::$obj->Ln(4);
-        self::$obj->SetX(145);
-        self::$obj->Image('images/signature_pdg.png', 145, self::$obj->GetY() + 1, 45, 0);
-        self::$obj->Ln(18);
+        // === DOUBLE BORDER FRAME ===
+        self::$obj->SetDrawColor(150, 0, 0);
+        self::$obj->SetLineWidth(1.2);
+        self::$obj->Rect(5, 5, 200, 287);
+        self::$obj->SetDrawColor(50, 50, 50);
+        self::$obj->SetLineWidth(0.4);
+        self::$obj->Rect(7.5, 7.5, 195, 282);
+        self::$obj->SetDrawColor(0, 0, 0);
+        self::$obj->SetLineWidth(0.2);
+
+        // === COMPANY STATUTORY INFO ===
+        $y = self::$obj->GetY();
+        self::$obj->SetXY(10, $y);
+        self::$obj->SetFont('Arial', 'I', 7);
+        self::$obj->Cell(47, 4, utf8_decode('Capital social: 10.000.000 GNF'), 0, 0, 'L');
+        self::$obj->Cell(58, 4, utf8_decode('RCCM: GN.TCC.2020.B.07295'), 0, 0, 'C');
+        self::$obj->Cell(45, 4, utf8_decode('NIF: 655987501 | CLE TVA: 9K'), 0, 0, 'C');
+        self::$obj->Cell(40, 4, utf8_decode('Tel: +224 625 12 32 32'), 0, 1, 'R');
+
+        // Red separator line
+        self::$obj->SetDrawColor(150, 0, 0);
+        self::$obj->SetLineWidth(0.6);
+        $lineY = self::$obj->GetY() + 1;
+        self::$obj->Line(10, $lineY, 200, $lineY);
+        self::$obj->SetDrawColor(0, 0, 0);
+        self::$obj->SetLineWidth(0.2);
+        self::$obj->Ln(7);
+
+        // === TITLE BOX ===
+        self::$obj->SetX(25);
+        self::$obj->SetFillColor(150, 0, 0);
+        self::$obj->SetTextColor(255, 255, 255);
+        self::$obj->SetFont('Arial', 'B', 15);
+        self::$obj->Cell(160, 12, utf8_decode('ATTESTATION DE TRAVAIL'), 0, 1, 'C', true);
+        self::$obj->SetTextColor(0, 0, 0);
+        self::$obj->SetFillColor(255, 255, 255);
+        self::$obj->Ln(12);
+
+        // === MAIN TEXT ===
+        self::$obj->SetFont('Arial', '', 11);
+        self::$obj->SetX(15);
+        self::$obj->MultiCell(180, 7, utf8_decode(
+            'Je soussigne, Monsieur TOURE Moussa, PDG de JAGUAR SECURITY SERVICES SARL, ' .
+            'certifie que M./Mme ' . $employee->firstname . ' ' . $employee->name .
+            ', matricule ' . $employee->matricule .
+            ', a occupe le poste de ' . $employee->position .
+            ' au sein de notre entreprise depuis le ' .
+            (!empty($employee->contract_start_at)
+                ? Carbon::parse($employee->contract_start_at)->format('d/m/Y')
+                : 'date non renseignee') . '.'
+        ), 0, 'J');
+
+        self::$obj->Ln(8);
+        self::$obj->SetX(15);
+        self::$obj->MultiCell(180, 7, utf8_decode(
+            'En foi de quoi, la presente attestation lui est delivree a sa demande pour servir et valoir ce que de droit.'
+        ), 0, 'J');
+
+        self::$obj->Ln(25);
+
+        // === SIGNATURE SECTION ===
+        $sigLineY = self::$obj->GetY();
+        self::$obj->SetXY(10, $sigLineY);
+        self::$obj->SetFont('Arial', 'I', 10);
+        self::$obj->Cell(100, 6, utf8_decode('Fait a Conakry, le ' . $today->format('d/m/Y')), 0, 0, 'L');
+        self::$obj->SetX(120);
+        self::$obj->SetFont('Arial', 'B', 10);
+        self::$obj->Cell(80, 6, utf8_decode('Le PDG'), 0, 1, 'C');
+
+        self::$obj->SetX(120);
+        self::$obj->Cell(80, 6, utf8_decode('Moussa TOURE'), 0, 1, 'C');
+
+        $sigImgY = self::$obj->GetY() + 2;
+        self::$obj->Image('images/signature_pdg.png', 130, $sigImgY, 50, 0);
+        self::$obj->Ln(22);
+
+        self::$obj->SetX(120);
         self::$obj->SetFont('Arial', '', 9);
-        self::$obj->Cell(190, 6, utf8_decode('Président Directeur Général (PDG)'), 0, 1, 'R');
+        self::$obj->Cell(80, 6, utf8_decode('President Directeur General (PDG)'), 0, 1, 'C');
 
         self::$obj->Output();
         exit;
@@ -1024,8 +1268,39 @@ class PrintController extends Controller
         self::$obj->SetTitle(utf8_decode('Contrat de Travail - ' . $employee->matricule));
         self::$obj->AddPage();
 
+        // Double border frame
+        self::$obj->SetDrawColor(150, 0, 0);
+        self::$obj->SetLineWidth(1.0);
+        self::$obj->Rect(5, 5, 200, 287);
+        self::$obj->SetDrawColor(50, 50, 50);
+        self::$obj->SetLineWidth(0.3);
+        self::$obj->Rect(7.5, 7.5, 195, 282);
+        self::$obj->SetDrawColor(0, 0, 0);
+        self::$obj->SetLineWidth(0.2);
+
+        // Company statutory info
+        self::$obj->SetFont('Arial', 'I', 7);
+        self::$obj->Cell(47, 4, utf8_decode('Capital social: 10.000.000 GNF'), 0, 0, 'L');
+        self::$obj->Cell(58, 4, utf8_decode('RCCM: GN.TCC.2020.B.07295'), 0, 0, 'C');
+        self::$obj->Cell(45, 4, utf8_decode('NIF: 655987501 | CLE TVA: 9K'), 0, 0, 'C');
+        self::$obj->Cell(40, 4, utf8_decode('Tel: +224 625 12 32 32'), 0, 1, 'R');
+        self::$obj->SetDrawColor(150, 0, 0);
+        self::$obj->SetLineWidth(0.5);
+        self::$obj->Line(10, self::$obj->GetY() + 1, 200, self::$obj->GetY() + 1);
+        self::$obj->SetDrawColor(0, 0, 0);
+        self::$obj->SetLineWidth(0.2);
+        self::$obj->Ln(7);
+
+        // Title box
+        self::$obj->SetX(25);
+        self::$obj->SetFillColor(150, 0, 0);
+        self::$obj->SetTextColor(255, 255, 255);
         self::$obj->SetFont('Arial', 'B', 14);
-        self::$obj->Cell(190, 9, utf8_decode('CONTRAT DE TRAVAIL'), 0, 1, 'C');
+        self::$obj->Cell(160, 11, utf8_decode('CONTRAT DE TRAVAIL'), 0, 1, 'C', true);
+        self::$obj->SetTextColor(0, 0, 0);
+        self::$obj->SetFillColor(255, 255, 255);
+        self::$obj->Ln(4);
+
         self::$obj->SetFont('Arial', 'I', 9);
         self::$obj->Cell(190, 6, utf8_decode('Date d\'edition: ' . $today->format('d/m/Y H:i')), 0, 1, 'C');
         self::$obj->Ln(2);

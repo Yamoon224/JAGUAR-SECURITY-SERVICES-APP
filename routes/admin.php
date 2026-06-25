@@ -48,6 +48,7 @@ Route::get('/{locale?}', [Controller::class, 'welcome'])->defaults('locale', 'fr
 
 
 Route::get('/prints/bill/{id}/{year}/{month?}/{isReceipt?}', [PrintController::class, 'bill'])->name('prints.bill');
+Route::get('/prints/bill/{id}/{year}/annual', [PrintController::class, 'billAnnual'])->name('prints.bill.annual');
 Route::get('/prints/bank/{month?}/{isBank?}', [PrintController::class, 'payByBankTransfer'])->name('prints.bank');
 Route::get('/prints/receipt/{id}/{month?}', [PrintController::class, 'paymentReceipt'])->name('prints.receipt');
 Route::get('/prints/employees/affectations', [PrintController::class, 'getEmployeesAffected'])->name('prints.affectations');

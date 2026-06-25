@@ -51,6 +51,7 @@
                                 @else
                                 <a href="{{ route('prints.bill', [$item->id, date('Y'), $month_id, 1]) }}"><span class="badge rounded-pill text-success bg-light-success p-2 text-uppercase px-3"><i class='bx bxs-printer me-1'></i>@lang('lang.receipt')</span></a>
                                 @endif
+                                <a href="{{ route('prints.bill.annual', [$item->id, date('Y')]) }}" title="Facture annuelle {{ date('Y') }}"><span class="badge rounded-pill text-warning bg-light-warning p-2 text-uppercase px-3 mt-1"><i class='bx bx-calendar-check me-1'></i>Annuelle</span></a>
                             </td>
                         </tr>
                         @php( $affectations += $item->affectations->count() )

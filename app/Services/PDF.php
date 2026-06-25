@@ -7,9 +7,93 @@ use Imagick;
 
 class PDF extends Fpdf
 {
+    private static ?string $watermarkTilePath = null;
+
+    private function buildWatermarkTile(): ?string
+    {
+        if (!function_exists('imagecreatetruecolor')) {
+            return null;
+        }
+
+        $logoPath = file_exists('images/logo-icon.png')
+            ? realpath('images/logo-icon.png')
+            : (file_exists('images/logo-icon.jpg') ? realpath('images/logo-icon.jpg') : null);
+
+        if (!$logoPath) {
+            return null;
+        }
+
+        $tilePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'jss_wm_tile_v2.png';
+
+        if (file_exists($tilePath)) {
+            return $tilePath;
+        }
+
+        try {
+            $size = 54;
+            $ext  = strtolower(pathinfo($logoPath, PATHINFO_EXTENSION));
+            $src  = $ext === 'png' ? imagecreatefrompng($logoPath) : imagecreatefromjpeg($logoPath);
+
+            if (!$src) {
+                return null;
+            }
+
+            $sw = imagesx($src);
+            $sh = imagesy($src);
+
+            $resized = imagecreatetruecolor($size, $size);
+            imagefill($resized, 0, 0, imagecolorallocate($resized, 255, 255, 255));
+            imagecopyresampled($resized, $src, 0, 0, 0, 0, $size, $size, $sw, $sh);
+            imagedestroy($src);
+
+            $tile = imagecreatetruecolor($size, $size);
+
+            for ($px = 0; $px < $size; $px++) {
+                for ($py = 0; $py < $size; $py++) {
+                    $rgb     = imagecolorat($resized, $px, $py);
+                    $r       = ($rgb >> 16) & 0xFF;
+                    $g       = ($rgb >> 8) & 0xFF;
+                    $b       = $rgb & 0xFF;
+                    $gray    = (int)(0.299 * $r + 0.587 * $g + 0.114 * $b);
+                    $blended = (int)(255 * 0.88 + $gray * 0.12);
+                    imagesetpixel($tile, $px, $py, imagecolorallocate($tile, $blended, $blended, $blended));
+                }
+            }
+
+            imagedestroy($resized);
+            imagepng($tile, $tilePath, 6);
+            imagedestroy($tile);
+
+            return file_exists($tilePath) ? $tilePath : null;
+
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    private function drawWatermark(): void
+    {
+        if (self::$watermarkTilePath === null) {
+            self::$watermarkTilePath = $this->buildWatermarkTile();
+        }
+
+        if (self::$watermarkTilePath === null) {
+            return;
+        }
+
+        $tileSize = 18;
+        for ($y = 0; $y < 297; $y += $tileSize) {
+            for ($x = 0; $x < 210; $x += $tileSize) {
+                $this->Image(self::$watermarkTilePath, $x, $y, $tileSize, $tileSize);
+            }
+        }
+    }
+
     // En-tête
     function Header()
     {
+        $this->drawWatermark();
+
         // Logo
         $this->Image('images/logo-icon.jpg', 10, 4, 12);
         
