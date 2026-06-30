@@ -463,8 +463,28 @@
                             <div class="tab-pane fade" id="salaryTab" role="tabpanel">
                                 <h6 class="mb-0 text-uppercase">Bulletin de salaire & Attestation</h6>
                                 <hr/>
+                                <div class="row g-2 align-items-end mb-3 col-lg-9">
+                                    <div class="col-md-6">
+                                        <label for="salaryMonthSelect" class="form-label">Mois du bulletin</label>
+                                        <select id="salaryMonthSelect" class="form-select">
+                                            @php $currentMonth = (int) date('m'); @endphp
+                                            @for ($m = 1; $m <= 12; $m++)
+                                                <option value="{{ $m }}" {{ $m === $currentMonth ? 'selected' : '' }}>
+                                                    {{ __('lang.' . getMonthName($m)) }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button type="button" id="salaryMonthBtn"
+                                            data-base-url="{{ route('prints.salary.receipt', $employee->id) }}"
+                                            class="btn btn-dark w-100">
+                                            <i class='bx bx-file'></i> Générer le bulletin du mois choisi
+                                        </button>
+                                    </div>
+                                </div>
                                 <div class="d-grid gap-2 col-lg-6">
-                                    <a href="{{ route('prints.salary.receipt', $employee->id) }}" target="_blank" class="btn btn-dark"><i class='bx bx-file'></i> Générer le bulletin de salaire</a>
+                                    <a href="{{ route('prints.salary.receipt', $employee->id) }}" target="_blank" class="btn btn-outline-dark"><i class='bx bx-file'></i> Bulletin du mois en cours</a>
                                     <a href="{{ route('prints.work.attestation', $employee->id) }}" target="_blank" class="btn btn-outline-dark"><i class='bx bx-certification'></i> Générer l’attestation de travail</a>
                                 </div>
                             </div>
@@ -484,5 +504,19 @@
 <x-leaf-employee-add :employee="$employee" />
 @endif
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.getElementById('salaryMonthBtn');
+        if (btn) {
+            btn.addEventListener('click', function () {
+                var select = document.getElementById('salaryMonthSelect');
+                var month = select ? select.value : '';
+                var base = btn.getAttribute('data-base-url');
+                if (base && month) {
+                    window.open(base + '/' + month, '_blank');
+                }
+            });
+        }
+    });
+</script>
 </x-admin-layout>
-
