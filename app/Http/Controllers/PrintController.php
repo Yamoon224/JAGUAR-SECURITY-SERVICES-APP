@@ -347,6 +347,9 @@ class PrintController extends Controller
     public static function salaryReceipt(int $id, int $month = NULL)
     {
         $month = is_null($month) ? (int) date('m') : (int) $month;
+        if ($month < 1 || $month > 12) {
+            $month = (int) date('m');
+        }
         $employee = Employee::findOrFail($id);
 
         $baseSalary = (float) $employee->salary;
@@ -373,18 +376,25 @@ class PrintController extends Controller
         self::$obj->SetDrawColor(0, 0, 0);
         self::$obj->SetLineWidth(0.2);
 
-        // Company statutory info
-        self::$obj->SetFont('Arial', 'I', 7);
-        self::$obj->Cell(47, 4, utf8_decode('Capital social: 10.000.000 GNF'), 0, 0, 'L');
-        self::$obj->Cell(58, 4, utf8_decode('RCCM: GN.TCC.2020.B.07295'), 0, 0, 'C');
-        self::$obj->Cell(45, 4, utf8_decode('NIF: 655987501 | CLE TVA: 9K'), 0, 0, 'C');
-        self::$obj->Cell(40, 4, utf8_decode('Tel: +224 625 12 32 32'), 0, 1, 'R');
+        // En-tête société (identique à la première capture)
+        self::$obj->SetX(10);
+        self::$obj->SetFont('Arial', 'BI', 11);
+        self::$obj->Cell(150, 5, utf8_decode('JAGUAR SECURITY SERVICES'), 0, 1, 'L');
+        self::$obj->SetFont('Arial', 'I', 8);
+        self::$obj->SetX(10);
+        self::$obj->Cell(150, 4, utf8_decode('CAPITAL SOCIAL: 10.000.000 GNF'), 0, 1, 'L');
+        self::$obj->SetX(10);
+        self::$obj->Cell(150, 4, utf8_decode('Aéroport International AST, Conakry'), 0, 1, 'L');
+        self::$obj->SetX(10);
+        self::$obj->Cell(150, 4, utf8_decode('Téléphone: +224 625 12 32 32'), 0, 1, 'L');
+        self::$obj->SetX(10);
+        self::$obj->Cell(150, 4, utf8_decode('Email: jaguar28jss@gmail.com'), 0, 1, 'L');
         self::$obj->SetDrawColor(150, 0, 0);
         self::$obj->SetLineWidth(0.5);
         self::$obj->Line(10, self::$obj->GetY() + 1, 200, self::$obj->GetY() + 1);
         self::$obj->SetDrawColor(0, 0, 0);
         self::$obj->SetLineWidth(0.2);
-        self::$obj->Ln(7);
+        self::$obj->Ln(5);
 
         // Title box
         self::$obj->SetX(25);
@@ -436,6 +446,23 @@ class PrintController extends Controller
 
         self::$obj->Ln(6);
         self::$obj->MultiCell(190, 6, utf8_decode('Sauf erreur ou omission, le montant de ce bulletin de salaire s\'élève à ' . moneyFormat($net) . ' pour le mois de ' . __('lang.' . getMonthName($month)) . '.'));
+
+        // Signature & cachet de la comptabilité
+        self::$obj->Ln(8);
+        self::$obj->SetFont('Arial', 'BI', 10);
+        self::$obj->SetX(120);
+        self::$obj->Cell(80, 5, utf8_decode('La Comptabilité'), 0, 1, 'C');
+        self::$obj->SetFont('Arial', 'I', 9);
+        self::$obj->SetX(120);
+        self::$obj->Cell(80, 5, utf8_decode('Conakry, le ' . date('d/m/Y')), 0, 1, 'C');
+        $signY = self::$obj->GetY() + 2;
+        if (file_exists('images/cachet.png')) {
+            self::$obj->Image('images/cachet.png', 132, $signY, 30, 0);
+        }
+        if (file_exists('images/signature_only.png')) {
+            self::$obj->Image('images/signature_only.png', 138, $signY + 4, 46, 0);
+        }
+
         self::$obj->Output();
         exit;
     }
