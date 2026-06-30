@@ -59,7 +59,7 @@
                                 </div>
                                 @else
                                 @php( $payees += 1 )
-                                <a href="{{ route('prints.receipt', [$item->id, $month_id]) }}"><span class="badge rounded-pill text-success bg-light-success p-2 text-uppercase px-3"><i class='bx bxs-printer me-1'></i>@lang('lang.soldout')</span></a>
+                                <a href="{{ route('prints.salary.receipt', [$item->id, $month_id]) }}"><span class="badge rounded-pill text-success bg-light-success p-2 text-uppercase px-3"><i class='bx bxs-printer me-1'></i>@lang('lang.soldout')</span></a>
                                 @endif
                             </td>
                         </tr>
