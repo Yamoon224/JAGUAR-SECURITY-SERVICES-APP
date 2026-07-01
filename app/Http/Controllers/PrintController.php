@@ -456,11 +456,11 @@ class PrintController extends Controller
         self::$obj->SetX(120);
         self::$obj->Cell(80, 5, utf8_decode('Conakry, le ' . date('d/m/Y')), 0, 1, 'C');
         $signY = self::$obj->GetY() + 2;
-        if (file_exists('images/cachet.png')) {
-            self::$obj->Image('images/cachet.png', 132, $signY, 30, 0);
+        if (file_exists('images/signature.png')) {
+            self::$obj->Image('images/signature.png', 132, $signY, 30, 0);
         }
-        if (file_exists('images/signature_only.png')) {
-            self::$obj->Image('images/signature_only.png', 138, $signY + 4, 46, 0);
+        if (file_exists('images/signature.png')) {
+            self::$obj->Image('images/signature.png', 138, $signY + 4, 46, 0);
         }
 
         self::$obj->Output();
