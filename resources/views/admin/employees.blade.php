@@ -161,9 +161,9 @@
                                     @foreach ($dotations as $item)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $item->employee->firstname." ".$item->employee->name." | ".$item->employee->position." | ".$item->employee->phone }}</td>
-                                        <td>{{ $item->equipment->name }}</td>
-                                        <td>{{ $item->qty." ".$item->equipment->unit }}</td>
+                                        <td>{{ $item->employee?->firstname." ".$item->employee?->name." | ".$item->employee?->position." | ".$item->employee?->phone }}</td>
+                                        <td>{{ $item->equipment?->name }}</td>
+                                        <td>{{ $item->qty." ".$item->equipment?->unit }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
