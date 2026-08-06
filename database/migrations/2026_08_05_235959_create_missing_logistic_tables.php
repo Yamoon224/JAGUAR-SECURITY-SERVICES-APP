@@ -30,8 +30,11 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('equipments')) {
-            Schema::create('equipments', function (Blueprint $table) {
+        // Eloquent treats "equipment" as an uncountable noun, so the
+        // Equipment model (which has no explicit $table) resolves to the
+        // singular table name "equipment", not "equipments".
+        if (!Schema::hasTable('equipment')) {
+            Schema::create('equipment', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('category_id')->constrained('categories');
                 $table->string('name');
@@ -47,7 +50,7 @@ return new class extends Migration
             Schema::create('dotations', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('employee_id')->constrained('employees');
-                $table->foreignId('equipment_id')->constrained('equipments');
+                $table->foreignId('equipment_id')->constrained('equipment');
                 $table->decimal('qty', 15, 2)->default(0);
                 $table->unsignedTinyInteger('deleted')->default(0)->index();
                 $table->timestamps();
@@ -58,7 +61,7 @@ return new class extends Migration
                     $table->foreignId('employee_id')->nullable()->constrained('employees');
                 }
                 if (!Schema::hasColumn('dotations', 'equipment_id')) {
-                    $table->foreignId('equipment_id')->nullable()->constrained('equipments');
+                    $table->foreignId('equipment_id')->nullable()->constrained('equipment');
                 }
                 if (!Schema::hasColumn('dotations', 'qty')) {
                     $table->decimal('qty', 15, 2)->default(0);

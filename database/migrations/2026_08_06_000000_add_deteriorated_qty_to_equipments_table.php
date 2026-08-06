@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('equipments', function (Blueprint $table) {
-            if (!Schema::hasColumn('equipments', 'deteriorated_qty')) {
+        Schema::table('equipment', function (Blueprint $table) {
+            if (!Schema::hasColumn('equipment', 'deteriorated_qty')) {
                 $table->decimal('deteriorated_qty', 15, 2)->default(0)->after('qty');
             }
         });

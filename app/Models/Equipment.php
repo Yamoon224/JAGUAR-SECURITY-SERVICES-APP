@@ -28,6 +28,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Equipment extends BaseModel
 {
+	// "equipment" is an uncountable noun, so make the table name explicit
+	// instead of relying on Eloquent's pluralization guess.
+	protected $table = 'equipment';
+
 	protected $casts = [
 		'price' => 'float',
 		'qty' => 'float',
