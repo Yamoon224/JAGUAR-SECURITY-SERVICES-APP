@@ -130,8 +130,8 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $item->created_at }}</td>
-                                        <td>{{ $item->employee->firstname." ".$item->employee->name." | ".$item->employee->position." | ".$item->employee->phone }}</td>
-                                        <td>{{ $item->customer->name." | ".$item->customer->responsible." | ".$item->customer->phone }}</td>
+                                        <td>{{ $item->employee?->firstname." ".$item->employee?->name." | ".$item->employee?->position." | ".$item->employee?->phone }}</td>
+                                        <td>{{ $item->customer?->name." | ".$item->customer?->responsible." | ".$item->customer?->phone }}</td>
                                         <td>{{ moneyFormat($item->price) }}</td>
                                     </tr>
                                     @endforeach
@@ -194,7 +194,7 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $item->created_at }}</td>
-                                    <td>{{ $item->employee->firstname." ".$item->employee->name." | ".$item->employee->position." | ".$item->employee->phone }}</td>
+                                    <td>{{ $item->employee?->firstname." ".$item->employee?->name." | ".$item->employee?->position." | ".$item->employee?->phone }}</td>
                                     <td>{{ $item->begin }}</td>
                                     <td>{{ $item->end }}</td>
                                     <td>{{ $item->reason }}</td>
@@ -227,7 +227,7 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $item->created_at }}</td>
-                                        <td>{{ $item->employee->firstname." ".$item->employee->name." | ".$item->employee->position." | ".$item->employee->phone }}</td>
+                                        <td>{{ $item->employee?->firstname." ".$item->employee?->name." | ".$item->employee?->position." | ".$item->employee?->phone }}</td>
                                         <td>{{ $item->duration." ".$item->unit }}</td>
                                         <td>{{ $item->reason }}</td>
                                     </tr>
