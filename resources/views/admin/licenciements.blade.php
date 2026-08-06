@@ -40,9 +40,9 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ date('d/m/Y H:i:s', strtotime($item->created_at)) }}</td>
-                                    <td>{{ $item->employee->firstname." ".$item->employee->name." | ".$item->employee->position." | ".$item->employee->phone." | ".$item->employee->matricule }}</td>
+                                    <td>{{ $item->employee?->firstname." ".$item->employee?->name." | ".$item->employee?->position." | ".$item->employee?->phone." | ".$item->employee?->matricule }}</td>
                                     <td>{{ $item->reason }}</td>
-                                    <td>{{ $item->employee->deleted == 0 ? date('d/m/Y H:i:s', strtotime($item->updated_at)) : '--' }}</td>
+                                    <td>{{ ($item->employee && $item->employee->deleted == 0) ? date('d/m/Y H:i:s', strtotime($item->updated_at)) : '--' }}</td>
                                     <td>
                                         <a data-bs-toggle="modal" data-bs-target="#licenciement{{ $item->id }}" class="btn btn-sm btn-primary" title="Editer les informations" style="display: inline-block">
                                             <i class="bx bx-edit-alt"></i>

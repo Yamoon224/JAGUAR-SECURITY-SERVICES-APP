@@ -30,8 +30,8 @@
                     <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $item->begin." - ".$item->end }}</td>
-                        <td>{{ $item->employee->firstname." ".$item->employee->name." | ".$item->employee->position." | ".$item->employee->phone." | ".$item->employee->matricule }}</td>
-                        <td>{{ $item->customer->name." | ".$item->customer->responsible." | ".$item->customer->phone }}</td>
+                        <td>{{ $item->employee?->firstname." ".$item->employee?->name." | ".$item->employee?->position." | ".$item->employee?->phone." | ".$item->employee?->matricule }}</td>
+                        <td>{{ $item->customer?->name." | ".$item->customer?->responsible." | ".$item->customer?->phone }}</td>
                         <td>{{ moneyFormat($item->price) }}</td>
                         <td>{{ $item->tva }}%</td>
                         <td>

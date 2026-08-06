@@ -348,7 +348,7 @@
                                                     <th scope="row">{{ $loop->iteration }}</th>
                                                     <td>{{ $item->created_at }}</td>
                                                     <td>{{ $item->price }}</td>
-                                                    <td>{{ $item->customer->name }}</td>
+                                                    <td>{{ $item->customer?->name }}</td>
                                                 </tr>
                                                 @endforeach
                                             </tbody>
@@ -416,8 +416,8 @@
                                                 <tr>
                                                     <th scope="row">{{ $loop->iteration }}</th>
                                                     <td>{{ $item->created_at }}</td>
-                                                    <td>{{ $item->equipment->name }}</td>
-                                                    <td>{{ $item->qty." ".$item->equipment->unit }}</td>
+                                                    <td>{{ $item->equipment?->name }}</td>
+                                                    <td>{{ $item->qty." ".$item->equipment?->unit }}</td>
                                                     <td>            
                                                         <form action="{{ route('dotations.destroy', $item->id) }}" method="POST" style="display: inline-block">
                                                             @csrf

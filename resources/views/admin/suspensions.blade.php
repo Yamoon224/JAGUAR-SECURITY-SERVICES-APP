@@ -38,7 +38,7 @@
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $item->created_at }}</td>
-                                <td>{{ $item->employee->firstname." ".$item->employee->name." | ".$item->employee->position." | ".$item->employee->phone }}</td>
+                                <td>{{ $item->employee?->firstname." ".$item->employee?->name." | ".$item->employee?->position." | ".$item->employee?->phone }}</td>
                                 <td>{{ $item->duration." ".$item->unit }}</td>
                                 <td>{{ $item->reason }}</td>
                                 <td>

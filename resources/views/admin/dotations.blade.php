@@ -38,9 +38,9 @@
                                 @foreach ($dotations as $item)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $item->employee->firstname." ".$item->employee->name." | ".$item->employee->position." | ".$item->employee->phone }}</td>
-                                    <td>{{ $item->equipment->name }}</td>
-                                    <td>{{ $item->qty." ".$item->equipment->unit }}</td>
+                                    <td>{{ $item->employee?->firstname." ".$item->employee?->name." | ".$item->employee?->position." | ".$item->employee?->phone }}</td>
+                                    <td>{{ $item->equipment?->name }}</td>
+                                    <td>{{ $item->qty." ".$item->equipment?->unit }}</td>
                                     <td>
                                         <a data-bs-toggle="modal" data-bs-target="#dotation{{ $item->id }}" class="btn btn-sm btn-primary" title="Editer les informations" style="display: inline-block">
                                             <i class="bx bx-edit-alt"></i>
