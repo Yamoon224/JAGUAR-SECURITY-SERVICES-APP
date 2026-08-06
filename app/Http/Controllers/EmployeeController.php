@@ -113,7 +113,7 @@ class EmployeeController extends Controller
     public function show(int $id)
     {
         $employee = Employee::find($id);
-        $equipments = Equipment::all()->filter(fn ($equipment) => $equipment->qty > $equipment->dotations->sum('qty'));
+        $equipments = Equipment::all()->filter(fn ($equipment) => $equipment->available_qty > 0);
         return view('admin.employee', compact('employee', 'equipments'));
     }
 

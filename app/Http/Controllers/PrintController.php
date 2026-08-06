@@ -887,7 +887,7 @@ class PrintController extends Controller
                 $item->name,
                 optional($item->category)->name,
                 (int) $item->qty,
-                (int) ($item->qty - $item->dotations->sum('qty')),
+                (int) $item->available_qty,
             ])->toArray(),
             'Aucun equipement disponible.'
         );

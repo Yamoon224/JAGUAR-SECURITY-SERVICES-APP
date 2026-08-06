@@ -19,7 +19,7 @@
                             <select class="form-select mb-3" name="equipment_id" required>
                                 <option value="" selected>@lang('lang.equipment', ['param'=>'']) *</option>
                                 @foreach ($equipments as $item)
-                                    <option value="{{ $item->id }}" title="{{ $item->qty - $item->dotations->sum('qty') }}">{{ $item->category->name." | ".$item->name." | ".($item->qty - $item->dotations->sum('qty'))." ".$item->unit." disponible(s)" }}</option>
+                                    <option value="{{ $item->id }}" title="{{ $item->available_qty }}">{{ $item->category->name." | ".$item->name." | ".$item->available_qty." ".$item->unit." disponible(s)" }}</option>
                                 @endforeach
                             </select>
                             <div class="position-relative input-icon mb-3">

@@ -19,6 +19,18 @@ class EquipmentController extends Controller
     }
 
     /**
+     * Display the equipments that have a deteriorated quantity.
+     */
+    public function deteriorated()
+    {
+        $categories = Category::all();
+        $equipments = Equipment::with('category', 'dotations')
+            ->where('deteriorated_qty', '>', 0)
+            ->get();
+        return view('admin.equipments-deteriorated', compact('equipments', 'categories'));
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

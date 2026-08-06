@@ -29,9 +29,14 @@
                                 <input type="number" class="form-control" name="qty" placeholder="@lang('lang.qty') *" value="{{ $equipment->qty }}" min="1" required>
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
                             </div>
-                            <div class="position-relative input-icon">
+                            <div class="position-relative input-icon mb-3">
                                 <input type="text" class="form-control" name="unit" placeholder="@lang('lang.unit')" value="{{ $equipment->unit }}">
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
+                            </div>
+                            <label class="form-label mb-1">@lang('lang.deteriorated_qty')</label>
+                            <div class="position-relative input-icon">
+                                <input type="number" class="form-control" name="deteriorated_qty" placeholder="@lang('lang.deteriorated_qty')" value="{{ $equipment->deteriorated_qty ?? 0 }}" min="0">
+                                <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-error'></i></span>
                             </div>
                         </div>
                     </div>

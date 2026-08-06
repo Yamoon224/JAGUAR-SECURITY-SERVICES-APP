@@ -79,7 +79,44 @@
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
                             </div>
                         </div>
-                        
+
+                        <div class="col-12 text-uppercase"><h6>@lang('lang.prime')s</h6></div>
+                        <div class="col-md-6">
+                            <label class="form-label mb-1">Indemnité de transport</label>
+                            <div class="position-relative input-icon">
+                                <input type="number" class="form-control" name="transport_indemnity" min="0" value="0">
+                                <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label mb-1">Prime de repas</label>
+                            <div class="position-relative input-icon">
+                                <input type="number" class="form-control" name="meal_allowance" min="0" value="0">
+                                <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label mb-1">Indemnité de logement</label>
+                            <div class="position-relative input-icon">
+                                <input type="number" class="form-control" name="housing_indemnity" min="0" value="0">
+                                <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label mb-1">Prime de ponctualité et d’assiduité</label>
+                            <div class="position-relative input-icon">
+                                <input type="number" class="form-control" name="punctuality_allowance" min="0" value="0">
+                                <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label mb-1">Prime de responsabilité</label>
+                            <div class="position-relative input-icon">
+                                <input type="number" class="form-control" name="responsibility_allowance" min="0" value="0">
+                                <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
+                            </div>
+                        </div>
+
                         <div class="col-12 text-uppercase"><h6>@lang('lang.bank')</h6></div>
                         <div class="col-md-6">
                             <div class="position-relative input-icon">

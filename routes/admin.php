@@ -16,6 +16,7 @@ use App\Http\Controllers\DotationController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ApplicantController;
 use App\Http\Controllers\EquipmentController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SuspensionController;
 use App\Http\Controllers\AffectationController;
 use App\Http\Controllers\LicenciementController;
@@ -82,6 +83,7 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'lang'])->group(function
     Route::get('/lang/{locale}', [Controller::class, 'language'])->name('lang');
     Route::get('/employees/notAffected/{id}', [EmployeeController::class, 'employeeNotAffected'])->name('employees.notaffected');
     Route::get('/employees/{id}/profile-card/print', [EmployeeController::class, 'printProfileCard'])->name('employees.profile-card.print');
+    Route::get('/equipments/deteriorated', [EquipmentController::class, 'deteriorated'])->name('equipments.deteriorated');
 
     Route::post('/bills/monthly', [BillController::class, 'getByMonthly'])->name('bills.monthly');
     Route::post('/payments/monthly', [PaymentController::class, 'getByMonthly'])->name('payments.monthly');
@@ -104,6 +106,7 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'lang'])->group(function
     Route::resource('categories', CategoryController::class);
     Route::resource('applicants', ApplicantController::class);
     Route::resource('equipments', EquipmentController::class);
+    Route::resource('purchases', PurchaseController::class);
     Route::resource('suspensions', SuspensionController::class);
     Route::resource('recruitments', RecruitmentController::class);
     Route::resource('affectations', AffectationController::class);
