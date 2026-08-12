@@ -59,6 +59,13 @@ class PrintController extends Controller
         $isUSD = ($id === 209);
         $rate = $isUSD ? self::getUsdRate() : 1;
         $currency = $isUSD ? 'USD' : 'GNF';
+
+        $bill = Bill::firstwhere([
+            'month_id' => $month,
+            'year_id' => $year,
+            'customer_id' => $id
+        ]);
+        $exonerationPct = $bill->exoneration ?? 0;
     
         self::$obj->SetTitle(utf8_decode("Facture - " . $customer->name . " - " . __('lang.' . getMonthName($month))));
         self::$obj->SetFont('Arial', 'IB', 8);
@@ -109,13 +116,19 @@ class PrintController extends Controller
         self::$obj->Cell(100, 4, utf8_decode($year), 0, 1);
     
         self::$obj->Ln(1);
-    
-        $bill = Bill::firstwhere([
-            'month_id' => $month,
-            'year_id' => $year,
-            'customer_id' => $id
-        ]);
-    
+
+        if ($exonerationPct > 0) {
+            $pctLabel = (floor($exonerationPct) == $exonerationPct)
+                ? number_format($exonerationPct, 0)
+                : number_format($exonerationPct, 2);
+            self::$obj->SetTextColor(0, 128, 0);
+            self::$obj->SetFont('Arial', 'B', 9);
+            self::$obj->setX(10);
+            self::$obj->Cell(190, 5, utf8_decode('EXONERATION DE ' . $pctLabel . '% DE LA TVA'), 0, 1, 'C');
+            self::$obj->SetTextColor(0, 0, 0);
+            self::$obj->Ln(1);
+        }
+
         // ✅ Headers dynamiques avec devise
         $headers = [
             '#',
@@ -130,7 +143,7 @@ class PrintController extends Controller
             $headers,
             $affectations,
             $isReceipt,
-            $bill ? ['discount' => $bill->discount, 'arrears' => $bill->arrears] : [],
+            $bill ? ['discount' => $bill->discount, 'arrears' => $bill->arrears, 'exoneration' => $exonerationPct] : [],
             false,
             $currency
         );

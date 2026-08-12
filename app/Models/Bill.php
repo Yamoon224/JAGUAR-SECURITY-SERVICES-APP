@@ -11,6 +11,10 @@ class Bill extends BaseModel
 
 	protected $guarded = [];
 
+	protected $casts = [
+		'exoneration' => 'float',
+	];
+
     public function customer()
 	{
 		return $this->belongsTo(Customer::class);

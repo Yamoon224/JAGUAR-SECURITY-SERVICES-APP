@@ -299,14 +299,22 @@ class PDF extends Fpdf
     
         $this->SetFont('Arial', 'I', 9);
     
-        $ttc = $sum + $taxs + $oraspc;
-    
+        // ✅ Exonération : un pourcentage déduit du montant de la TVA
+        $exonerationPct = $others['exoneration'] ?? 0;
+        $exonerationAmount = $taxs * $exonerationPct * 0.01;
+
+        $ttc = $sum + $taxs + $oraspc - $exonerationAmount;
+
         $supp = [
             'TOTAL HT' => moneyFormat($sum, ".", $currency),
-            'TOTAL TVA' => moneyFormat($taxs, ".", $currency),
             'TOTAL ORASPC' => moneyFormat($oraspc, ".", $currency),
+            'TOTAL TVA' => moneyFormat($taxs, ".", $currency),
         ];
-    
+
+        if ($exonerationPct > 0) {
+            $supp['EXONERATION'] = moneyFormat($exonerationAmount, ".", $currency);
+        }
+
         if (!empty($others['discount'])) {
             $discount = $others['discount'];
             if ($isUSD) $discount *= $rate;
