@@ -60,13 +60,13 @@ class PrintController extends Controller
         $rate = $isUSD ? self::getUsdRate() : 1;
         $currency = $isUSD ? 'USD' : 'GNF';
 
-        $bill = Bill::firstwhere([
-            'month_id' => $month,
-            'year_id' => $year,
-            'customer_id' => $id
-        ]);
-        $exonerationPct = $bill->exoneration ?? 0;
-    
+        // ✅ Exonération : gérée par affectation comme ORASPC/TVA, on calcule ici
+        // le taux effectif (pondéré par la TVA de chaque affectation) pour la
+        // mention d'en-tête.
+        $totalTva = $affectations->sum(fn ($a) => ($a->tva ?? 0) * 0.01 * $a->price);
+        $totalExoneration = $affectations->sum(fn ($a) => ($a->tva ?? 0) * 0.01 * $a->price * (($a->exoneration ?? 0) * 0.01));
+        $exonerationPct = $totalTva > 0 ? ($totalExoneration / $totalTva * 100) : 0;
+
         self::$obj->SetTitle(utf8_decode("Facture - " . $customer->name . " - " . __('lang.' . getMonthName($month))));
         self::$obj->SetFont('Arial', 'IB', 8);
         self::$obj->AddPage();
@@ -129,6 +129,12 @@ class PrintController extends Controller
             self::$obj->Ln(1);
         }
 
+        $bill = Bill::firstwhere([
+            'month_id' => $month,
+            'year_id' => $year,
+            'customer_id' => $id
+        ]);
+
         // ✅ Headers dynamiques avec devise
         $headers = [
             '#',
@@ -138,12 +144,12 @@ class PrintController extends Controller
             'ORASPC',
             'TTC'
         ];
-    
+
         self::$obj->FancyTable(
             $headers,
             $affectations,
             $isReceipt,
-            $bill ? ['discount' => $bill->discount, 'arrears' => $bill->arrears, 'exoneration' => $exonerationPct] : [],
+            $bill ? ['discount' => $bill->discount, 'arrears' => $bill->arrears] : [],
             false,
             $currency
         );

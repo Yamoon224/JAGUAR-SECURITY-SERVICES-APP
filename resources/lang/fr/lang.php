@@ -230,7 +230,7 @@ return array(
     'search' => 'Recherche',
     'year' => 'Année:param',
     'discount' => 'Montant Remise',
-    'exoneration' => 'Exonération (%)',
+    'exoneration' => 'Exonération',
     'soldout' => 'Reglée',
     'pay' => 'Payer',
     'payment' => 'Paiment:param',

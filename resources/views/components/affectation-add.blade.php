@@ -48,7 +48,11 @@
                             <div class="position-relative input-icon mb-2">
                                 <input type="text" class="form-control" name="tva" placeholder="@lang('lang.tva')" />
                                 <span class="position-absolute top-50 translate-middle-y">%</span>
-                            </div>  
+                            </div>
+                            <div class="position-relative input-icon mb-2">
+                                <input type="text" class="form-control" name="exoneration" placeholder="@lang('lang.exoneration')" value="18" />
+                                <span class="position-absolute top-50 translate-middle-y">%</span>
+                            </div>
                         </div>
                     </div>
                 </div>

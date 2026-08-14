@@ -27,7 +27,6 @@ class StoreBillRequest extends FormRequest
             "discount" => ['required'],
             "month_id" => ['required'],
             "year_id" => ['required'],
-            "exoneration" => ['nullable', 'numeric', 'min:0', 'max:100'],
         ];
     }
 }

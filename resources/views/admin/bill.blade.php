@@ -21,7 +21,6 @@
                             <th>@lang('lang.amount')</th>
                             <th>@lang('lang.discount')</th>
                             <th>@lang('lang.arrears')</th>
-                            <th>@lang('lang.exoneration')</th>
                             <th>@lang('lang.contract_amount')</th>
                             <th>@lang('lang.action', ['param'=>'s'])</th>
                         </tr>
@@ -41,9 +40,6 @@
                             </td>
                             <td id="arrears{{ $item->id }}">
                                 <input type="number" id="arrears{{ $item->id }}" list="{{ $item->bills->count() ? $item->bills->first()->id : 0 }}"  class="form-control form-control-sm arrears" value="{{ $item->bills->count() ? $item->bills->first()->arrears : 0 }}">
-                            </td>
-                            <td>
-                                <input type="number" id="exoneration{{ $item->id }}" list="{{ $item->bills->count() ? $item->bills->first()->id : 0 }}" min="0" max="100" step="0.01" class="form-control form-control-sm exoneration" value="{{ $item->bills->count() ? $item->bills->first()->exoneration : 18 }}">
                             </td>
                             <td id="amount{{ $item->id }}">{{ moneyFormat($item->amount) }}</td>
                             <td>
@@ -69,21 +65,20 @@
                             <th>TOTAL : {{ $affectations }} @lang('lang.employee', ['param'=>'s'])</th>
                             <th>TOTAL : {{ moneyFormat($sum) }}</th>
                             <th>TOTAL : {{ moneyFormat(0) }}</th>
-                            <th></th>
                             <th>TOTAL : {{ moneyFormat($sum) }}</th>
                             <th></th>
                         </tr>
                     </tfoot>
                 </table>
             </div>
-        </div>     
-    </div> 
+        </div>
+    </div>
 </div>
 <script>
     var customerId = (target) => {
         var nombres = target.match(/\d+/g);
-        if (nombres) 
-            nombres = nombres.map(Number); 
+        if (nombres)
+            nombres = nombres.map(Number);
         return nombres;
     }
     $('.makePay').each(function () {
@@ -92,15 +87,14 @@
                 amount = $('#amount'+customer_id).text(),
                 net = $('#net'+customer_id).val(),
                 arrears = $('#arrears'+customer_id).val(),
-                discount = $('#discount'+customer_id).val(),
-                exoneration = $('#exoneration'+customer_id).val();
+                discount = $('#discount'+customer_id).val();
 
-            let data = {'customer_id':customer_id, 'arrears':arrears, 'net':net, 'amount':amount, 'discount':discount, 'exoneration':exoneration, 'month_id':"{{ $month_id }}", '_token':"{{ csrf_token() }}", 'year_id':"{{ date('Y') }}"}
+            let data = {'customer_id':customer_id, 'arrears':arrears, 'net':net, 'amount':amount, 'discount':discount, 'month_id':"{{ $month_id }}", '_token':"{{ csrf_token() }}", 'year_id':"{{ date('Y') }}"}
             $.ajax({type: "POST",
                 url: "{{ route('bills.store') }}",
                 data: data,
                 success: (success) => {
-                    notify(success.message) 
+                    notify(success.message)
                     if(success?.redirect) {
                         window.location.href = success.redirect;
                     }else {
@@ -115,13 +109,12 @@
         $(this).on('change', function () {
             let discount = $(this).val(),
                 id = $(this).attr('list');
-                
+
             let customer_id = customerId($(this).prop('id'))[0];
             let data = {
                 'discount':discount, '_token':"{{ csrf_token() }}", '_method':"PUT", 'customer_id':customer_id,
                 'id':id, 'net':$('#net'+customer_id).val(), 'amount':$('#amount'+customer_id).val(),
-                'month_id':"{{ $month_id }}", 'year_id':"{{ date('Y') }}", 'arrears':$('#arrears'+customer_id).val(),
-                'exoneration':$('#exoneration'+customer_id).val()
+                'month_id':"{{ $month_id }}", 'year_id':"{{ date('Y') }}", 'arrears':$('#arrears'+customer_id).val()
             }
             $.ajax({type: "POST",
                 url: "https://admin.jss-gn.com/admin/bills/"+id,
@@ -142,40 +135,12 @@
         $(this).on('change', function () {
             let arrears = $(this).val(),
                 id = $(this).attr('list');
-                
+
             let customer_id = customerId($(this).prop('id'))[0];
             let data = {
                 'arrears':arrears, '_token':"{{ csrf_token() }}", '_method':"PUT", 'id':id,
                 'net':$('#net'+customer_id).val(), 'amount':$('#amount'+customer_id).val(), 'discount':$('#discount'+customer_id).val(),
-                'month_id':"{{ $month_id }}", 'year_id':"{{ date('Y') }}", 'customer_id':customer_id,
-                'exoneration':$('#exoneration'+customer_id).val()
-            }
-            $.ajax({type: "POST",
-                url: "https://admin.jss-gn.com/admin/bills/"+id,
-                data: data,
-                success: (success) => {
-                    notify(success.message);
-                    if(success?.redirect) {
-                        window.location.href = success.redirect;
-                    }else {
-                        setTimeout(location.reload(), 5000);
-                    }
-                },
-                error: (error) => console.log(error)
-            });
-        })
-    })
-    $('.exoneration').each(function () {
-        $(this).on('change', function () {
-            let exoneration = $(this).val(),
-                id = $(this).attr('list');
-
-            let customer_id = customerId($(this).prop('id'))[0];
-            let data = {
-                'exoneration':exoneration, '_token':"{{ csrf_token() }}", '_method':"PUT", 'id':id,
-                'net':$('#net'+customer_id).val(), 'amount':$('#amount'+customer_id).val(), 'discount':$('#discount'+customer_id).val(),
-                'month_id':"{{ $month_id }}", 'year_id':"{{ date('Y') }}", 'customer_id':customer_id,
-                'arrears':$('#arrears'+customer_id).val()
+                'month_id':"{{ $month_id }}", 'year_id':"{{ date('Y') }}", 'customer_id':customer_id
             }
             $.ajax({type: "POST",
                 url: "https://admin.jss-gn.com/admin/bills/"+id,

@@ -231,7 +231,7 @@ return array(
     'search' => 'Search',
     'year' => 'Year:param',
     'discount' => 'Discount',
-    'exoneration' => 'Exoneration (%)',
+    'exoneration' => 'Exoneration',
     'soldout' => 'Sold Out',
     'pay' => 'Pay',
     'payment' => 'Payment:param',

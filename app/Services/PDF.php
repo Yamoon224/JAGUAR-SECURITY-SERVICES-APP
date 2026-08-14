@@ -251,25 +251,29 @@ class PDF extends Fpdf
         $sum = 0;
         $taxs = 0;
         $oraspc = 0;
-    
+        $exoneration = 0;
+
         foreach ($data as $key => $row) {
-    
+
             // Calculs
             $price = $row->price;
             $tvaAmount = $row->tva * 0.01 * $price;
             $orasp = $row->oraspc;
+            // ✅ Exonération : un pourcentage propre à l'affectation, déduit de la TVA de la ligne (géré comme oraspc/tva)
+            $exo = $tvaAmount * ($row->exoneration ?? 0) * 0.01;
             $ttc = $price + $tvaAmount;
-    
+
             // Conversion si USD
             if ($isUSD && $rate > 0) {
                 $price *= $rate;
                 $tvaAmount *= $rate;
                 $orasp *= $rate;
+                $exo *= $rate;
                 $ttc *= $rate;
             }
-    
+
             $this->Cell($w[0], 6, ++$key, 'LR', 0, 'C', $fill);
-    
+
             $this->Cell(
                 $w[1],
                 6,
@@ -279,31 +283,28 @@ class PDF extends Fpdf
                 ),
                 'LR', 0, 'C', $fill
             );
-    
+
             $this->Cell($w[2], 6, moneyFormat($price, ".", $currency), 'LR', 0, 'C', $fill);
             $this->Cell($w[3], 6, moneyFormat($tvaAmount, ".", $currency), 'LR', 0, 'C', $fill);
             $this->Cell($w[4], 6, moneyFormat($orasp, ".", $currency), 'LR', 0, 'C', $fill);
             $this->Cell($w[5], 6, moneyFormat($ttc, ".", $currency), 'LR', 0, 'C', $fill);
-    
+
             $this->Ln();
             $fill = !$fill;
-    
+
             $sum += $price;
             $taxs += $tvaAmount;
             $oraspc += $orasp;
+            $exoneration += $exo;
         }
-    
+
         // Ligne de fin
         $this->Cell(array_sum($w), 0, '', 'T', 1);
         $this->Ln();
-    
-        $this->SetFont('Arial', 'I', 9);
-    
-        // ✅ Exonération : un pourcentage déduit du montant de la TVA
-        $exonerationPct = $others['exoneration'] ?? 0;
-        $exonerationAmount = $taxs * $exonerationPct * 0.01;
 
-        $ttc = $sum + $taxs + $oraspc - $exonerationAmount;
+        $this->SetFont('Arial', 'I', 9);
+
+        $ttc = $sum + $taxs + $oraspc - $exoneration;
 
         $supp = [
             'TOTAL HT' => moneyFormat($sum, ".", $currency),
@@ -311,8 +312,8 @@ class PDF extends Fpdf
             'TOTAL TVA' => moneyFormat($taxs, ".", $currency),
         ];
 
-        if ($exonerationPct > 0) {
-            $supp['EXONERATION'] = moneyFormat($exonerationAmount, ".", $currency);
+        if ($exoneration > 0) {
+            $supp['EXONERATION'] = moneyFormat($exoneration, ".", $currency);
         }
 
         if (!empty($others['discount'])) {

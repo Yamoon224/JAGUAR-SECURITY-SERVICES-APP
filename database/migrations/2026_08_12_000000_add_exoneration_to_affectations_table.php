@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('bills', function (Blueprint $table) {
-            if (!Schema::hasColumn('bills', 'exoneration')) {
-                // No ->after(...): given this table's columns were never fully
-                // tracked by migrations, don't assume a specific column exists.
+        Schema::table('affectations', function (Blueprint $table) {
+            if (!Schema::hasColumn('affectations', 'exoneration')) {
+                // No ->after(...): this table's columns were never fully
+                // tracked by migrations, don't assume a specific one exists.
                 $table->decimal('exoneration', 5, 2)->default(18);
             }
         });
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('bills', function (Blueprint $table) {
-            if (Schema::hasColumn('bills', 'exoneration')) {
+        Schema::table('affectations', function (Blueprint $table) {
+            if (Schema::hasColumn('affectations', 'exoneration')) {
                 $table->dropColumn('exoneration');
             }
         });
