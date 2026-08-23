@@ -1,5 +1,5 @@
 <div class="modal fade" id="employee-add" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-dark">
                 <h5 class="modal-title text-white"><i class="bx bx-user-plus"></i> @lang('lang.new_employee')</h5>
@@ -9,19 +9,22 @@
                 @csrf
                 <div class="modal-body">
                     <div class="row g-3">
-                        <div class="col-12 text-uppercase"><h6>@lang('lang.employee', ['param'=>''])</h6></div>
                         <div class="col-12" id="applicant-delete"></div>
-                        <div class="col-12">                                    
+                        <div class="col-12">
                             <select class="form-select mb-3" name="employee_id" required>
                                 <option value='' selected>@lang('lang.applicant', ['param'=>'s']) *</option>
                                 @foreach ($applicants as $item)
                                     <option value="{{ $item->id }}">{{ $item->firstname." ".$item->name." | ".$item->phone. " | " .$item->applicationid }}</option>
                                 @endforeach
                             </select>
-                            <div class="position-relative input-icon mb-3">
+                        </div>
+                        <div class="col-md-6">
+                            <div class="position-relative input-icon">
                                 <input type="email" class="form-control" name="email" placeholder="@lang('lang.email')">
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-envelope'></i></span>
                             </div>
+                        </div>
+                        <div class="col-md-6">
                             <div class="position-relative input-icon">
                                 <input type="text" class="form-control" name="position" placeholder="@lang('lang.position') *" required>
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-user'></i></span>
@@ -70,12 +73,9 @@
                             <input type="date" class="form-control" name="contract_end_at">
                         </div>
                         <div class="col-12">
+                            <label class="form-label mb-1">Salaire</label>
                             <div class="position-relative input-icon mb-3">
                                 <input type="number" class="form-control" name="salary" placeholder="@lang('lang.salary') *" min="600000" required>
-                                <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
-                            </div>
-                            <div class="position-relative input-icon">
-                                <input type="number" class="form-control" name="prime" placeholder="@lang('lang.prime')" min="0">
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
                             </div>
                         </div>
@@ -103,16 +103,16 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label mb-1">Prime de ponctualité et d’assiduité</label>
-                            <div class="position-relative input-icon">
-                                <input type="number" class="form-control" name="punctuality_allowance" min="0" value="0">
-                                <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
                             <label class="form-label mb-1">Prime de responsabilité</label>
                             <div class="position-relative input-icon">
                                 <input type="number" class="form-control" name="responsibility_allowance" min="0" value="0">
+                                <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label mb-1">Prime de ponctualité et d’assiduité</label>
+                            <div class="position-relative input-icon">
+                                <input type="number" class="form-control" name="punctuality_allowance" min="0" value="0">
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
                             </div>
                         </div>

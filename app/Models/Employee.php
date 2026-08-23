@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $familystatus
  * @property string $contract
  * @property float $salary
- * @property float|null $prime
+ * @property float|null $prime La colonne brute n'est plus alimentée : la valeur exposée est calculée, voir getPrimeAttribute().
  * @property string $emergency_name
  * @property string $emergency_phone
  * @property string $status
@@ -91,5 +91,21 @@ class Employee extends BaseModel
 	public function currentAffectation()
 	{
 		return$this->affectations->sortByDesc('updated_at')->first();
+	}
+
+	/**
+	 * La "prime" globale a été subdivisée en indemnités détaillées
+	 * (transport, repas, logement, ponctualité, responsabilité). Ce champ
+	 * n'a plus de formulaire pour être saisi directement : partout où le
+	 * code lit $employee->prime (paie, CNSS/RTS, bulletins, reçus...), on
+	 * expose désormais la somme de ces indemnités à la place.
+	 */
+	public function getPrimeAttribute()
+	{
+		return ($this->transport_indemnity ?? 0)
+			+ ($this->meal_allowance ?? 0)
+			+ ($this->housing_indemnity ?? 0)
+			+ ($this->punctuality_allowance ?? 0)
+			+ ($this->responsibility_allowance ?? 0);
 	}
 }

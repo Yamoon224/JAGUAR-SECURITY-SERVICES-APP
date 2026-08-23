@@ -1,5 +1,5 @@
 <div class="modal fade" id="employee{{ $employee->id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-dark">
                 <h5 class="modal-title text-white"><i class="bx bx-edit-alt"></i> @lang('lang.new_employee')</h5>
@@ -40,14 +40,14 @@
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-phone'></i></span>
                             </div>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <label class="form-label mb-1">@lang('lang.email')</label>
                             <div class="position-relative input-icon">
                                 <input type="email" class="form-control" name="email" placeholder="@lang('lang.email')" value="{{ $employee->email }}">
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-envelope'></i></span>
                             </div>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <label class="form-label mb-1">@lang('lang.position')</label>
                             <div class="position-relative input-icon">
                                 <input type="text" class="form-control" name="position" placeholder="@lang('lang.position') *" value="{{ $employee->position }}" required>
@@ -156,13 +156,7 @@
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label mb-1">Prime de ponctualité et d’assiduité</label>
-                            <div class="position-relative input-icon">
-                                <input type="number" class="form-control" name="punctuality_allowance" min="0" value="{{ $employee->punctuality_allowance ?? 0 }}">
-                                <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
-                            </div>
-                        </div>
+                        
                         <div class="col-md-6">
                             <label class="form-label mb-1">Prime de responsabilité</label>
                             <div class="position-relative input-icon">
@@ -170,10 +164,10 @@
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label mb-1">@lang('lang.prime')</label>
+                        <div class="col-12">
+                            <label class="form-label mb-1">Prime de ponctualité et d’assiduité</label>
                             <div class="position-relative input-icon">
-                                <input type="number" class="form-control" name="prime" placeholder="@lang('lang.prime')" min="0" value="{{ $employee->prime }}">
+                                <input type="number" class="form-control" name="punctuality_allowance" min="0" value="{{ $employee->punctuality_allowance ?? 0 }}">
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
                             </div>
                         </div>

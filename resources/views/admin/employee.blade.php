@@ -181,13 +181,6 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label mb-1"></label>@lang('lang.prime')</label>
-                                    <div class="position-relative input-icon">
-                                        <input type="number" class="form-control" name="prime" placeholder="@lang('lang.prime')" min="0" value="{{ $employee->prime }}">
-                                        <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-money'></i></span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
                                     <div class="form-check form-switch form-check-success">
                                         <input class="form-check-input" type="checkbox" role="switch" id="hastoPay" name="hastopay" {{ $employee->hastopay == 1 ? 'checked' : '' }}>
                                         <label class="form-check-label" for="hastoPay">@lang('lang.hastopay')</label>
