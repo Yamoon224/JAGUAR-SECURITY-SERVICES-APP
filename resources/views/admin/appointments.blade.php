@@ -1,76 +1,119 @@
 <x-admin-layout>
+@push('css-view')
+<link href="{{ asset('assets/admin/plugins/fullcalendar/css/main.min.css') }}" rel="stylesheet" />
+<style>
+    #appointmentCalendar { --fc-border-color: #e9ecef; }
+    #appointmentCalendar .fc-toolbar-title { font-size: 1.15rem; }
+    #appointmentCalendar .fc-event { cursor: pointer; border: none; padding: 2px 4px; }
+    #appointmentCalendar .fc-daygrid-event { white-space: normal; }
+    @media (max-width: 575.98px) {
+        #appointmentCalendar .fc-toolbar { flex-direction: column; gap: .5rem; }
+    }
+</style>
+@endpush
+
 <div class="col">
-    <div class="d-none d-sm-flex align-items-center">
-        <div class="ms-auto">
-            <a class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#appointment-add"><i class="bx bx-calendar"></i> @lang('lang.new_appointment')</a>
-            <a class="btn btn-sm btn-dark" href="{{ route('appointments.report') }}"><i class="bx bx-printer"></i> @lang('lang.appointment', ['param'=>'s'])</a>
+    <div class="d-sm-flex align-items-center flex-wrap gap-2">
+        <h6 class="mb-0 text-uppercase">@lang('lang.appointment', ['param'=>'s'])</h6>
+        <div class="ms-auto d-flex flex-wrap gap-2">
+            <a class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#appointment-add"><i class="bx bx-calendar-plus"></i> @lang('lang.new_appointment')</a>
+            <a class="btn btn-sm btn-danger" href="{{ route('appointments.report') }}" target="_blank"><i class="bx bx-printer"></i> PDF @lang('lang.appointment', ['param'=>'s'])</a>
         </div>
     </div>
     <hr/>
+
     <div class="card border-dark border-bottom border-3 border-0">
         <div class="card-body">
-            <ul class="nav nav-tabs nav-default" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <a class="nav-link active" data-bs-toggle="tab" href="#table-customer" role="tab" aria-selected="false">
-                        <div class="d-flex align-items-center">
-                            <div class="tab-icon"><i class='bx bx-calendar font-18 me-1'></i></div>
-                            <div class="tab-title">@lang('lang.appointment', ['param'=>'s'])</div>
-                        </div>
-                    </a>
-                </li>
-            </ul>
-            <div class="tab-content py-3">
-                <div class="tab-pane fade show active" id="table-customer" role="tabpanel">
-                    <div class="col">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-bordered w-100">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>@lang('lang.expected_at')</th>
-                                        <th>@lang('lang.start_time')</th>
-                                        <th>@lang('lang.end_time')</th>
-                                        <th>@lang('lang.visitor')</th>
-                                        <th>@lang('lang.phone_id')</th>
-                                        <th>@lang('lang.company')</th>
-                                        <th>@lang('lang.action', ['param'=>'s'])</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($appointments as $item)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ date('d/m/Y', strtotime($item->expected_at)) }}</td>
-                                        <td>{{ date('H:i', strtotime($item->start_time)) }}</td>
-                                        <td>{{ date('H:i', strtotime($item->end_time)) }}</td>
-                                        <td>{{ $item->visitor }}</td>
-                                        <td>{{ $item->phone }}</td>
-                                        <td>{{ $item->company }}</td>
-                                        <td>
-                                            <a data-bs-toggle="modal" data-bs-target="#appointment{{ $item->id }}" class="btn btn-sm btn-primary" title="Editer les informations" style="display: inline-block">
-                                                <i class="bx bx-edit-alt"></i>
-                                            </a>
-                                            <x-appointment-edit :appointment="$item" />
-                
-                                            <form action="{{ route('meets.destroy', $item->id) }}" method="POST" style="display: inline-block">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-sm btn-danger" title="Supprimer cet Employé">
-                                                    <i class="bx bx-trash"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>     
-                </div> 
-            </div>
+            <div id="appointmentCalendar"></div>
+
+            @forelse ($appointments as $item)
+                <x-appointment-edit :appointment="$item" />
+            @empty
+            @endforelse
         </div>
     </div>
 </div>
 
-<x-appointment-add></x-appointment-add>
+<x-appointment-add />
+
+@push('js-view')
+<script src="{{ asset('assets/admin/plugins/fullcalendar/js/main.min.js') }}"></script>
+<script src="{{ asset('assets/admin/plugins/fullcalendar/locales/fr.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('appointmentCalendar');
+        if (!el || typeof FullCalendar === 'undefined') return;
+
+        var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+        var ymd = function (d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+        var hm  = function (d) { return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+
+        var calendar = new FullCalendar.Calendar(el, {
+            initialView: 'dayGridMonth',
+            locale: 'fr',
+            firstDay: 1,
+            height: 'auto',
+            nowIndicator: true,
+            editable: {{ isRightAccess([1, 4, 7]) ? 'true' : 'false' }},
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            },
+            slotMinTime: '06:00:00',
+            slotMaxTime: '21:00:00',
+            events: @json($events),
+
+            dateClick: function (info) {
+                var form = document.querySelector('#appointment-add form');
+                if (form) {
+                    var dateField = form.querySelector('[name="expected_at"]');
+                    if (dateField) dateField.value = info.dateStr.substring(0, 10);
+                    if (info.date && info.view.type !== 'dayGridMonth') {
+                        var st = form.querySelector('[name="start_time"]');
+                        var et = form.querySelector('[name="end_time"]');
+                        if (st) st.value = hm(info.date);
+                        var endDate = new Date(info.date.getTime() + 30 * 60000);
+                        if (et) et.value = hm(endDate);
+                    }
+                }
+                new bootstrap.Modal(document.getElementById('appointment-add')).show();
+            },
+
+            eventClick: function (info) {
+                var modal = document.getElementById('appointment' + info.event.id);
+                if (modal) new bootstrap.Modal(modal).show();
+            },
+
+            eventDrop: reschedule,
+            eventResize: reschedule
+        });
+
+        calendar.render();
+
+        function reschedule(info) {
+            var e = info.event;
+            var body = new URLSearchParams();
+            body.set('_method', 'PUT');
+            body.set('expected_at', ymd(e.start));
+            body.set('start_time', hm(e.start));
+            body.set('end_time', hm(e.end || new Date(e.start.getTime() + 30 * 60000)));
+
+            fetch("{{ url('appointments') }}/" + e.id, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: body.toString()
+            }).then(function (r) {
+                if (!r.ok) info.revert();
+            }).catch(function () {
+                info.revert();
+            });
+        }
+    });
+</script>
+@endpush
 </x-admin-layout>

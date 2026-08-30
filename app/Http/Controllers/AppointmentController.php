@@ -3,17 +3,41 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource (vue calendrier).
      */
     public function index()
     {
-        $appointments = Appointment::all();
-        return view('admin.appointments', compact('appointments'));
+        $appointments = Appointment::orderByDesc('expected_at')->get();
+
+        $events = $appointments->map(function ($item) {
+            $date = Carbon::parse($item->expected_at)->format('Y-m-d');
+            $start = $item->start_time
+                ? $date . 'T' . Carbon::parse($item->start_time)->format('H:i:s')
+                : $date;
+            $end = $item->end_time
+                ? $date . 'T' . Carbon::parse($item->end_time)->format('H:i:s')
+                : null;
+
+            return [
+                'id' => (string) $item->id,
+                'title' => trim($item->visitor . ($item->company ? ' — ' . $item->company : '')),
+                'start' => $start,
+                'end' => $end,
+                'extendedProps' => [
+                    'visitor' => $item->visitor,
+                    'phone' => $item->phone,
+                    'company' => $item->company,
+                ],
+            ];
+        })->values();
+
+        return view('admin.appointments', compact('appointments', 'events'));
     }
 
     /**
@@ -29,11 +53,11 @@ class AppointmentController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->except('_token');
+        $data = $request->except(['_token', '_method']);
         $data['created_by'] = $data['updated_by'] = auth()->id();
-        Appointment::create( $data );
+        Appointment::create($data);
 
-        return back()->with(['message'=>__('locale.save', ['param'=>__('locale.category', ['suffix'=>'', 'prefix'=>''])])]);
+        return back();
     }
 
     /**
@@ -57,11 +81,17 @@ class AppointmentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $data = $request->except(['_token']);
-        $appointment = Appointment::find($id);
+        $data = $request->except(['_token', '_method']);
+        $data['updated_by'] = auth()->id();
+
+        $appointment = Appointment::findOrFail($id);
         $appointment->update($data);
 
-        return back()->with(['message'=>__('locale.update', ['param'=>__('locale.Appointment', ['suffix'=>'', 'prefix'=>''])])]);
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['ok' => true]);
+        }
+
+        return back();
     }
 
     /**
@@ -69,9 +99,8 @@ class AppointmentController extends Controller
      */
     public function destroy(string $id)
     {
-        $appointment = Appointment::find($id);
-        $appointment->delete();
+        Appointment::findOrFail($id)->delete();
 
-        return back()->with(['message'=>__('locale.delete', ['param'=>__('locale.Appointment', ['suffix'=>'', 'prefix'=>''])])]);
+        return back();
     }
 }

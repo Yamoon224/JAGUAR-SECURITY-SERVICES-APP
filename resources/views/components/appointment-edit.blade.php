@@ -25,27 +25,38 @@
                             </div>
                             <div class="position-relative">
                                 <label>@lang('lang.expected_at') <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" name="expected_at" placeholder="@lang('lang.expected_at') *" value="{{ $appointment->expected_at }}" required>
+                                <input type="date" class="form-control" name="expected_at" placeholder="@lang('lang.expected_at') *" value="{{ \Carbon\Carbon::parse($appointment->expected_at)->format('Y-m-d') }}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="position-relative">
                                 <label>@lang('lang.start_time') <span class="text-danger">*</span></label>
-                                <input type="time" class="form-control" name="start_time" placeholder="@lang('lang.start_time')" value="{{ $appointment->start_time }}" required>
+                                <input type="time" class="form-control" name="start_time" placeholder="@lang('lang.start_time')" value="{{ $appointment->start_time ? \Carbon\Carbon::parse($appointment->start_time)->format('H:i') : '' }}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="position-relative">
                                 <label>@lang('lang.end_time') <span class="text-danger">*</span></label>
-                                <input type="time" class="form-control" name="end_time" placeholder="@lang('lang.end_time')" value="{{ $appointment->end_time }}" required>
+                                <input type="time" class="form-control" name="end_time" placeholder="@lang('lang.end_time')" value="{{ $appointment->end_time ? \Carbon\Carbon::parse($appointment->end_time)->format('H:i') : '' }}" required>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer justify-content-between">
                     <button class="btn btn-sm btn-success"><i class="bx bx-user-check"></i> @lang('lang.submit')</button>
+                    @if(isRightAccess([1, 4, 7]))
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="if(confirm('Confirmez-Vous cette suppression')) document.getElementById('appointment-delete-{{ $appointment->id }}').submit()">
+                        <i class="bx bx-trash"></i> @lang('lang.delete')
+                    </button>
+                    @endif
                 </div>
             </form>
+            @if(isRightAccess([1, 4, 7]))
+            <form id="appointment-delete-{{ $appointment->id }}" action="{{ route('appointments.destroy', $appointment->id) }}" method="POST" class="d-none">
+                @csrf
+                @method('DELETE')
+            </form>
+            @endif
         </div>
     </div>
 </div>
