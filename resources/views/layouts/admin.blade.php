@@ -28,15 +28,23 @@
 	<link href="{{ asset('assets/admin/css/pace.min.css') }}" rel="stylesheet"/>
 	<script src="{{ asset('assets/admin/js/pace.min.js') }}"></script>
 	<!-- Bootstrap CSS -->
+	@php
+		// Cache-busting : le suffixe change dès que le fichier CSS est modifié
+		// (git met à jour le mtime au pull), ce qui force le navigateur/CDN à recharger.
+		$cssv = function ($path) {
+			$full = base_path('assets/' . $path);
+			return '?v=' . (is_file($full) ? filemtime($full) : date('YmdH'));
+		};
+	@endphp
 	<link href="{{ asset('assets/admin/css/bootstrap.min.css') }}" rel="stylesheet">
-	<link href="{{ asset('assets/admin/css/bootstrap-extended.css') }}" rel="stylesheet">
+	<link href="{{ asset('assets/admin/css/bootstrap-extended.css') }}{{ $cssv('admin/css/bootstrap-extended.css') }}" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-	<link href="{{ asset('assets/admin/css/app.css') }}" rel="stylesheet">
+	<link href="{{ asset('assets/admin/css/app.css') }}{{ $cssv('admin/css/app.css') }}" rel="stylesheet">
 	<link href="{{ asset('assets/admin/css/icons.css') }}" rel="stylesheet">
 	<!-- Theme Style CSS -->
-	<link rel="stylesheet" href="{{ asset('assets/admin/css/dark-theme.css') }}"/>
-	<link rel="stylesheet" href="{{ asset('assets/admin/css/semi-dark.css') }}"/>
-	<link rel="stylesheet" href="{{ asset('assets/admin/css/header-colors.css') }}"/>
+	<link rel="stylesheet" href="{{ asset('assets/admin/css/dark-theme.css') }}{{ $cssv('admin/css/dark-theme.css') }}"/>
+	<link rel="stylesheet" href="{{ asset('assets/admin/css/semi-dark.css') }}{{ $cssv('admin/css/semi-dark.css') }}"/>
+	<link rel="stylesheet" href="{{ asset('assets/admin/css/header-colors.css') }}{{ $cssv('admin/css/header-colors.css') }}"/>
 	<title>{{ config('app.name', "JSS SARL") }}</title>
 
 	<!-- Select2 : recherche dans les listes déroulantes (employés, etc.) -->
@@ -89,6 +97,25 @@
 		}
 		.select2-container--open { z-index: 1060; }
 		.select2-dropdown { z-index: 1065; }
+
+		/* --- Personnalisation « Couleur du Menu » : pastilles + sidebar en dur
+		   (défini ici pour ne pas dépendre du cache de header-colors.css) --- */
+		.switcher-wrapper .sidebarcolor1 { background:#0727d7!important }
+		.switcher-wrapper .sidebarcolor2 { background:#23282c!important }
+		.switcher-wrapper .sidebarcolor3 { background:#e10a1f!important }
+		.switcher-wrapper .sidebarcolor4 { background:#157d4c!important }
+		.switcher-wrapper .sidebarcolor5 { background:#673ab7!important }
+		.switcher-wrapper .sidebarcolor6 { background:#795548!important }
+		.switcher-wrapper .sidebarcolor7 { background:#d3094e!important }
+		.switcher-wrapper .sidebarcolor8 { background:#ff9800!important }
+		html.color-sidebar.sidebarcolor1 .sidebar-wrapper { background:#0727d7!important }
+		html.color-sidebar.sidebarcolor2 .sidebar-wrapper { background:#23282c!important }
+		html.color-sidebar.sidebarcolor3 .sidebar-wrapper { background:#e10a1f!important }
+		html.color-sidebar.sidebarcolor4 .sidebar-wrapper { background:#157d4c!important }
+		html.color-sidebar.sidebarcolor5 .sidebar-wrapper { background:#673ab7!important }
+		html.color-sidebar.sidebarcolor6 .sidebar-wrapper { background:#795548!important }
+		html.color-sidebar.sidebarcolor7 .sidebar-wrapper { background:#d3094e!important }
+		html.color-sidebar.sidebarcolor8 .sidebar-wrapper { background:#ff9800!important }
 	</style>
 
 	@stack('css-view')
