@@ -152,63 +152,63 @@ html.color-sidebar .sidebar-wrapper {
 
 
 .switcher-wrapper .sidebarcolor1 {
-	background-image: url(../../../images/bg-themes/1.png);
+	background: #0727d7 !important;
 }
 .switcher-wrapper .sidebarcolor2 {
-	background-image: url(../../../images/bg-themes/2.png);
+	background: #23282c !important;
 }
 .switcher-wrapper .sidebarcolor3 {
-	background-image: url(../../../images/bg-themes/3.png);
+	background: #e10a1f !important;
 }
 .switcher-wrapper .sidebarcolor4 {
-	background-image: url(../../../images/bg-themes/4.png);
+	background: #157d4c !important;
 }
 .switcher-wrapper .sidebarcolor5 {
-	background-image: url(../../../images/bg-themes/5.png);
+	background: #673ab7 !important;
 }
 .switcher-wrapper .sidebarcolor6 {
-	background-image: url(../../../images/bg-themes/6.png);
+	background: #795548 !important;
 }
 .switcher-wrapper .sidebarcolor7 {
-	background-image: url(../../../images/bg-themes/7.png);
+	background: #d3094e !important;
 }
 .switcher-wrapper .sidebarcolor8 {
-	background-image: url(../../../images/bg-themes/8.png);
+	background: #ff9800 !important;
 }
 
 
 
 
 html.color-sidebar.sidebarcolor1 .sidebar-wrapper {
-    background-image: url(../../../images/bg-themes/1.png);
+    background: #0727d7 !important;
 }
 
 html.color-sidebar.sidebarcolor2 .sidebar-wrapper {
-    background-image: url(../../../images/bg-themes/2.png);
+    background: #23282c !important;
 }
 
 html.color-sidebar.sidebarcolor3 .sidebar-wrapper {
-    background-image: url(../../../images/bg-themes/3.png);
+    background: #e10a1f !important;
 }
 
 html.color-sidebar.sidebarcolor4 .sidebar-wrapper {
-    background-image: url(../../../images/bg-themes/4.png);
+    background: #157d4c !important;
 }
 
 html.color-sidebar.sidebarcolor5 .sidebar-wrapper {
-    background-image: url(../../../images/bg-themes/5.png);
+    background: #673ab7 !important;
 }
 
 html.color-sidebar.sidebarcolor6 .sidebar-wrapper {
-    background-image: url(../../../images/bg-themes/6.png);
+    background: #795548 !important;
 }
 
 html.color-sidebar.sidebarcolor7 .sidebar-wrapper {
-    background-image: url(../../../images/bg-themes/7.png);
+    background: #d3094e !important;
 }
 
 html.color-sidebar.sidebarcolor8 .sidebar-wrapper {
-    background-image: url(../../../images/bg-themes/8.png);
+    background: #ff9800 !important;
 }
 
 
