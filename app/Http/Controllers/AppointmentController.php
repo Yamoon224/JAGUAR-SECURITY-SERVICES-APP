@@ -53,7 +53,9 @@ class AppointmentController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->except(['_token', '_method']);
+        abort_unless(isRightAccess([1, 4, 7]), 403);
+
+        $data = $this->validated($request);
         $data['created_by'] = $data['updated_by'] = auth()->id();
         Appointment::create($data);
 
@@ -81,11 +83,12 @@ class AppointmentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $data = $request->except(['_token', '_method']);
+        abort_unless(isRightAccess([1, 4, 7]), 403);
+
+        $data = $this->validated($request);
         $data['updated_by'] = auth()->id();
 
-        $appointment = Appointment::findOrFail($id);
-        $appointment->update($data);
+        Appointment::findOrFail($id)->update($data);
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json(['ok' => true]);
@@ -99,8 +102,25 @@ class AppointmentController extends Controller
      */
     public function destroy(string $id)
     {
+        abort_unless(isRightAccess([1, 4, 7]), 403);
+
         Appointment::findOrFail($id)->delete();
 
         return back();
+    }
+
+    /**
+     * Champs autorisés pour un rendez-vous.
+     */
+    private function validated(Request $request): array
+    {
+        return $request->validate([
+            'visitor' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:30'],
+            'company' => ['nullable', 'string', 'max:255'],
+            'expected_at' => ['required', 'date'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+        ]);
     }
 }

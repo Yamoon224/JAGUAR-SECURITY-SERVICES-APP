@@ -98,6 +98,9 @@
             body.set('expected_at', ymd(e.start));
             body.set('start_time', hm(e.start));
             body.set('end_time', hm(e.end || new Date(e.start.getTime() + 30 * 60000)));
+            body.set('visitor', e.extendedProps.visitor || e.title);
+            body.set('phone', e.extendedProps.phone || '');
+            body.set('company', e.extendedProps.company || '');
 
             fetch("{{ url('appointments') }}/" + e.id, {
                 method: 'POST',
