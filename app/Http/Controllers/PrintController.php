@@ -1229,7 +1229,7 @@ class PrintController extends Controller
             $meets->map(fn ($item) => [
                 $item->id,
                 $item->objet ?? $item->object,
-                $item->points,
+                strip_tags($item->points),
                 optional($item->created_at)->format('d/m/Y'),
             ])->toArray(),
             'Aucune reunion disponible.'
@@ -1371,7 +1371,7 @@ class PrintController extends Controller
             $meets->map(fn ($item) => [
                 $item->id,
                 $item->objet,
-                $item->points,
+                strip_tags($item->points),
                 optional($item->created_at)->format('d/m/Y'),
             ])->toArray(),
             'Aucune reunion disponible.'

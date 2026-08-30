@@ -27,7 +27,7 @@
                     </div>
                 </div>
 
-                <div class="small text-muted flex-grow-1" style="white-space: pre-line">{{ \Illuminate\Support\Str::limit($item->points, 220) }}</div>
+                <div class="small text-muted flex-grow-1">{{ \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags($item->points))), 220) }}</div>
 
                 <div class="d-flex align-items-center gap-2 mt-3">
                     @if($item->file_path)
@@ -59,4 +59,65 @@
 </div>
 
 <x-meet-add />
+
+@push('js-view')
+<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+<script>
+    (function () {
+        if (typeof CKEDITOR === 'undefined') return;
+
+        CKEDITOR.disableAutoInline = true;
+        var config = {
+            height: 220,
+            removePlugins: 'elementspath',
+            removeButtons: 'Anchor,Styles,Subscript,Superscript,Image',
+            toolbar: [
+                { name: 'clipboard', items: ['Undo', 'Redo'] },
+                { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', '-', 'RemoveFormat'] },
+                { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
+                { name: 'links', items: ['Link', 'Unlink'] },
+                { name: 'insert', items: ['Table', 'HorizontalRule'] }
+            ],
+            language: 'fr'
+        };
+
+        var build = function (modal) {
+            modal.querySelectorAll('textarea.ckeditor-points').forEach(function (ta) {
+                if (ta.id && !CKEDITOR.instances[ta.id]) {
+                    CKEDITOR.replace(ta.id, config);
+                }
+            });
+        };
+        var teardown = function (modal) {
+            modal.querySelectorAll('textarea.ckeditor-points').forEach(function (ta) {
+                var editor = ta.id && CKEDITOR.instances[ta.id];
+                if (editor) { editor.updateElement(); editor.destroy(true); }
+            });
+        };
+
+        document.addEventListener('shown.bs.modal', function (e) { build(e.target); });
+        document.addEventListener('hidden.bs.modal', function (e) { teardown(e.target); });
+
+        // Synchronise le contenu de l'éditeur vers le textarea avant l'envoi.
+        document.addEventListener('submit', function (e) {
+            e.target.querySelectorAll('textarea.ckeditor-points').forEach(function (ta) {
+                var editor = ta.id && CKEDITOR.instances[ta.id];
+                if (!editor) return;
+                editor.updateElement();
+                if (!ta.value.replace(/<[^>]*>/g, '').trim()) {
+                    e.preventDefault();
+                    alert("L'ordre du jour est obligatoire.");
+                }
+            });
+        }, true);
+
+        // Laisse les boîtes de dialogue CKEditor recevoir le focus dans une modale Bootstrap 5.
+        document.addEventListener('focusin', function (e) {
+            if (e.target.closest('.cke_dialog, .cke_dialog_background_cover')) {
+                e.stopImmediatePropagation();
+            }
+        }, true);
+    })();
+</script>
+@endpush
 </x-admin-layout>

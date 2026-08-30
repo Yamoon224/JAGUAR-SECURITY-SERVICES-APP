@@ -15,7 +15,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold"><i class="bx bx-message-detail"></i> @lang('lang.points') <span class="text-danger">*</span></label>
-                        <textarea class="form-control" name="points" rows="4" style="resize: none" required>{{ $meet->points }}</textarea>
+                        <textarea class="form-control ckeditor-points" id="points-{{ $meet->id }}" name="points" rows="6">{{ $meet->points }}</textarea>
                     </div>
                     <div class="mb-2">
                         <label class="form-label fw-semibold">@lang('lang.file_path') <span class="text-muted small">(PDF)</span></label>
