@@ -59,8 +59,10 @@ class DotationController extends Controller
         $employee = Employee::where('deleted', 0)->findOrFail($employee);
         $dotations = $employee->dotations()->with('equipment')->latest()->get();
         $equipments = $this->availableEquipments();
+        $employees = Employee::where('deleted', 0)->orderBy('name')->get();
+        $allEquipments = Equipment::with('category')->get();
 
-        return view('admin.dotation', compact('employee', 'dotations', 'equipments'));
+        return view('admin.dotation', compact('employee', 'dotations', 'equipments', 'employees', 'allEquipments'));
     }
 
     /**

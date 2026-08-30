@@ -57,6 +57,11 @@
                                 <td>{{ $item->qty." ".$item->equipment?->unit }}</td>
                                 <td>
                                     @if(isRightAccess([1, 5]))
+                                    <a data-bs-toggle="modal" data-bs-target="#dotation{{ $item->id }}" class="btn btn-sm btn-primary" title="@lang('lang.edit')" style="display:inline-block">
+                                        <i class="bx bx-edit-alt"></i>
+                                    </a>
+                                    <x-dotation-edit :employees="$employees" :equipments="$allEquipments" :dotation="$item" />
+
                                     <form action="{{ route('dotations.destroy', $item->id) }}" method="POST" style="display: inline-block">
                                         @csrf
                                         @method('DELETE')

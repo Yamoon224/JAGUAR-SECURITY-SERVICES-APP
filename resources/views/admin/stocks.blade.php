@@ -2,6 +2,9 @@
 
 <div class="page-breadcrumb d-none d-sm-flex align-items-center">
     <h6 class="breadcrumb-title pe-3 text-uppercase">@lang('lang.logistic_archive')</h6>
+    <div class="ms-auto">
+        <a class="btn btn-sm btn-danger" href="{{ route('prints.inventory.report') }}" target="_blank"><i class="bx bx-printer"></i> PDF @lang('lang.detailed_inventory')</a>
+    </div>
 </div>
 <hr/>
 
@@ -40,6 +43,14 @@
                     <div class="d-flex align-items-center">
                         <div class="tab-icon"><i class='bx bx-transfer font-18 me-1'></i></div>
                         <div class="tab-title">@lang('lang.stock_movement')</div>
+                    </div>
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" data-bs-toggle="tab" href="#tab-inventory" role="tab">
+                    <div class="d-flex align-items-center">
+                        <div class="tab-icon"><i class='bx bx-package font-18 me-1'></i></div>
+                        <div class="tab-title">@lang('lang.detailed_inventory')</div>
                     </div>
                 </a>
             </li>
@@ -119,6 +130,76 @@
                     </table>
                 </div>
                 <x-pagination :paginator="$movements" />
+            </div>
+
+            <div class="tab-pane fade" id="tab-inventory" role="tabpanel">
+                @php $grandValue = 0; @endphp
+                <div class="table-responsive">
+                    <table class="table table-bordered w-100 align-middle">
+                        <thead>
+                            <tr class="table-dark">
+                                <th>@lang('lang.equipment', ['param'=>''])</th>
+                                <th class="text-end">@lang('lang.price')</th>
+                                <th class="text-end">@lang('lang.total_qty')</th>
+                                <th class="text-end">@lang('lang.allocated_qty')</th>
+                                <th class="text-end">@lang('lang.deteriorated_qty')</th>
+                                <th class="text-end">@lang('lang.available')</th>
+                                <th class="text-end">@lang('lang.stock_value')</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($inventory as $categoryName => $items)
+                                @php
+                                    $catQty = 0; $catAllocated = 0; $catDeteriorated = 0; $catAvailable = 0; $catValue = 0;
+                                @endphp
+                                <tr class="table-secondary">
+                                    <td colspan="7" class="fw-bold text-uppercase">
+                                        <i class="bx bx-bookmark"></i> {{ $categoryName }} <span class="text-muted">({{ $items->count() }})</span>
+                                    </td>
+                                </tr>
+                                @foreach ($items as $equipment)
+                                    @php
+                                        $allocated = $equipment->dotations->sum('qty');
+                                        $deteriorated = $equipment->deteriorated_qty ?? 0;
+                                        $available = $equipment->available_qty;
+                                        $value = $available * $equipment->price;
+                                        $catQty += $equipment->qty; $catAllocated += $allocated;
+                                        $catDeteriorated += $deteriorated; $catAvailable += $available; $catValue += $value;
+                                        $grandValue += $value;
+                                    @endphp
+                                    <tr @class(['table-warning' => $available <= 0])>
+                                        <td>{{ $equipment->name }}</td>
+                                        <td class="text-end">{{ moneyFormat($equipment->price) }}</td>
+                                        <td class="text-end">{{ $equipment->qty }} {{ $equipment->unit }}</td>
+                                        <td class="text-end">{{ $allocated }} {{ $equipment->unit }}</td>
+                                        <td class="text-end">{{ $deteriorated }} {{ $equipment->unit }}</td>
+                                        <td class="text-end {{ $available <= 0 ? 'text-danger fw-semibold' : '' }}">{{ $available }} {{ $equipment->unit }}</td>
+                                        <td class="text-end">{{ moneyFormat($value) }}</td>
+                                    </tr>
+                                @endforeach
+                                <tr class="fw-semibold">
+                                    <td class="text-end">@lang('lang.subtotal')</td>
+                                    <td></td>
+                                    <td class="text-end">{{ $catQty }}</td>
+                                    <td class="text-end">{{ $catAllocated }}</td>
+                                    <td class="text-end">{{ $catDeteriorated }}</td>
+                                    <td class="text-end">{{ $catAvailable }}</td>
+                                    <td class="text-end">{{ moneyFormat($catValue) }}</td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="7" class="text-center">@lang('lang.no_stock_movement')</td></tr>
+                            @endforelse
+                        </tbody>
+                        @if($inventory->isNotEmpty())
+                        <tfoot>
+                            <tr class="table-dark fw-bold">
+                                <td colspan="6" class="text-end">@lang('lang.stock_value') @lang('lang.total')</td>
+                                <td class="text-end">{{ moneyFormat($grandValue) }}</td>
+                            </tr>
+                        </tfoot>
+                        @endif
+                    </table>
+                </div>
             </div>
 
             <div class="tab-pane fade" id="tab-depleted" role="tabpanel">

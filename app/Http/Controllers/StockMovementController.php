@@ -14,7 +14,7 @@ class StockMovementController extends Controller
      */
     public function index(Request $request)
     {
-        $equipments = Equipment::with('category')->orderBy('name')->get();
+        $equipments = Equipment::with('category', 'dotations')->orderBy('name')->get();
 
         $movements = StockMovement::with(['equipment', 'employee'])
             ->when($request->filled('equipment_id'), fn ($q) => $q->where('equipment_id', $request->integer('equipment_id')))
@@ -22,6 +22,11 @@ class StockMovementController extends Controller
             ->orderByDesc('id')
             ->paginate(25)
             ->withQueryString();
+
+        // Inventaire détaillé, classé par catégorie.
+        $inventory = $equipments
+            ->sortBy(fn ($equipment) => [optional($equipment->category)->name ?? 'zzz', $equipment->name])
+            ->groupBy(fn ($equipment) => optional($equipment->category)->name ?? 'Sans catégorie');
 
         $depletedEquipments = $equipments->filter(fn ($equipment) => $equipment->is_depleted);
 
@@ -35,6 +40,6 @@ class StockMovementController extends Controller
 
         $reasons = StockMovement::REASON_LABELS;
 
-        return view('admin.stocks', compact('movements', 'equipments', 'depletedEquipments', 'stats', 'reasons'));
+        return view('admin.stocks', compact('movements', 'equipments', 'inventory', 'depletedEquipments', 'stats', 'reasons'));
     }
 }

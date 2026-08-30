@@ -1015,6 +1015,117 @@ class PrintController extends Controller
         }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
+    /**
+     * Inventaire détaillé des équipements, classé par catégorie, avec
+     * sous-totaux par catégorie et valeur totale du stock disponible (PDF).
+     */
+    public static function getInventoryReport()
+    {
+        $grouped = Equipment::with('category', 'dotations')
+            ->orderBy('name')
+            ->get()
+            ->sortBy(fn ($e) => [optional($e->category)->name ?? 'zzz', $e->name])
+            ->groupBy(fn ($e) => optional($e->category)->name ?? 'Sans categorie');
+
+        self::initSimpleReport('Inventaire detaille par categorie');
+
+        $headers = ['Equipement', 'Prix', 'Qte totale', 'Dotee', 'Deterioree', 'Disponible', 'Valeur (GNF)'];
+        $widths  = [54, 22, 22, 18, 20, 20, 34]; // total 190
+
+        if ($grouped->isEmpty()) {
+            self::$obj->SetFont('Arial', 'I', 10);
+            self::$obj->Cell(190, 8, utf8_decode('Aucun equipement enregistre.'), 1, 1, 'C');
+            self::$obj->Output();
+            exit;
+        }
+
+        $grandValue = 0.0;
+
+        foreach ($grouped as $categoryName => $items) {
+            if (self::$obj->GetY() > 245) {
+                self::$obj->AddPage();
+            }
+
+            self::$obj->Ln(2);
+            self::$obj->SetFont('Arial', 'B', 10);
+            self::$obj->SetFillColor(40, 40, 40);
+            self::$obj->SetTextColor(255, 255, 255);
+            self::$obj->Cell(190, 7, self::textCell(mb_strtoupper((string) $categoryName, 'UTF-8') . '  (' . $items->count() . ')', 90), 1, 1, 'L', true);
+
+            self::$obj->SetFont('Arial', 'B', 8);
+            self::$obj->SetFillColor(224, 215, 215);
+            self::$obj->SetTextColor(0, 0, 0);
+            foreach ($headers as $i => $header) {
+                self::$obj->Cell($widths[$i], 6, self::textCell($header, 18), 1, 0, 'C', true);
+            }
+            self::$obj->Ln();
+
+            $catQty = $catAlloc = $catDeter = $catAvail = $catValue = 0.0;
+
+            self::$obj->SetFont('Arial', '', 8);
+            foreach ($items as $equipment) {
+                if (self::$obj->GetY() > 272) {
+                    self::$obj->AddPage();
+                    self::$obj->SetFont('Arial', 'B', 8);
+                    self::$obj->SetFillColor(224, 215, 215);
+                    foreach ($headers as $i => $header) {
+                        self::$obj->Cell($widths[$i], 6, self::textCell($header, 18), 1, 0, 'C', true);
+                    }
+                    self::$obj->Ln();
+                    self::$obj->SetFont('Arial', '', 8);
+                }
+
+                $alloc = (float) $equipment->dotations->sum('qty');
+                $deter = (float) ($equipment->deteriorated_qty ?? 0);
+                $avail = (float) $equipment->available_qty;
+                $value = $avail * (float) $equipment->price;
+
+                $catQty += (float) $equipment->qty;
+                $catAlloc += $alloc;
+                $catDeter += $deter;
+                $catAvail += $avail;
+                $catValue += $value;
+                $grandValue += $value;
+
+                self::$obj->Cell($widths[0], 6, self::textCell($equipment->name, 32), 1, 0, 'L');
+                self::$obj->Cell($widths[1], 6, self::textCell(number_format((float) $equipment->price, 0, ',', ' '), 14), 1, 0, 'R');
+                self::$obj->Cell($widths[2], 6, self::textCell($equipment->qty . ' ' . $equipment->unit, 12), 1, 0, 'R');
+                self::$obj->Cell($widths[3], 6, self::textCell(self::numTrim($alloc), 10), 1, 0, 'R');
+                self::$obj->Cell($widths[4], 6, self::textCell(self::numTrim($deter), 10), 1, 0, 'R');
+                self::$obj->Cell($widths[5], 6, self::textCell(self::numTrim($avail), 10), 1, 0, 'R');
+                self::$obj->Cell($widths[6], 6, self::textCell(number_format($value, 0, ',', ' '), 18), 1, 1, 'R');
+            }
+
+            self::$obj->SetFont('Arial', 'B', 8);
+            self::$obj->Cell($widths[0], 6, self::textCell('Sous-total ' . $categoryName, 30), 1, 0, 'R');
+            self::$obj->Cell($widths[1], 6, '', 1, 0);
+            self::$obj->Cell($widths[2], 6, self::textCell(self::numTrim($catQty), 12), 1, 0, 'R');
+            self::$obj->Cell($widths[3], 6, self::textCell(self::numTrim($catAlloc), 10), 1, 0, 'R');
+            self::$obj->Cell($widths[4], 6, self::textCell(self::numTrim($catDeter), 10), 1, 0, 'R');
+            self::$obj->Cell($widths[5], 6, self::textCell(self::numTrim($catAvail), 10), 1, 0, 'R');
+            self::$obj->Cell($widths[6], 6, self::textCell(number_format($catValue, 0, ',', ' '), 18), 1, 1, 'R');
+        }
+
+        self::$obj->Ln(3);
+        self::$obj->SetFont('Arial', 'B', 10);
+        self::$obj->SetFillColor(40, 40, 40);
+        self::$obj->SetTextColor(255, 255, 255);
+        self::$obj->Cell(156, 8, utf8_decode('VALEUR TOTALE DU STOCK DISPONIBLE (GNF)'), 1, 0, 'R', true);
+        self::$obj->Cell(34, 8, self::textCell(number_format($grandValue, 0, ',', ' '), 20), 1, 1, 'R', true);
+        self::$obj->SetTextColor(0, 0, 0);
+
+        self::$obj->Output();
+        exit;
+    }
+
+    /**
+     * Affiche un nombre sans décimales inutiles (2.0 -> "2", 2.5 -> "2,5").
+     */
+    private static function numTrim(float $value): string
+    {
+        return rtrim(rtrim(number_format($value, 2, ',', ' '), '0'), ',');
+    }
+
     public static function getEquipmentsReport()
     {
         $equipments = Equipment::with('category', 'dotations')->orderBy('name')->get();

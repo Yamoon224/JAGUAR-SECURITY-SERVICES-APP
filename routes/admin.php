@@ -66,6 +66,7 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'lang'])->group(function
     Route::get('/prints/categories/report', [PrintController::class, 'getCategoriesReport'])->name('prints.categories.report');
     Route::get('/prints/dotations/report', [PrintController::class, 'getDotationsReport'])->name('prints.dotations.report');
     Route::get('/prints/equipments/report', [PrintController::class, 'getEquipmentsReport'])->name('prints.equipments.report');
+    Route::get('/prints/inventory/report', [PrintController::class, 'getInventoryReport'])->name('prints.inventory.report');
     Route::get('/prints/leaves/report', [PrintController::class, 'getLeavesReport'])->name('prints.leaves.report');
     Route::get('/prints/leaves/{id}/acceptance', [PrintController::class, 'leaveAcceptance'])->name('prints.leaf.acceptance');
     Route::get('/prints/suspensions/report', [PrintController::class, 'getSuspensionsReport'])->name('prints.suspensions.report');
