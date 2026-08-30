@@ -30,8 +30,10 @@
                                     <td>#</td>
                                     <th>@lang('lang.date')</th>
                                     <th>@lang('lang.employee', ['param'=>''])</th>
+                                    <th>@lang('lang.leaf_type')</th>
                                     <th>@lang('lang.begin')</th>
                                     <th>@lang('lang.end')</th>
+                                    <th>@lang('lang.destination')</th>
                                     <th>@lang('lang.reason')</th>
                                     <th>@lang('lang.action', ['param'=>'s'])</th>
                                 </tr>
@@ -42,10 +44,15 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $item->created_at }}</td>
                                     <td>{{ $item->employee?->firstname." ".$item->employee?->name." | ".$item->employee?->position." | ".$item->employee?->phone }}</td>
+                                    <td>{{ $item->type_label }}</td>
                                     <td>{{ $item->begin }}</td>
                                     <td>{{ $item->end }}</td>
+                                    <td>{{ $item->destination ?: '—' }}</td>
                                     <td>{{ $item->reason }}</td>
                                     <td>
+                                        <a href="{{ route('prints.leaf.acceptance', $item->id) }}" target="_blank" class="btn btn-sm btn-success" title="@lang('lang.acceptance_letter')" style="display: inline-block">
+                                            <i class="bx bx-file"></i>
+                                        </a>
                                         <a data-bs-toggle="modal" data-bs-target="#leaf{{ $item->id }}" class="btn btn-sm btn-primary" title="Editer les informations" style="display: inline-block">
                                             <i class="bx bx-edit-alt"></i>
                                         </a>

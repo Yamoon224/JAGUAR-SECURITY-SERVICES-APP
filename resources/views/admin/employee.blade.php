@@ -364,18 +364,28 @@
                                             <thead>
                                                 <tr>
                                                     <th scope="col">#</th>
+                                                    <th scope="col">@lang('lang.leaf_type')</th>
                                                     <th scope="col">@lang('lang.begin')</th>
                                                     <th scope="col">@lang('lang.end')</th>
+                                                    <th scope="col">@lang('lang.destination')</th>
                                                     <th scope="col">@lang('lang.reason')</th>
+                                                    <th scope="col">@lang('lang.acceptance_letter')</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 @foreach ($employee->leaves as $item)
                                                 <tr>
                                                     <th scope="row">{{ $loop->iteration }}</th>
+                                                    <td>{{ $item->type_label }}</td>
                                                     <td>{{ $item->begin }}</td>
                                                     <td>{{ $item->end }}</td>
+                                                    <td>{{ $item->destination ?: '—' }}</td>
                                                     <td>{{ $item->reason }}</td>
+                                                    <td>
+                                                        <a href="{{ route('prints.leaf.acceptance', $item->id) }}" target="_blank" class="btn btn-sm btn-success" title="@lang('lang.acceptance_letter')">
+                                                            <i class="bx bx-file"></i>
+                                                        </a>
+                                                    </td>
                                                 </tr>
                                                 @endforeach
                                             </tbody>

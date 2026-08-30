@@ -1304,6 +1304,132 @@ class PrintController extends Controller
         exit;
     }
 
+    /**
+     * Lettre d'acceptation de congé : document formalisé qui accompagne
+     * obligatoirement toute demande de congé. Elle précise le nom, le
+     * prénom, le matricule de l'employé, le motif du congé et la période
+     * accordée. Pour les congés sanitaires ou touristiques, la destination
+     * (pays ou ville) y figure également.
+     */
+    public static function leaveAcceptance(int $id)
+    {
+        $leaf     = Leaf::with('employee')->findOrFail($id);
+        $employee = $leaf->employee;
+        $today    = Carbon::now();
+
+        $begin = Carbon::parse($leaf->begin);
+        $end   = Carbon::parse($leaf->end);
+        $days  = $begin->diffInDays($end) + 1;
+
+        self::$obj = new PDF('P', 'mm', 'A4');
+        self::$obj->SetTitle(utf8_decode('Lettre d\'acceptation de conge - ' . ($employee->matricule ?? '')));
+        self::$obj->AddPage();
+
+        // === DOUBLE BORDER FRAME ===
+        self::$obj->SetDrawColor(150, 0, 0);
+        self::$obj->SetLineWidth(1.2);
+        self::$obj->Rect(5, 19, 200, 254);
+        self::$obj->SetDrawColor(50, 50, 50);
+        self::$obj->SetLineWidth(0.4);
+        self::$obj->Rect(7.5, 21, 195, 250);
+        self::$obj->SetDrawColor(0, 0, 0);
+        self::$obj->SetLineWidth(0.2);
+
+        // === COMPANY STATUTORY INFO ===
+        self::$obj->SetXY(10, self::$obj->GetY());
+        self::$obj->SetFont('Arial', 'I', 7);
+        self::$obj->Cell(47, 4, utf8_decode('Capital social: 10.000.000 GNF'), 0, 0, 'L');
+        self::$obj->Cell(58, 4, utf8_decode('RCCM: GN.TCC.2020.B.07295'), 0, 0, 'C');
+        self::$obj->Cell(45, 4, utf8_decode('NIF: 655987501 | CLE TVA: 9K'), 0, 0, 'C');
+        self::$obj->Cell(40, 4, utf8_decode('Tel: +224 625 12 32 32'), 0, 1, 'R');
+
+        self::$obj->SetDrawColor(150, 0, 0);
+        self::$obj->SetLineWidth(0.6);
+        $lineY = self::$obj->GetY() + 1;
+        self::$obj->Line(10, $lineY, 200, $lineY);
+        self::$obj->SetDrawColor(0, 0, 0);
+        self::$obj->SetLineWidth(0.2);
+        self::$obj->Ln(7);
+
+        // === TITLE BOX ===
+        self::$obj->SetX(20);
+        self::$obj->SetFillColor(150, 0, 0);
+        self::$obj->SetTextColor(255, 255, 255);
+        self::$obj->SetFont('Arial', 'B', 14);
+        self::$obj->Cell(170, 12, utf8_decode('LETTRE D\'ACCEPTATION DE CONGE'), 0, 1, 'C', true);
+        self::$obj->SetTextColor(0, 0, 0);
+        self::$obj->SetFillColor(255, 255, 255);
+        self::$obj->Ln(4);
+
+        self::$obj->SetFont('Arial', 'I', 9);
+        self::$obj->Cell(190, 6, utf8_decode('Date d\'edition: ' . $today->format('d/m/Y')), 0, 1, 'C');
+        self::$obj->Ln(4);
+
+        // === INTRO ===
+        self::$obj->SetFont('Arial', '', 11);
+        self::$obj->SetX(15);
+        self::$obj->MultiCell(180, 7, utf8_decode(
+            'La Direction de JAGUAR SECURITY SERVICES SARL accuse reception de la demande de conge ' .
+            'et informe l\'interesse(e) que celle-ci est acceptee dans les conditions ci-apres :'
+        ), 0, 'J');
+        self::$obj->Ln(4);
+
+        // === DETAILS TABLE ===
+        $rows = [
+            ['Nom', strtoupper($employee->name ?? '-')],
+            ['Prenom', $employee->firstname ?? '-'],
+            ['Matricule', $employee->matricule ?? '-'],
+            ['Fonction', $employee->position ?? '-'],
+            ['Nature du conge', $leaf->type_label],
+            ['Motif du conge', $leaf->reason],
+            ['Periode accordee', 'Du ' . $begin->format('d/m/Y') . ' au ' . $end->format('d/m/Y') .
+                ' (' . $days . ' jour' . ($days > 1 ? 's' : '') . ')'],
+        ];
+        if ($leaf->requiresDestination() || ! empty($leaf->destination)) {
+            $rows[] = ['Destination (pays ou ville)', $leaf->destination ?: '-'];
+        }
+
+        foreach ($rows as $row) {
+            $yStart = self::$obj->GetY();
+            self::$obj->SetXY(15, $yStart);
+            self::$obj->SetFont('Arial', 'B', 10);
+            self::$obj->SetFillColor(235, 235, 235);
+            self::$obj->MultiCell(55, 8, utf8_decode($row[0]), 1, 'L', true);
+            $yAfterLabel = self::$obj->GetY();
+
+            self::$obj->SetXY(70, $yStart);
+            self::$obj->SetFont('Arial', '', 10);
+            self::$obj->MultiCell(125, 8, utf8_decode($row[1]), 1, 'L');
+            $yAfterValue = self::$obj->GetY();
+
+            self::$obj->SetY(max($yAfterLabel, $yAfterValue));
+        }
+
+        self::$obj->Ln(8);
+        self::$obj->SetX(15);
+        self::$obj->SetFont('Arial', '', 11);
+        self::$obj->MultiCell(180, 7, utf8_decode(
+            'A l\'issue de cette periode, l\'interesse(e) est tenu(e) de reprendre effectivement son ' .
+            'service. La presente lettre vaut autorisation formelle d\'absence pour la duree indiquee.'
+        ), 0, 'J');
+
+        self::$obj->Ln(22);
+        $sigY = self::$obj->GetY();
+        self::$obj->SetXY(10, $sigY);
+        self::$obj->SetFont('Arial', 'I', 10);
+        self::$obj->Cell(100, 6, utf8_decode('Fait a Conakry, le ' . $today->format('d/m/Y')), 0, 0, 'L');
+        self::$obj->SetX(120);
+        self::$obj->SetFont('Arial', 'B', 10);
+        self::$obj->Cell(80, 6, utf8_decode('La Direction des Ressources Humaines'), 0, 1, 'C');
+        self::$obj->Ln(18);
+        self::$obj->SetX(120);
+        self::$obj->SetFont('Arial', '', 9);
+        self::$obj->Cell(80, 6, utf8_decode('Signature et cachet'), 0, 1, 'C');
+
+        self::$obj->Output();
+        exit;
+    }
+
     public static function getEmployeeContract(int $id)
     {
         $employee = Employee::where('deleted', 0)->findOrFail($id);

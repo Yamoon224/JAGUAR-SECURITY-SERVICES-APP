@@ -1,6 +1,7 @@
 <x-admin-layout>
 
 <div class="page-breadcrumb d-none d-sm-flex align-items-center">
+    <h6 class="breadcrumb-title pe-3 text-uppercase">@lang('lang.material_supply')</h6>
     <div class="ms-auto">
         <a class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#purchase-add"><i class="bx bx-cart-add"></i> @lang('lang.new_purchase')</a>
     </div>
@@ -37,7 +38,7 @@
                             <tbody>
                                 @forelse ($purchases as $item)
                                 <tr>
-                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $purchases->firstItem() + $loop->index }}</td>
                                     <td>{{ \Carbon\Carbon::parse($item->purchased_at)->format('d/m/Y') }}</td>
                                     <td>{{ $item->equipment?->name }}</td>
                                     <td>{{ $item->qty." ".$item->equipment?->unit }}</td>
@@ -63,6 +64,9 @@
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+                    <div class="d-flex justify-content-center mt-3">
+                        <x-pagination :paginator="$purchases" />
                     </div>
                 </div>
             </div>

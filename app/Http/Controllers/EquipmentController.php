@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Equipment;
+use App\Models\StockMovement;
+use App\Services\StockLedger;
 use Illuminate\Http\Request;
 
 class EquipmentController extends Controller
@@ -44,7 +46,17 @@ class EquipmentController extends Controller
     public function store(Request $request)
     {
         $data = $request->except('_token');
-        Equipment::create($data);
+        $equipment = Equipment::create($data);
+
+        // Solde d'ouverture dans l'archive logistique.
+        StockLedger::record(
+            $equipment,
+            StockMovement::IN,
+            StockMovement::REASON_OPENING,
+            (float) ($equipment->qty ?? 0),
+            ['note' => 'Création de la fiche équipement']
+        );
+
         return back();
     }
 
@@ -69,9 +81,31 @@ class EquipmentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $equipment = Equipment::find($id);
+        $equipment = Equipment::findOrFail($id);
         $data = $request->except('_token');
+
+        $formerQty = (float) $equipment->qty;
+        $formerDeteriorated = (float) ($equipment->deteriorated_qty ?? 0);
+
         $equipment->update($data);
+        $equipment->refresh();
+
+        // Détérioration / remise en service.
+        $deterioratedDelta = (float) ($equipment->deteriorated_qty ?? 0) - $formerDeteriorated;
+        if ($deterioratedDelta > 0) {
+            StockLedger::record($equipment, StockMovement::OUT, StockMovement::REASON_DETERIORATION, $deterioratedDelta, ['note' => 'Mise à jour de la quantité détériorée']);
+        } elseif ($deterioratedDelta < 0) {
+            StockLedger::record($equipment, StockMovement::IN, StockMovement::REASON_REPAIR, abs($deterioratedDelta), ['note' => 'Remise en service']);
+        }
+
+        // Ajustement manuel du stock total.
+        $qtyDelta = (float) $equipment->qty - $formerQty;
+        if ($qtyDelta > 0) {
+            StockLedger::record($equipment, StockMovement::IN, StockMovement::REASON_ADJUSTMENT, $qtyDelta, ['note' => 'Ajustement manuel du stock']);
+        } elseif ($qtyDelta < 0) {
+            StockLedger::record($equipment, StockMovement::OUT, StockMovement::REASON_ADJUSTMENT, abs($qtyDelta), ['note' => 'Ajustement manuel du stock']);
+        }
+
         return back();
     }
 

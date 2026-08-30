@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Models\Leaf;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class LeafController extends Controller
 {
@@ -19,39 +20,14 @@ class LeafController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        $data = $request->except('_token');
-        $employee = Employee::find($data['employee_id']);
-        $employee->update(array('isleaved'=>1));
+        $data = $this->validated($request);
+        Employee::whereKey($data['employee_id'])->update(['isleaved' => 1]);
         Leaf::create($data);
         return back();
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
     }
 
     /**
@@ -59,9 +35,8 @@ class LeafController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $leaf = Leaf::find($id);
-        $data = $request->except('_token');
-        $leaf->update($data);
+        $leaf = Leaf::findOrFail($id);
+        $leaf->update($this->validated($request));
         return back();
     }
 
@@ -70,8 +45,34 @@ class LeafController extends Controller
      */
     public function destroy(string $id)
     {
-        $leaf = Leaf::find($id);
-        $leaf->delete();
+        Leaf::findOrFail($id)->delete();
         return back();
+    }
+
+    /**
+     * Règles de validation partagées.
+     *
+     * Toute demande de congé est formalisée par une lettre d'acceptation
+     * (nom, prénom, matricule, motif, période accordée). Pour les congés
+     * sanitaires ou touristiques, la destination est obligatoire.
+     */
+    private function validated(Request $request): array
+    {
+        return $request->validate([
+            'employee_id' => ['required', 'exists:employees,id'],
+            'begin' => ['required', 'date'],
+            'end' => ['required', 'date', 'after_or_equal:begin'],
+            'reason' => ['required', 'string'],
+            'type' => ['required', Rule::in(array_keys(Leaf::TYPES))],
+            'destination' => [
+                Rule::requiredIf(fn () => in_array($request->input('type'), Leaf::TYPES_REQUIRING_DESTINATION, true)),
+                'nullable',
+                'string',
+                'max:255',
+            ],
+        ], [
+            'destination.required' => 'La destination (pays ou ville) est obligatoire pour un congé sanitaire ou touristique.',
+            'end.after_or_equal' => 'La date de fin doit être postérieure ou égale à la date de début.',
+        ]);
     }
 }

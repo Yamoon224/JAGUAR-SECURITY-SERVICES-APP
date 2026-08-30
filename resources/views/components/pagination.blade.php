@@ -1,3 +1,5 @@
+@props(['paginator', 'count' => null])
+@php($lastPage = $count ? (int) ceil($count / 16) : $paginator->lastPage())
 @if ($paginator->hasPages())
     <nav>
         <ul class="pagination">
@@ -14,7 +16,7 @@
 
             {{-- Pagination Elements --}}
             
-            @for($page = 1; $page <= ceil($count/16); $page++)
+            @for($page = 1; $page <= $lastPage; $page++)
                 @if ($page == $paginator->currentPage())
                     <li class="page-item active" aria-current="page">
                         <a class="page-link" rel="next" aria-label="@lang('pagination.previous')">{{ $page }}</a>

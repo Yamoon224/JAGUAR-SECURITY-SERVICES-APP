@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Equipment;
 use App\Models\Purchase;
+use App\Models\StockMovement;
+use App\Services\StockLedger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -15,7 +17,7 @@ class PurchaseController extends Controller
     public function index()
     {
         $equipments = Equipment::all();
-        $purchases = Purchase::with('equipment')->latest('purchased_at')->get();
+        $purchases = Purchase::with('equipment')->latest('purchased_at')->paginate(15);
         return view('admin.purchases', compact('purchases', 'equipments'));
     }
 
@@ -40,8 +42,16 @@ class PurchaseController extends Controller
         ]);
 
         DB::transaction(function () use ($data) {
-            Purchase::create($data);
+            $purchase = Purchase::create($data);
             Equipment::whereKey($data['equipment_id'])->increment('qty', $data['qty']);
+
+            StockLedger::record(
+                Equipment::findOrFail($data['equipment_id']),
+                StockMovement::IN,
+                StockMovement::REASON_SUPPLY,
+                $data['qty'],
+                ['note' => "Approvisionnement #{$purchase->id}"]
+            );
         });
 
         return back();
@@ -78,11 +88,29 @@ class PurchaseController extends Controller
         ]);
 
         DB::transaction(function () use ($purchase, $data) {
+            $formerEquipmentId = $purchase->equipment_id;
+            $formerQty = (float) $purchase->qty;
+
             // Undo the old purchase's effect on the (possibly former) equipment's stock...
-            Equipment::whereKey($purchase->equipment_id)->decrement('qty', $purchase->qty);
+            Equipment::whereKey($formerEquipmentId)->decrement('qty', $formerQty);
             $purchase->update($data);
             // ...then apply the new one.
             Equipment::whereKey($data['equipment_id'])->increment('qty', $data['qty']);
+
+            StockLedger::record(
+                Equipment::findOrFail($formerEquipmentId),
+                StockMovement::OUT,
+                StockMovement::REASON_ADJUSTMENT,
+                $formerQty,
+                ['note' => "Correction approvisionnement #{$purchase->id}"]
+            );
+            StockLedger::record(
+                Equipment::findOrFail($data['equipment_id']),
+                StockMovement::IN,
+                StockMovement::REASON_SUPPLY,
+                $data['qty'],
+                ['note' => "Correction approvisionnement #{$purchase->id}"]
+            );
         });
 
         return back();
@@ -98,6 +126,14 @@ class PurchaseController extends Controller
         DB::transaction(function () use ($purchase) {
             Equipment::whereKey($purchase->equipment_id)->decrement('qty', $purchase->qty);
             $purchase->delete();
+
+            StockLedger::record(
+                Equipment::findOrFail($purchase->equipment_id),
+                StockMovement::OUT,
+                StockMovement::REASON_SUPPLY_CANCEL,
+                (float) $purchase->qty,
+                ['note' => "Annulation approvisionnement #{$purchase->id}"]
+            );
         });
 
         return back();

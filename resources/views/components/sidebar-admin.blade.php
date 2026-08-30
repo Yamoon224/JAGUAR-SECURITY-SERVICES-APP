@@ -78,10 +78,12 @@
                 <div class="menu-title">@lang('lang.logistic', ['param'=>"s"])</div>
             </a>
             <ul>
-                <li> <a href="{{ route('dotations.index') }}"><i class='bx bx-user-plus'></i>@lang('lang.dotation', ['param'=>'s'])</a></li>
-                <li> <a href="{{ route('purchases.index') }}"><i class='bx bx-cart'></i>@lang('lang.purchase', ['param'=>'s'])</a></li>
+                <li> <a href="{{ route('dotations.index') }}"><i class='bx bx-user-plus'></i>@lang('lang.material_dotation')</a></li>
+                <li> <a href="{{ route('purchases.index') }}"><i class='bx bx-cart'></i>@lang('lang.material_supply')</a></li>
+                <li> <a href="{{ route('fuelings.index') }}"><i class='bx bx-gas-pump'></i>@lang('lang.fueling', ['param'=>'s'])</a></li>
                 <li> <a href="{{ route('equipments.index') }}"><i class='bx bx-customize'></i>@lang('lang.equipment', ['param'=>'s']) @lang('lang.available')</a></li>
                 <li> <a href="{{ route('equipments.deteriorated') }}"><i class='bx bx-error'></i>@lang('lang.deteriorated_equipment')</a></li>
+                <li> <a href="{{ route('stocks.index') }}"><i class='bx bx-archive'></i>@lang('lang.logistic_archive')</a></li>
             </ul>
         </li>
         @endif

@@ -56,8 +56,21 @@ class Equipment extends BaseModel
 		return $this->hasMany(Purchase::class);
 	}
 
+	public function stockMovements()
+	{
+		return $this->hasMany(StockMovement::class);
+	}
+
 	public function getAvailableQtyAttribute()
 	{
 		return $this->qty - $this->dotations->sum('qty') - ($this->deteriorated_qty ?? 0);
+	}
+
+	/**
+	 * L'équipement est épuisé lorsqu'il n'y a plus aucune unité disponible.
+	 */
+	public function getIsDepletedAttribute(): bool
+	{
+		return $this->available_qty <= 0;
 	}
 }

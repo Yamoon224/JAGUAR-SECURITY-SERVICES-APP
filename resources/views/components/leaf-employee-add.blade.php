@@ -25,7 +25,8 @@
                             <div class="position-relative input-icon mb-3">
                                 <textarea class="form-control" name="reason" placeholder="@lang('lang.reason')" style="resize: none" required></textarea>
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-message-detail'></i></span>
-                            </div>     
+                            </div>
+                            <x-leaf-type-fields />
                         </div>
                     </div>
                 </div>

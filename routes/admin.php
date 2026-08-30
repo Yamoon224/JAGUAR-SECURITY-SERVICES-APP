@@ -17,6 +17,8 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ApplicantController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\FuelingController;
+use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\SuspensionController;
 use App\Http\Controllers\AffectationController;
 use App\Http\Controllers\LicenciementController;
@@ -65,6 +67,7 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'lang'])->group(function
     Route::get('/prints/dotations/report', [PrintController::class, 'getDotationsReport'])->name('prints.dotations.report');
     Route::get('/prints/equipments/report', [PrintController::class, 'getEquipmentsReport'])->name('prints.equipments.report');
     Route::get('/prints/leaves/report', [PrintController::class, 'getLeavesReport'])->name('prints.leaves.report');
+    Route::get('/prints/leaves/{id}/acceptance', [PrintController::class, 'leaveAcceptance'])->name('prints.leaf.acceptance');
     Route::get('/prints/suspensions/report', [PrintController::class, 'getSuspensionsReport'])->name('prints.suspensions.report');
     Route::get('/prints/licenciements/report', [PrintController::class, 'getLicenciementsReport'])->name('prints.licenciements.report');
     Route::get('/prints/meets/report', [PrintController::class, 'getMeetsReport'])->name('prints.meets.report');
@@ -84,11 +87,14 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'lang'])->group(function
     Route::get('/employees/notAffected/{id}', [EmployeeController::class, 'employeeNotAffected'])->name('employees.notaffected');
     Route::get('/employees/{id}/profile-card/print', [EmployeeController::class, 'printProfileCard'])->name('employees.profile-card.print');
     Route::get('/equipments/deteriorated', [EquipmentController::class, 'deteriorated'])->name('equipments.deteriorated');
+    Route::get('/stocks', [StockMovementController::class, 'index'])->name('stocks.index');
 
     Route::post('/bills/monthly', [BillController::class, 'getByMonthly'])->name('bills.monthly');
     Route::post('/payments/monthly', [PaymentController::class, 'getByMonthly'])->name('payments.monthly');
     Route::post('/dash', [Controller::class, 'dash'])->name('dash');
     Route::post('/employees/search', [EmployeeController::class, 'getSearch'])->name('employees.search');
+    Route::post('/dotations/search', [DotationController::class, 'search'])->name('dotations.search');
+    Route::get('/dotations/{employee}/history', [DotationController::class, 'history'])->name('dotations.history');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -101,12 +107,13 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'lang'])->group(function
     Route::resource('leaves', LeafController::class);
     Route::resource('payments', PaymentController::class);
     Route::resource('employees', EmployeeController::class);
-    Route::resource('dotations', DotationController::class);
+    Route::resource('dotations', DotationController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('customers', CustomerController::class);
     Route::resource('categories', CategoryController::class);
     Route::resource('applicants', ApplicantController::class);
     Route::resource('equipments', EquipmentController::class);
     Route::resource('purchases', PurchaseController::class);
+    Route::resource('fuelings', FuelingController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('suspensions', SuspensionController::class);
     Route::resource('recruitments', RecruitmentController::class);
     Route::resource('affectations', AffectationController::class);

@@ -102,7 +102,9 @@ class Controller extends BaseController
     
     public function logistic()
     {
-        return view('admin.logistic');
+        $count = Employee::where('deleted', 0)->count();
+        $employees = Employee::where('deleted', 0)->orderByDesc('id')->paginate(16);
+        return view('admin.logistic', compact('employees', 'count'));
     }
     
     public function getAgents()
