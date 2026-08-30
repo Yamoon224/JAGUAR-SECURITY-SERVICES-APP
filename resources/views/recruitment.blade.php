@@ -18,6 +18,15 @@
             border-left: 4px solid #dc3545;
             border-radius: .35rem;
         }
+        /* Contenu riche saisi via l'éditeur (description de la campagne) */
+        .recruit-desc { color: #343a40; font-size: .9rem; line-height: 1.55; }
+        .recruit-desc :last-child { margin-bottom: 0; }
+        .recruit-desc p { margin-bottom: .5rem; }
+        .recruit-desc ul, .recruit-desc ol { margin-bottom: .5rem; padding-left: 1.25rem; }
+        .recruit-desc h1, .recruit-desc h2, .recruit-desc h3,
+        .recruit-desc h4, .recruit-desc h5, .recruit-desc h6 {
+            font-size: .95rem; font-weight: 700; margin: .75rem 0 .35rem;
+        }
         .recruit-section-title {
             font-size: .8rem;
             font-weight: 700;
@@ -37,8 +46,8 @@
 
     @if($recruitment)
         <div class="recruit-notice p-3 mb-4">
-            <div class="fw-semibold mb-1">{{ $recruitment->title }}</div>
-            <div class="small text-muted">
+            <div class="fw-semibold mb-2">{{ $recruitment->title }}</div>
+            <div class="recruit-desc">
                 {!! $recruitment->description ?: 'Recrutement en cours.' !!}
             </div>
             @if($recruitment->start_date || $recruitment->end_date)

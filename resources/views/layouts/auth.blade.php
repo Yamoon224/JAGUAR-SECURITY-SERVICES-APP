@@ -37,16 +37,27 @@
                 inset: 0;
                 background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.45));
             }
+            /* display:flex + margin:auto sur l'enfant : centré verticalement quand
+               il y a de la place, et intégralement défilable (haut ET bas) quand
+               le contenu dépasse la hauteur de l'écran. */
             .auth-split__form {
                 display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 2rem 1rem;
+                min-height: 100vh;
+                padding: 2.5rem 1rem;
                 background: #f7f7f9;
             }
-            .auth-split__form .card-wrap { width: 100%; max-width: {{ $wide ? '660px' : '460px' }}; }
+            .auth-split__form .card-wrap {
+                width: 100%;
+                max-width: {{ $wide ? '660px' : '460px' }};
+                margin: auto;
+            }
             @media (min-width: 992px) {
-                .auth-split__form { overflow-y: auto; max-height: 100vh; }
+                .auth-split__cover {
+                    position: sticky;
+                    top: 0;
+                    align-self: flex-start;
+                    height: 100vh;
+                }
             }
         </style>
         @endif
