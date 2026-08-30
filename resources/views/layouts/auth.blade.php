@@ -23,35 +23,47 @@
         <link href="{{ asset('assets/admin/css/app.css') }}" rel="stylesheet">
         <link href="{{ asset('assets/admin/css/icons.css') }}" rel="stylesheet">
         @stack('links')
+
+        @if(!empty($cover))
+        <style>
+            .auth-split { min-height: 100vh; }
+            .auth-split__cover {
+                background: #111 url('{{ $cover }}') center / cover no-repeat;
+            }
+            .auth-split__form {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem 1rem;
+            }
+            .auth-split__form .card-wrap { width: 100%; max-width: 460px; }
+        </style>
+        @endif
     </head>
-    <body class="" style="background-image: url({{ asset('assets/images/bglogin.png') }})">
+    <body @if(empty($cover)) style="background-image: url({{ asset('images/bglogin.png') }})" @endif>
         <!--wrapper-->
         <div class="wrapper">
+            @if(!empty($cover))
+            {{-- Mise en page en deux colonnes : image / formulaire --}}
+            <div class="row g-0 auth-split">
+                <div class="col-lg-7 d-none d-lg-block auth-split__cover"></div>
+                <div class="col-lg-5 auth-split__form">
+                    <div class="card-wrap">
+                        @include('layouts.partials.auth-card')
+                    </div>
+                </div>
+            </div>
+            @else
             <div class="section-authentication-signin d-flex align-items-center justify-content-center my-5 my-lg-0">
                 <div class="container">
                     <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-{{ $size }}">
                         <div class="col mx-auto">
-                            <div class="card border-dark border-bottom border-top border-3 border-0 mb-0">
-                                <div class="card-body">
-                                    <div class="p-4">
-                                        <div class="mb-3 text-center">
-                                            <img src="{{ asset('assets/images/logo-icon.png') }}" width="60" alt="" />
-                                        </div>
-                                        
-                                        {{ $slot }}
-
-                                        <div class="login-separater text-center mb-2"> 
-                                            <span>Copyright &copy; JSS {{ date('Y') }}</span>
-                                            <hr/>
-                                        </div>    
-                                    </div>
-                                </div>
-                            </div>
+                            @include('layouts.partials.auth-card')
                         </div>
                     </div>
-                    <!--end row-->
                 </div>
             </div>
+            @endif
         </div>
         <!--end wrapper-->
         <!-- Bootstrap JS -->

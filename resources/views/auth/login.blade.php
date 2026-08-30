@@ -1,4 +1,4 @@
-<x-auth-layout :size="3">
+<x-auth-layout :size="3" :cover="asset('images/login-cover.jpg')">
     <div class="text-center mb-4">
         <h6 class="">JAGUAR SECURITY SERVICES SARL</h6>
         @if(!$errors->isEmpty())
