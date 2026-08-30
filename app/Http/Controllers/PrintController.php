@@ -6,6 +6,7 @@ use Imagick;
 use App\Services\PDF;
 use App\Models\Bill;
 use App\Models\Leaf;
+use App\Models\Mail;
 use App\Models\Meet;
 use App\Models\Dotation;
 use App\Models\Category;
@@ -1212,6 +1213,54 @@ class PrintController extends Controller
             ])->toArray(),
             'Aucun licenciement disponible.'
         );
+
+        self::$obj->Output();
+        exit;
+    }
+
+    /**
+     * Liste générale des courriers, avec Arrivées et Départs présentés
+     * séparément. ?type=arrivee | depart pour n'exporter qu'un seul volet.
+     */
+    public static function getMailsReport(Request $request)
+    {
+        $type = strtoupper((string) $request->query('type'));
+        $mails = Mail::orderByDesc('mail_datetime')->orderByDesc('id')->get();
+
+        $headers = ['#', 'N. Courrier', 'Date', 'Source', 'Destinataire', 'Objet'];
+        $widths  = [10, 34, 26, 38, 38, 44]; // total 190
+
+        $row = fn ($item, $i) => [
+            $i,
+            $item->mail_id,
+            $item->mail_datetime ? Carbon::parse($item->mail_datetime)->format('d/m/Y H:i') : '-',
+            $item->srce,
+            $item->destinator,
+            $item->subject,
+        ];
+
+        $sections = [
+            'ARRIVEE' => 'Courriers Arrivees',
+            'DEPART' => 'Courriers Departs',
+        ];
+        if (in_array($type, ['ARRIVEE', 'DEPART'], true)) {
+            $sections = array_intersect_key($sections, [$type => true]);
+        }
+
+        self::initSimpleReport('Rapport Courriers' . ($type ? ' - ' . ucfirst(strtolower($type)) . 's' : ''));
+
+        foreach ($sections as $name => $title) {
+            $subset = $mails->where('name', $name)->values();
+
+            self::renderTableSection(
+                $title . ' (' . $subset->count() . ')',
+                $headers,
+                $widths,
+                $subset->map(fn ($item) => $row($item, $item->id))->values()->toArray(),
+                'Aucun courrier.'
+            );
+            self::$obj->Ln(3);
+        }
 
         self::$obj->Output();
         exit;

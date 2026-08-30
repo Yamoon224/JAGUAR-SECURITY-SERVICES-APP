@@ -72,6 +72,7 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'lang'])->group(function
     Route::get('/prints/suspensions/report', [PrintController::class, 'getSuspensionsReport'])->name('prints.suspensions.report');
     Route::get('/prints/licenciements/report', [PrintController::class, 'getLicenciementsReport'])->name('prints.licenciements.report');
     Route::get('/prints/meets/report', [PrintController::class, 'getMeetsReport'])->name('prints.meets.report');
+    Route::get('/prints/mails/report', [PrintController::class, 'getMailsReport'])->name('prints.mails.report');
     Route::get('/prints/contracts/{id}', [PrintController::class, 'getEmployeeContract'])->name('prints.contract.employee');
     Route::get('/prints/salary/{id}/{month?}', [PrintController::class, 'salaryReceipt'])->name('prints.salary.receipt');
     Route::get('/prints/attestation/{id}', [PrintController::class, 'workAttestation'])->name('prints.work.attestation');

@@ -5,7 +5,16 @@
         <h5 class="mb-0 text-uppercase">@lang('lang.mail', ['param'=>'s'])</h5>
         <small class="text-muted">{{ $mails->count() }} @lang('lang.mail', ['param'=>'s'])</small>
     </div>
-    <div class="ms-auto">
+    <div class="ms-auto d-flex flex-wrap gap-2">
+        <div class="btn-group">
+            <button type="button" class="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown"><i class="bx bx-printer"></i> PDF</button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="{{ route('prints.mails.report', ['type' => 'arrivee']) }}" target="_blank"><i class="bx bx-down-arrow-alt text-success"></i> Courriers arrivés</a></li>
+                <li><a class="dropdown-item" href="{{ route('prints.mails.report', ['type' => 'depart']) }}" target="_blank"><i class="bx bx-up-arrow-alt text-primary"></i> Courriers départs</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ route('prints.mails.report') }}" target="_blank"><i class="bx bx-list-ul"></i> Liste générale (arrivés + départs)</a></li>
+            </ul>
+        </div>
         <a class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#mail-add"><i class="bx bx-mail-send"></i> @lang('lang.new_mail')</a>
     </div>
 </div>
