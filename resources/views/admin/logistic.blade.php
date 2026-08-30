@@ -48,8 +48,8 @@
                 </div>
             </div>
         </div>
-        <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-4 search-result"></div>
-        <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-4" id="no-search">
+        <div class="row g-4 row-cols-1 row-cols-lg-2 row-cols-xl-4 search-result"></div>
+        <div class="row g-4 row-cols-1 row-cols-lg-2 row-cols-xl-4" id="no-search">
             @foreach ($employees->items() as $item)
             <div class="col d-flex">
                 <div class="card border-bottom border-dark radius-15 h-100 w-100">

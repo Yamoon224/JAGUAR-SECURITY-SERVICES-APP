@@ -1,8 +1,8 @@
 @props(['paginator', 'count' => null])
 @php($lastPage = $count ? (int) ceil($count / 16) : $paginator->lastPage())
 @if ($paginator->hasPages())
-    <nav>
-        <ul class="pagination">
+    <nav class="d-flex justify-content-center w-100 mt-3">
+        <ul class="pagination flex-wrap justify-content-center mb-0">
             {{-- Previous Page Link --}}
             @if ($paginator->onFirstPage())
                 <li class="page-item disabled" aria-disabled="true" aria-label="@lang('pagination.previous')">

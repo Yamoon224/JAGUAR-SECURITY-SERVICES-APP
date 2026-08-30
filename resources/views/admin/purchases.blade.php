@@ -65,9 +65,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="d-flex justify-content-center mt-3">
-                        <x-pagination :paginator="$purchases" />
-                    </div>
+                    <x-pagination :paginator="$purchases" />
                 </div>
             </div>
         </div>
