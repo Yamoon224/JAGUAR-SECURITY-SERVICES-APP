@@ -40,36 +40,43 @@
 	<title>{{ config('app.name', "JSS SARL") }}</title>
 
 	<!-- Select2 : recherche dans les listes déroulantes (employés, etc.) -->
-	<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-	<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+	<link href="{{ asset('assets/admin/plugins/select2/css/select2.min.css') }}" rel="stylesheet" />
+	<link href="{{ asset('assets/admin/plugins/select2/css/select2-bootstrap-5-theme.min.css') }}" rel="stylesheet" />
 
 	<style>
-		/* --- Bouton de fermeture des modaux : bien visible, rouge --- */
+		/* --- Bouton de fermeture des modaux : bien visible, rouge ---
+		   Le thème applique un filtre invert() sur tous les .btn-close, ce qui
+		   délavait notre pastille : on le neutralise et on force le rendu. */
 		.btn-close,
-		.modal .btn-close {
-			--bs-btn-close-bg: none;
-			opacity: 1;
-			width: 1.7rem;
-			height: 1.7rem;
-			padding: 0;
-			background-color: #dc3545;
-			border-radius: 50%;
-			background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3e%3cpath d='M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854z'/%3e%3c/svg%3e");
-			background-position: center;
-			background-repeat: no-repeat;
-			background-size: 0.95rem;
+		.modal .btn-close,
+		.modal-header .btn-close,
+		.btn-close.text-white {
+			--bs-btn-close-bg: none !important;
+			--bs-btn-close-opacity: 1 !important;
+			filter: none !important;
+			opacity: 1 !important;
+			width: 1.7rem !important;
+			height: 1.7rem !important;
+			padding: 0 !important;
+			background-color: #dc3545 !important;
+			border-radius: 50% !important;
+			background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3e%3cpath d='M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854z'/%3e%3c/svg%3e") !important;
+			background-position: center !important;
+			background-repeat: no-repeat !important;
+			background-size: 0.95rem !important;
 			box-shadow: none;
 			flex: 0 0 auto;
+			transition: transform .15s ease, background-color .15s ease;
 		}
 		.btn-close:hover,
 		.modal .btn-close:hover {
-			background-color: #b02a37;
+			background-color: #b02a37 !important;
 			transform: rotate(90deg);
-			opacity: 1;
+			opacity: 1 !important;
 		}
 		.btn-close:focus {
-			box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, .4);
-			opacity: 1;
+			box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, .5) !important;
+			opacity: 1 !important;
 		}
 
 		/* --- Select2 : cohérence avec les champs Bootstrap --- */
@@ -283,7 +290,7 @@
 	<script src="{{ asset('assets/admin/js/app.js') }}"></script>
 
 	<!-- Select2 -->
-	<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+	<script src="{{ asset('assets/admin/plugins/select2/js/select2.min.js') }}"></script>
 	<script>
 		(function () {
 			function initEmployeeSelects(scope) {
@@ -324,20 +331,38 @@
 	<script>
 		(function () {
 			var KEY = 'jss-admin-theme';
-			var save = function () {
-				try { localStorage.setItem(KEY, document.documentElement.className); } catch (e) {}
+			var root = document.documentElement;
+
+			// Ne garde que les classes de thème (on ignore les classes transitoires
+			// ajoutées par d'autres scripts, ex. pace-running / pace-done).
+			var cleaned = function () {
+				return (root.className || '')
+					.split(/\s+/)
+					.filter(function (c) { return c && c.indexOf('pace-') !== 0; })
+					.join(' ');
 			};
 
+			var save = function () {
+				try { localStorage.setItem(KEY, cleaned()); } catch (e) {}
+			};
+
+			// Toute modification de la classe de <html> (quelle que soit sa source :
+			// panneau de perso, bouton lune de l'en-tête...) est persistée.
+			try {
+				new MutationObserver(save).observe(root, { attributes: true, attributeFilter: ['class'] });
+			} catch (e) {}
+
+			// Filet de sécurité si MutationObserver indisponible.
 			var controls = document.querySelectorAll(
 				'#lightmode, #darkmode, #semidark, #minimaltheme,'
-				+ '.switcher-body .indigator, .dark-mode, .dark-mode-icon'
+				+ ' .switcher-body .indigator, .dark-mode, .dark-mode-icon'
 			);
-			controls.forEach(function (el) {
-				el.addEventListener('click', function () { setTimeout(save, 60); });
+			Array.prototype.forEach.call(controls, function (el) {
+				el.addEventListener('click', function () { setTimeout(save, 80); });
 			});
 
 			// Refléter le thème actif dans les boutons radio du panneau.
-			var cls = ' ' + document.documentElement.className + ' ';
+			var cls = ' ' + (root.className || '') + ' ';
 			var radios = { 'dark-theme': 'darkmode', 'semi-dark': 'semidark', 'minimal-theme': 'minimaltheme', 'light-theme': 'lightmode' };
 			Object.keys(radios).forEach(function (name) {
 				if (cls.indexOf(' ' + name + ' ') !== -1) {
