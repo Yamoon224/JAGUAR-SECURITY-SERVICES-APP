@@ -293,9 +293,12 @@
 	<script src="{{ asset('assets/admin/plugins/select2/js/select2.min.js') }}"></script>
 	<script>
 		(function () {
-			function initEmployeeSelects(scope) {
+			// Listes déroulantes rendues recherchables (employé, équipement...).
+			var SEARCHABLE = 'select[name="employee_id"], select[name="equipment_id"], select.select2';
+
+			function initSearchableSelects(scope) {
 				var $scope = scope ? $(scope) : $(document);
-				$scope.find('select[name="employee_id"]').each(function () {
+				$scope.find(SEARCHABLE).each(function () {
 					var $select = $(this);
 					if ($select.hasClass('select2-hidden-accessible')) return;
 					var $modal = $select.closest('.modal');
@@ -318,10 +321,10 @@
 			}
 
 			$(function () {
-				initEmployeeSelects();
+				initSearchableSelects();
 				// Les modaux d'édition sont rendus à la volée : on (ré)initialise à l'ouverture.
 				$(document).on('shown.bs.modal', function (event) {
-					initEmployeeSelects(event.target);
+					initSearchableSelects(event.target);
 				});
 			});
 		})();

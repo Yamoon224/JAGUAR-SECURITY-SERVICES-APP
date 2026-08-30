@@ -14,11 +14,26 @@
                 <span class="badge bg-dark">{{ $employee->dotations_count ?? $employee->dotations->count() }} @lang('lang.dotation', ['param'=>'s'])</span>
             </div>
             <ul class="list-group list-group-flush small mt-3 mb-3">
-                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">@lang('lang.name')</span><strong>{{ $employee->name }}</strong></li>
-                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">@lang('lang.firstname')</span><strong>{{ $employee->firstname }}</strong></li>
-                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">@lang('lang.phone_id')</span><strong>{{ $employee->phone }}</strong></li>
-                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">@lang('lang.matricule')</span><strong>{{ $employee->matricule }}</strong></li>
-                <li class="list-group-item d-flex justify-content-between"><span class="text-muted">@lang('lang.location')</span><strong class="text-end">{{ $site }}</strong></li>
+                <li class="list-group-item d-flex align-items-center gap-2">
+                    <i class="bx bx-id-card fs-5 text-muted" title="@lang('lang.name')"></i>
+                    <strong class="ms-auto text-end">{{ $employee->name }}</strong>
+                </li>
+                <li class="list-group-item d-flex align-items-center gap-2">
+                    <i class="bx bx-user fs-5 text-muted" title="@lang('lang.firstname')"></i>
+                    <strong class="ms-auto text-end">{{ $employee->firstname }}</strong>
+                </li>
+                <li class="list-group-item d-flex align-items-center gap-2">
+                    <i class="bx bx-phone fs-5 text-muted" title="@lang('lang.phone_id')"></i>
+                    <strong class="ms-auto text-end">{{ $employee->phone }}</strong>
+                </li>
+                <li class="list-group-item d-flex align-items-center gap-2">
+                    <i class="bx bx-hash fs-5 text-muted" title="@lang('lang.matricule')"></i>
+                    <strong class="ms-auto text-end">{{ $employee->matricule }}</strong>
+                </li>
+                <li class="list-group-item d-flex align-items-center gap-2">
+                    <i class="bx bx-map fs-5 text-muted" title="@lang('lang.location')"></i>
+                    <strong class="ms-auto text-end">{{ $site }}</strong>
+                </li>
             </ul>
             <div class="d-grid mt-auto">
                 <a href="{{ route('dotations.history', $employee->id) }}" class="btn btn-outline-dark radius-15"><i class="bx bx-history"></i> @lang('lang.dotation_history')</a>
