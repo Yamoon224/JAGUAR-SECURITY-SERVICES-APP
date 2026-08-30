@@ -29,7 +29,7 @@
     <div class="card-body">
         <p class="text-muted mb-3">@lang('lang.material_dotation_hint')</p>
 
-        <div class="row">
+        <div class="row position-relative" style="z-index: 5">
             <div class="col-12 col-lg-6 col-md-6">
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="inputGroup-sizing"><i class="bx bx-search-alt"></i></span>
@@ -38,9 +38,9 @@
             </div>
         </div>
 
-        <div class="row g-4 row-cols-1 row-cols-lg-2 row-cols-xl-4 search-result"></div>
+        <div class="row g-4 mt-0 row-cols-1 row-cols-lg-2 row-cols-xl-4 search-result"></div>
 
-        <div class="row g-4 row-cols-1 row-cols-lg-2 row-cols-xl-4" id="no-search">
+        <div class="row g-4 mt-0 row-cols-1 row-cols-lg-2 row-cols-xl-4" id="no-search">
             @forelse ($beneficiaries as $item)
                 <x-dotation-beneficiary-card :employee="$item" />
             @empty

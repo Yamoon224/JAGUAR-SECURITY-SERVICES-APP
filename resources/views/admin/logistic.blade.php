@@ -40,7 +40,7 @@
         <div class="d-sm-flex align-items-center mb-3">
             <h6 class="mb-0 text-uppercase">@lang('lang.employee', ['param'=>'s'])</h6>
         </div>
-        <div class="row">
+        <div class="row position-relative" style="z-index: 5">
             <div class="col-12 col-lg-6 col-md-6">
                 <div class="input-group mb-3">
                     <span class="input-group-text"><i class="bx bx-search-alt"></i></span>
@@ -48,8 +48,8 @@
                 </div>
             </div>
         </div>
-        <div class="row g-4 row-cols-1 row-cols-lg-2 row-cols-xl-4 search-result"></div>
-        <div class="row g-4 row-cols-1 row-cols-lg-2 row-cols-xl-4" id="no-search">
+        <div class="row g-4 mt-0 row-cols-1 row-cols-lg-2 row-cols-xl-4 search-result"></div>
+        <div class="row g-4 mt-0 row-cols-1 row-cols-lg-2 row-cols-xl-4" id="no-search">
             @foreach ($employees->items() as $item)
             <div class="col d-flex">
                 <div class="card border-bottom border-dark radius-15 h-100 w-100">
