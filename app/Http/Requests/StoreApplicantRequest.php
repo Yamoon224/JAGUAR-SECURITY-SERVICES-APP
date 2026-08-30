@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Applicant;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreApplicantRequest extends FormRequest
 {
@@ -24,10 +24,28 @@ class StoreApplicantRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:50'],
-            'address' => ['required', 'string'],
             'firstname' => ['required', 'string', 'max:80'],
-            'phone' => ['required', 'string', 'max:20', 'unique:'.Applicant::class],
-            'file' => ['required|mimes:pdf']
+            'address' => ['required', 'string', 'max:255'],
+            'affiliate' => ['nullable', 'string', 'max:255'],
+            'phone' => [
+                'required', 'string', 'max:20',
+                Rule::unique('applicants', 'phone')->where(fn ($q) => $q->where('deleted', 0)),
+            ],
+            'recruitment_id' => ['nullable', 'integer'],
+            'photo' => ['nullable', 'image', 'max:4096'],
+            'path' => ['nullable', 'mimes:pdf,doc,docx', 'max:8192'],
+        ];
+    }
+
+    /**
+     * Messages d'erreur personnalisés (formulaire public de candidature).
+     */
+    public function messages(): array
+    {
+        return [
+            'phone.unique' => 'Une candidature a déjà été enregistrée avec ce numéro de téléphone.',
+            'path.mimes' => 'Le dossier de candidature doit être un fichier PDF ou Word.',
+            'photo.image' => 'La photo doit être une image (JPG, PNG…).',
         ];
     }
 }

@@ -28,15 +28,26 @@
         <style>
             .auth-split { min-height: 100vh; }
             .auth-split__cover {
+                position: relative;
                 background: #111 url('{{ $cover }}') center / cover no-repeat;
+            }
+            .auth-split__cover::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.45));
             }
             .auth-split__form {
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 padding: 2rem 1rem;
+                background: #f7f7f9;
             }
-            .auth-split__form .card-wrap { width: 100%; max-width: 460px; }
+            .auth-split__form .card-wrap { width: 100%; max-width: {{ $wide ? '660px' : '460px' }}; }
+            @media (min-width: 992px) {
+                .auth-split__form { overflow-y: auto; max-height: 100vh; }
+            }
         </style>
         @endif
     </head>

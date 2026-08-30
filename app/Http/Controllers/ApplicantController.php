@@ -59,7 +59,20 @@ class ApplicantController extends Controller
         }
         $data['applicationid'] = "N° DOSSIER " . str_pad((is_null($item->id) ? 0 : $item->id) + 1, 4, 0, STR_PAD_LEFT);
         Applicant::create($data);
-        return auth()->check() ? back() : redirect()->route('applicants.done',  ['fr', $data['applicationid']]);
+
+        return auth()->check()
+            ? back()
+            : redirect()->route('applicants.done')->with('reference', $data['applicationid']);
+    }
+
+    /**
+     * Page de confirmation affichée au candidat après l'envoi de sa candidature.
+     */
+    public function done()
+    {
+        return view('recruitment-done', [
+            'reference' => session('reference'),
+        ]);
     }
 
     /**

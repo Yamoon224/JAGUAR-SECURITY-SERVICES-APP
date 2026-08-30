@@ -44,9 +44,16 @@ class RouteServiceProvider extends ServiceProvider
                 ->middleware('web')
                 ->group(base_path('routes/admin.php'));
                 
-            Route::domain('recrutement.jss-gn.com')
+            // Sous-domaine recrutement.
+            Route::domain('recruitement.jss-gn.com')
                 ->middleware('web')
                 ->group(base_path('routes/recrutement.php'));
+
+            // Ancienne orthographe -> redirection permanente vers la nouvelle.
+            Route::domain('recrutement.jss-gn.com')->group(function () {
+                Route::get('/{path?}', fn (string $path = '') => redirect('https://recruitement.jss-gn.com/'.$path, 301))
+                    ->where('path', '.*');
+            });
         });
     }
 }

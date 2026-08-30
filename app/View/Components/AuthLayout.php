@@ -12,10 +12,14 @@ class AuthLayout extends Component
     /** URL d'une image de couverture : affiche une mise en page en deux colonnes (image / formulaire). */
     public ?string $cover;
 
-    public function __construct(int $size = 3, ?string $cover = null)
+    /** Carte du formulaire plus large (utile pour les formulaires multi-colonnes). */
+    public bool $wide;
+
+    public function __construct(int $size = 3, ?string $cover = null, bool $wide = false)
     {
         $this->size = $size;
         $this->cover = $cover;
+        $this->wide = $wide;
     }
 
     /**
