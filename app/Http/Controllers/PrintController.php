@@ -869,27 +869,150 @@ class PrintController extends Controller
         exit;
     }
 
-    public static function getDotationsReport()
+    /**
+     * Export des dotations, filtrable par période
+     * (jour / semaine / mois / trimestre / semestre / année), au format PDF ou CSV.
+     */
+    public static function getDotationsReport(Request $request)
     {
-        $dotations = Dotation::with('employee', 'equipment')->orderByDesc('id')->get();
+        [$from, $to, $periodLabel] = self::resolvePeriod($request);
+
+        $query = Dotation::with(['employee.affectations.customer', 'equipment.category'])
+            ->orderByDesc('created_at');
+
+        if ($from && $to) {
+            $query->whereBetween('created_at', [$from, $to]);
+        }
+
+        $dotations = $query->get();
+
+        if (strtolower((string) $request->query('format')) === 'csv') {
+            return self::streamDotationsCsv($dotations, $periodLabel);
+        }
 
         self::initSimpleReport('Rapport Dotations');
+        self::$obj->SetFont('Arial', 'I', 9);
+        self::$obj->Cell(190, 6, self::textCell('Periode : ' . $periodLabel, 120), 0, 1, 'C');
+        self::$obj->Cell(190, 6, self::textCell('Total : ' . $dotations->count() . ' dotation(s)', 120), 0, 1, 'C');
+        self::$obj->Ln(2);
+
         self::renderTableSection(
             'Dotations',
-            ['#', 'Employe', 'Equipement', 'Quantite', 'Date'],
-            [10, 68, 50, 22, 40],
+            ['#', 'Date', 'Employe', 'Matricule', 'Fonction', 'Equipement', 'Categorie', 'Qte'],
+            [8, 20, 42, 24, 28, 34, 22, 12],
             $dotations->map(fn ($item) => [
                 $item->id,
-                trim((optional($item->employee)->firstname ?? '') . ' ' . (optional($item->employee)->name ?? '')),
-                optional($item->equipment)->name,
-                $item->qty,
                 optional($item->created_at)->format('d/m/Y'),
+                trim((optional($item->employee)->firstname ?? '') . ' ' . (optional($item->employee)->name ?? '')),
+                optional($item->employee)->matricule,
+                optional($item->employee)->position,
+                optional($item->equipment)->name,
+                optional(optional($item->equipment)->category)->name,
+                $item->qty . ' ' . (optional($item->equipment)->unit ?? ''),
             ])->toArray(),
-            'Aucune dotation disponible.'
+            'Aucune dotation sur la periode.'
         );
 
         self::$obj->Output();
         exit;
+    }
+
+    /**
+     * Détermine l'intervalle [from, to] et son libellé à partir de ?period et ?date.
+     *
+     * @return array{0:?\Carbon\Carbon,1:?\Carbon\Carbon,2:string}
+     */
+    private static function resolvePeriod(Request $request): array
+    {
+        $period = strtolower((string) $request->query('period', 'all'));
+        $anchor = $request->filled('date')
+            ? Carbon::parse($request->query('date'))
+            : Carbon::now();
+
+        switch ($period) {
+            case 'jour':
+            case 'day':
+                return [$anchor->copy()->startOfDay(), $anchor->copy()->endOfDay(),
+                    'Jour du ' . $anchor->format('d/m/Y')];
+
+            case 'semaine':
+            case 'week':
+                $start = $anchor->copy()->startOfWeek();
+                $end = $anchor->copy()->endOfWeek();
+                return [$start, $end, 'Semaine du ' . $start->format('d/m/Y') . ' au ' . $end->format('d/m/Y')];
+
+            case 'mois':
+            case 'month':
+                return [$anchor->copy()->startOfMonth(), $anchor->copy()->endOfMonth(),
+                    'Mois de ' . $anchor->format('m/Y')];
+
+            case 'trimestre':
+            case 'quarter':
+                return [$anchor->copy()->startOfQuarter(), $anchor->copy()->endOfQuarter(),
+                    'Trimestre T' . $anchor->quarter . ' ' . $anchor->year];
+
+            case 'semestre':
+            case 'semester':
+                $firstHalf = $anchor->month <= 6;
+                $start = $anchor->copy()->month($firstHalf ? 1 : 7)->startOfMonth();
+                $end = $anchor->copy()->month($firstHalf ? 6 : 12)->endOfMonth();
+                return [$start, $end, 'Semestre S' . ($firstHalf ? 1 : 2) . ' ' . $anchor->year];
+
+            case 'annee':
+            case 'year':
+                return [$anchor->copy()->startOfYear(), $anchor->copy()->endOfYear(),
+                    'Annee ' . $anchor->year];
+
+            default:
+                return [null, null, 'Toutes les dotations'];
+        }
+    }
+
+    /**
+     * Export CSV (séparateur « ; », BOM UTF-8 pour Excel) de la collection de dotations.
+     */
+    private static function streamDotationsCsv($dotations, string $periodLabel)
+    {
+        $filename = 'dotations_' . now()->format('Ymd_His') . '.csv';
+
+        return response()->streamDownload(function () use ($dotations, $periodLabel) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            fputcsv($out, ['Periode', $periodLabel], ';');
+            fputcsv($out, ['Total', $dotations->count() . ' dotation(s)'], ';');
+            fputcsv($out, [], ';');
+            fputcsv($out, [
+                '#', 'Date', 'Heure', 'Prenom', 'Nom', 'Matricule', 'Fonction', 'Telephone',
+                'Site d\'affectation', 'Equipement', 'Categorie', 'Quantite', 'Unite',
+            ], ';');
+
+            foreach ($dotations as $item) {
+                $employee = $item->employee;
+                $affectation = $employee ? $employee->currentAffectation() : null;
+                $site = $affectation
+                    ? ($affectation->location ?: (optional($affectation->customer)->name ?? ''))
+                    : '';
+
+                fputcsv($out, [
+                    $item->id,
+                    optional($item->created_at)->format('d/m/Y'),
+                    optional($item->created_at)->format('H:i'),
+                    optional($employee)->firstname,
+                    optional($employee)->name,
+                    optional($employee)->matricule,
+                    optional($employee)->position,
+                    optional($employee)->phone,
+                    $site,
+                    optional($item->equipment)->name,
+                    optional(optional($item->equipment)->category)->name,
+                    $item->qty,
+                    optional($item->equipment)->unit,
+                ], ';');
+            }
+
+            fclose($out);
+        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
     public static function getEquipmentsReport()
