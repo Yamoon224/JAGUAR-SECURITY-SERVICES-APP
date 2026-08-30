@@ -29,7 +29,7 @@ class EmployeeController extends Controller
         $count = $employees->count();
         $employees = $employees->orderByDesc('id')->paginate(16);
         $applicants = Applicant::where(array('status'=>'inprogress', 'deleted'=>0))->get();
-        $equipments = Equipment::all();
+        $equipments = Equipment::with('dotations')->get()->filter(fn ($equipment) => $equipment->available_qty > 0)->values();
         $suspensions = Suspension::with('employee')->get();
         $leaves = Leaf::with('employee')->get();
         $dotations = Dotation::with('employee', 'equipment')->get();

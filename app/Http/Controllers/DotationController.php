@@ -9,6 +9,7 @@ use App\Models\StockMovement;
 use App\Services\StockLedger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class DotationController extends Controller
 {
@@ -60,7 +61,7 @@ class DotationController extends Controller
         $dotations = $employee->dotations()->with('equipment')->latest()->get();
         $equipments = $this->availableEquipments();
         $employees = Employee::where('deleted', 0)->orderBy('name')->get();
-        $allEquipments = Equipment::with('category')->get();
+        $allEquipments = Equipment::with('category', 'dotations')->get();
 
         return view('admin.dotation', compact('employee', 'dotations', 'equipments', 'employees', 'allEquipments'));
     }
@@ -93,7 +94,7 @@ class DotationController extends Controller
     public function update(Request $request, int $id)
     {
         $dotation = Dotation::findOrFail($id);
-        $data = $this->validated($request);
+        $data = $this->validated($request, $dotation);
 
         DB::transaction(function () use ($dotation, $data) {
             $formerEquipmentId = $dotation->equipment_id;
@@ -150,14 +151,49 @@ class DotationController extends Controller
 
     /**
      * Règles de validation partagées pour la dotation matérielle.
+     *
+     * Un équipement épuisé (disponible <= 0) ne peut pas être doté, et la
+     * quantité demandée ne peut pas dépasser le stock réellement disponible.
      */
-    private function validated(Request $request): array
+    private function validated(Request $request, ?Dotation $current = null): array
     {
-        return $request->validate([
+        $validator = Validator::make($request->all(), [
             'employee_id' => ['required', 'exists:employees,id'],
             'equipment_id' => ['required', 'exists:equipment,id'],
             'qty' => ['required', 'numeric', 'min:1'],
         ]);
+
+        $validator->after(function ($validator) use ($request, $current) {
+            $equipment = Equipment::with('dotations')->find($request->input('equipment_id'));
+
+            if (! $equipment) {
+                return;
+            }
+
+            $available = (float) $equipment->available_qty;
+
+            // En édition sur le même équipement, la quantité de la ligne
+            // courante est d'abord "restituée".
+            if ($current && (int) $current->equipment_id === (int) $equipment->id) {
+                $available += (float) $current->qty;
+            }
+
+            $unit = trim((string) $equipment->unit);
+
+            if ($available <= 0) {
+                $validator->errors()->add('equipment_id',
+                    "L'équipement « {$equipment->name} » est épuisé : aucune unité disponible pour une dotation.");
+
+                return;
+            }
+
+            if ((float) $request->input('qty') > $available) {
+                $validator->errors()->add('qty',
+                    "Stock insuffisant : {$available} {$unit} disponible(s) pour « {$equipment->name} ».");
+            }
+        });
+
+        return $validator->validate();
     }
 
     /**

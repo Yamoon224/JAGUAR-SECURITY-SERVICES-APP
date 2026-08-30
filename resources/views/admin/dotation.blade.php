@@ -16,6 +16,12 @@
 </div>
 <hr/>
 
+@if ($errors->any())
+<div class="alert alert-danger">
+    <ul class="mb-0 ps-3">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+</div>
+@endif
+
 <div class="row">
     <div class="col-12 col-lg-4">
         <div class="card border-bottom border-dark radius-15">

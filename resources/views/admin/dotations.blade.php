@@ -25,6 +25,12 @@
 </div>
 <hr/>
 
+@if ($errors->any())
+<div class="alert alert-danger">
+    <ul class="mb-0 ps-3">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+</div>
+@endif
+
 <div class="card border-dark border-bottom border-3 border-0">
     <div class="card-body">
         <p class="text-muted mb-3">@lang('lang.material_dotation_hint')</p>
