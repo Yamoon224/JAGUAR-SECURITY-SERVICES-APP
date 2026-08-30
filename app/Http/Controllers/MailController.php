@@ -13,7 +13,7 @@ class MailController extends Controller
      */
     public function index()
     {
-        $mails = Mail::all();
+        $mails = Mail::orderByDesc('mail_datetime')->orderByDesc('id')->get();
         return view('admin.mails', compact('mails'));
     }
 
@@ -30,9 +30,9 @@ class MailController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->except('_token');
-        $data['mail_id'] = 'COURRIERJSS' . date('Y') ." ". str_pad(!empty(Mail::orderByDesc('id')->first()) ? Mail::orderByDesc('id')->first()->id : 0, 4, '0', STR_PAD_LEFT);
-        
+        $data = $this->validated($request);
+        $data['mail_id'] = 'COURRIERJSS ' . date('Y') . ' ' . str_pad((int) Mail::max('id') + 1, 4, '0', STR_PAD_LEFT);
+
         Mail::create($data);
         return back();
     }
@@ -58,10 +58,7 @@ class MailController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $mail = Mail::find($id);
-        $data = $request->except('_token');
-        
-        $mail->update($data);
+        Mail::findOrFail($id)->update($this->validated($request));
         return back();
     }
 
@@ -70,8 +67,22 @@ class MailController extends Controller
      */
     public function destroy(string $id)
     {
-        $mail = Mail::find($id);
-        $mail->delete();
+        Mail::findOrFail($id)->delete();
         return back();
+    }
+
+    /**
+     * Champs autorisés pour un courrier.
+     */
+    private function validated(Request $request): array
+    {
+        return $request->validate([
+            'mail_datetime' => ['required', 'date'],
+            'name' => ['required', 'in:DEPART,ARRIVEE'],
+            'srce' => ['required', 'string', 'max:255'],
+            'destinator' => ['required', 'string', 'max:255'],
+            'subject' => ['required', 'string', 'max:255'],
+            'observation' => ['nullable', 'string'],
+        ]);
     }
 }

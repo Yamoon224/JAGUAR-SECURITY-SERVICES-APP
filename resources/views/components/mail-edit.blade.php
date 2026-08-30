@@ -13,7 +13,7 @@
                         <div class="col-12">   
                             <div class="position-relative mb-3">
                                 <label for="mail_datetime{{ $mail->id }}">@lang('lang.mail_datetime')</label>
-                                <input type="datetime-local" class="form-control" value="{{ $mail->mail_datetime }}" name="mail_datetime" id="mail_datetime{{ $mail->id }}" required />
+                                <input type="datetime-local" class="form-control" value="{{ $mail->mail_datetime ? \Carbon\Carbon::parse($mail->mail_datetime)->format('Y-m-d\TH:i') : '' }}" name="mail_datetime" id="mail_datetime{{ $mail->id }}" required />
                             </div>  
                             <div class="position-relative mb-3">
                                 <label for="name{{ $mail->id }}">@lang('lang.type')</label>

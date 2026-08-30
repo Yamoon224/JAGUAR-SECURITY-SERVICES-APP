@@ -7,24 +7,25 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Mail
- * 
+ *
  * @property int $id
- * @property string $category
+ * @property string $mail_id
+ * @property Carbon $mail_datetime
  * @property string $name
- * @property string|null $expeditor
+ * @property string|null $srce
  * @property string|null $destinator
+ * @property string|null $subject
+ * @property string|null $observation
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ * @property int $deleted
  *
  * @package App\Models
  */
 class Mail extends BaseModel
 {
-    use SoftDeletes;
 	protected $guarded = [];
 }

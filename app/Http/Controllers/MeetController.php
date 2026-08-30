@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Meet;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class MeetController extends Controller
 {
@@ -13,16 +13,8 @@ class MeetController extends Controller
      */
     public function index()
     {
-        $meets = Meet::where('deleted', 0)->get();
+        $meets = Meet::where('deleted', 0)->orderByDesc('id')->get();
         return view('admin.meets', compact('meets'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -30,27 +22,11 @@ class MeetController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->except('_token');
-        $data['file_path'] = $request->file('file_path')->store('public/meets');
-        $data['file_path'] = substr($data['file_path'], 7);
+        $data = $this->validated($request);
+        $data['file_path'] = $this->storeFile($request);
+
         Meet::create($data);
         return back();
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
     }
 
     /**
@@ -58,13 +34,16 @@ class MeetController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $meet = Meet::find($id);
-        $data = $request->except('_token');
+        $meet = Meet::findOrFail($id);
+        $data = $this->validated($request);
+
         if ($request->hasFile('file_path')) {
-            $data['file_path'] = $request->file('file_path')->store('public/meets');
-            $data['file_path'] = substr($data['file_path'], 7);
-            File::delete("storage/".$meet->file_path);
+            if ($meet->file_path) {
+                Storage::disk('public')->delete($meet->file_path);
+            }
+            $data['file_path'] = $this->storeFile($request);
         }
+
         $meet->update($data);
         return back();
     }
@@ -74,8 +53,31 @@ class MeetController extends Controller
      */
     public function destroy(string $id)
     {
-        $meet = Meet::find($id);
-        $meet->update(['deleted'=>1]);
+        Meet::findOrFail($id)->update(['deleted' => 1]);
         return back();
+    }
+
+    /**
+     * Champs autorisés pour une réunion.
+     */
+    private function validated(Request $request): array
+    {
+        return $request->validate([
+            'object' => ['required', 'string', 'max:255'],
+            'points' => ['required', 'string'],
+            'file_path' => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
+        ], [], ['file_path' => 'compte rendu']);
+    }
+
+    /**
+     * Enregistre le PDF sur le disque public et retourne son chemin relatif.
+     */
+    private function storeFile(Request $request): ?string
+    {
+        if (! $request->hasFile('file_path')) {
+            return null;
+        }
+
+        return $request->file('file_path')->store('meets', 'public');
     }
 }
