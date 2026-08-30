@@ -6,7 +6,7 @@ use App\Http\Controllers\ApplicantController;
 
 /*
 |--------------------------------------------------------------------------
-| Sous-domaine recrutement (recruitement.jss-gn.com)
+| Sous-domaine recrutement (recruitment.jss-gn.com)
 |--------------------------------------------------------------------------
 */
 

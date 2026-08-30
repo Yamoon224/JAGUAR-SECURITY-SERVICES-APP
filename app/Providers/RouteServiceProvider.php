@@ -44,16 +44,21 @@ class RouteServiceProvider extends ServiceProvider
                 ->middleware('web')
                 ->group(base_path('routes/admin.php'));
                 
-            // Sous-domaine recrutement.
-            Route::domain('recruitement.jss-gn.com')
+            // Sous-domaine recrutement — domaine canonique.
+            $recruitmentDomain = 'recruitment.jss-gn.com';
+
+            Route::domain($recruitmentDomain)
                 ->middleware('web')
                 ->group(base_path('routes/recrutement.php'));
 
-            // Ancienne orthographe -> redirection permanente vers la nouvelle.
-            Route::domain('recrutement.jss-gn.com')->group(function () {
-                Route::get('/{path?}', fn (string $path = '') => redirect('https://recruitement.jss-gn.com/'.$path, 301))
-                    ->where('path', '.*');
-            });
+            // Autres orthographes du sous-domaine -> redirection 301 vers le canonique.
+            // (routes anonymes : compatibles avec `route:cache`)
+            foreach (['recruitement.jss-gn.com', 'recrutement.jss-gn.com'] as $aliasDomain) {
+                Route::domain($aliasDomain)->group(function () use ($recruitmentDomain) {
+                    Route::get('/{path?}', fn (string $path = '') => redirect('https://'.$recruitmentDomain.'/'.$path, 301))
+                        ->where('path', '.*');
+                });
+            }
         });
     }
 }
