@@ -66,7 +66,14 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        $category = Category::find($id);
+        $category = Category::findOrFail($id);
+
+        if ($category->equipment()->exists()) {
+            return back()->withErrors([
+                'category' => "Impossible de supprimer la catégorie « {$category->name} » : des équipements y sont encore rattachés.",
+            ]);
+        }
+
         $category->delete();
         return redirect()->route('categories.index');
     }

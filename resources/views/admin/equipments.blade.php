@@ -39,7 +39,7 @@
                                 @foreach ($equipments as $item)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $item->category->name }}</td>
+                                    <td>{{ $item->category?->name ?? '—' }}</td>
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->price }}</td>
                                     <td>{{ $item->qty." ".$item->unit }}</td>

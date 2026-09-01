@@ -201,6 +201,6 @@ class DotationController extends Controller
      */
     private function availableEquipments()
     {
-        return Equipment::with('category')->get()->filter(fn ($equipment) => $equipment->available_qty > 0);
+        return Equipment::with('category', 'dotations')->get()->filter(fn ($equipment) => $equipment->available_qty > 0)->values();
     }
 }

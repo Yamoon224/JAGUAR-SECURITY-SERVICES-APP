@@ -37,7 +37,7 @@
                                 @forelse ($equipments as $item)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $item->category->name }}</td>
+                                    <td>{{ $item->category?->name ?? '—' }}</td>
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->qty." ".$item->unit }}</td>
                                     <td>{{ $item->deteriorated_qty." ".$item->unit }}</td>
