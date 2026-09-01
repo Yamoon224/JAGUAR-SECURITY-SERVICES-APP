@@ -16,7 +16,7 @@ class PurchaseController extends Controller
      */
     public function index()
     {
-        $equipments = Equipment::all();
+        $equipments = Equipment::with('category', 'dotations')->orderBy('name')->get();
         $purchases = Purchase::with('equipment')->latest('purchased_at')->paginate(15);
         return view('admin.purchases', compact('purchases', 'equipments'));
     }

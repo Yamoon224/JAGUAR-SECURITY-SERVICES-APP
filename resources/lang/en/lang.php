@@ -246,6 +246,7 @@ return array(
     'semester' => 'Semester',
     'all_periods' => 'All periods',
     'export' => 'Export',
+    'qty_to_supply' => 'Quantity to supply',
     'edit' => 'Edit',
     'detailed_inventory' => 'Detailed inventory',
     'total_qty' => 'Total qty',

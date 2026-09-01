@@ -245,6 +245,7 @@ return array(
     'semester' => 'Semestre',
     'all_periods' => 'Toutes périodes',
     'export' => 'Exporter',
+    'qty_to_supply' => 'Quantité à approvisionner',
     'edit' => 'Modifier',
     'detailed_inventory' => 'Inventaire détaillé',
     'total_qty' => 'Qté totale',
