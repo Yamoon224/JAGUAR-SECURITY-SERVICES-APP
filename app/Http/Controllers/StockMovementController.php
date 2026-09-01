@@ -28,10 +28,14 @@ class StockMovementController extends Controller
             ->sortBy(fn ($equipment) => [optional($equipment->category)->name ?? 'zzz', $equipment->name])
             ->groupBy(fn ($equipment) => optional($equipment->category)->name ?? 'Sans catégorie');
 
-        $depletedEquipments = $equipments->filter(fn ($equipment) => $equipment->is_depleted);
+        $depletedEquipments = $equipments->filter(fn ($equipment) => $equipment->is_depleted)->values();
+        $availableEquipments = $equipments->filter(fn ($equipment) => ! $equipment->is_depleted)
+            ->sortByDesc(fn ($equipment) => (float) $equipment->available_qty)
+            ->values();
 
         $stats = [
             'equipments' => $equipments->count(),
+            'available' => $availableEquipments->count(),
             'depleted' => $depletedEquipments->count(),
             'movements_month' => StockMovement::whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
@@ -40,6 +44,6 @@ class StockMovementController extends Controller
 
         $reasons = StockMovement::REASON_LABELS;
 
-        return view('admin.stocks', compact('movements', 'equipments', 'inventory', 'depletedEquipments', 'stats', 'reasons'));
+        return view('admin.stocks', compact('movements', 'equipments', 'inventory', 'availableEquipments', 'depletedEquipments', 'stats', 'reasons'));
     }
 }

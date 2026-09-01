@@ -8,12 +8,20 @@
 </div>
 <hr/>
 
-<div class="row row-cols-1 row-cols-md-3 g-3 mb-3">
+<div class="row row-cols-2 row-cols-md-4 g-3 mb-3">
     <div class="col">
         <div class="card radius-15 h-100 border-dark border-bottom border-3">
             <div class="card-body text-center">
                 <h3 class="mb-0">{{ $stats['equipments'] }}</h3>
                 <p class="mb-0 text-muted">@lang('lang.equipment', ['param'=>'s'])</p>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card radius-15 h-100 border-success border-bottom border-3">
+            <div class="card-body text-center">
+                <h3 class="mb-0 text-success">{{ $stats['available'] }}</h3>
+                <p class="mb-0 text-muted">@lang('lang.available_stock')</p>
             </div>
         </div>
     </div>
@@ -51,6 +59,14 @@
                     <div class="d-flex align-items-center">
                         <div class="tab-icon"><i class='bx bx-package font-18 me-1'></i></div>
                         <div class="tab-title">@lang('lang.detailed_inventory')</div>
+                    </div>
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" data-bs-toggle="tab" href="#tab-available" role="tab">
+                    <div class="d-flex align-items-center">
+                        <div class="tab-icon"><i class='bx bx-check-circle font-18 me-1'></i></div>
+                        <div class="tab-title">@lang('lang.available_stock')</div>
                     </div>
                 </a>
             </li>
@@ -198,6 +214,39 @@
                             </tr>
                         </tfoot>
                         @endif
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-available" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered w-100">
+                        <thead class="table-light">
+                            <tr>
+                                <td>#</td>
+                                <th>@lang('lang.category', ['param'=>''])</th>
+                                <th>@lang('lang.equipment', ['param'=>''])</th>
+                                <th class="text-end">@lang('lang.total_qty')</th>
+                                <th class="text-end">@lang('lang.allocated_qty')</th>
+                                <th class="text-end">@lang('lang.deteriorated_qty')</th>
+                                <th class="text-end">@lang('lang.available')</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($availableEquipments as $equipment)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $equipment->category?->name ?? '—' }}</td>
+                                <td>{{ $equipment->name }}</td>
+                                <td class="text-end">{{ $equipment->qty." ".$equipment->unit }}</td>
+                                <td class="text-end">{{ $equipment->dotations->sum('qty')." ".$equipment->unit }}</td>
+                                <td class="text-end">{{ ($equipment->deteriorated_qty ?? 0)." ".$equipment->unit }}</td>
+                                <td class="text-end text-success fw-semibold">{{ $equipment->available_qty." ".$equipment->unit }}</td>
+                            </tr>
+                            @empty
+                            <tr><td colspan="7" class="text-center">@lang('lang.no_available_stock')</td></tr>
+                            @endforelse
+                        </tbody>
                     </table>
                 </div>
             </div>

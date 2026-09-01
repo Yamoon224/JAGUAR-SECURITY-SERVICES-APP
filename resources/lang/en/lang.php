@@ -175,6 +175,8 @@ return array(
     'stock_out' => 'Out',
     'stock_after' => 'Stock after',
     'depleted_stock' => 'Depleted stock',
+    'available_stock' => 'Available stock',
+    'no_available_stock' => 'No available stock',
     'no_stock_movement' => 'No stock movement',
     'no_depleted_stock' => 'No depleted stock',
     'reset' => 'Reset',
