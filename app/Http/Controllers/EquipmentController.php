@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\Equipment;
 use App\Models\StockMovement;
 use App\Services\StockLedger;
@@ -15,9 +14,8 @@ class EquipmentController extends Controller
      */
     public function index()
     {
-        $categories = Category::all();
-        $equipments = Equipment::with('category', 'dotations')->get();
-        return view('admin.equipments', compact('equipments', 'categories'));
+        $equipments = Equipment::with('dotations')->orderBy('name')->get();
+        return view('admin.equipments', compact('equipments'));
     }
 
     /**
@@ -25,19 +23,11 @@ class EquipmentController extends Controller
      */
     public function deteriorated()
     {
-        $categories = Category::all();
-        $equipments = Equipment::with('category', 'dotations')
+        $equipments = Equipment::with('dotations')
             ->where('deteriorated_qty', '>', 0)
+            ->orderBy('name')
             ->get();
-        return view('admin.equipments-deteriorated', compact('equipments', 'categories'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return view('admin.equipments-deteriorated', compact('equipments'));
     }
 
     /**
@@ -45,10 +35,11 @@ class EquipmentController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->except('_token');
+        $data = $this->validated($request);
+        $data['category_id'] = Equipment::defaultCategoryId();
+
         $equipment = Equipment::create($data);
 
-        // Solde d'ouverture dans l'archive logistique.
         StockLedger::record(
             $equipment,
             StockMovement::IN,
@@ -61,28 +52,12 @@ class EquipmentController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
         $equipment = Equipment::findOrFail($id);
-        $data = $request->except('_token');
+        $data = $this->validated($request);
 
         $formerQty = (float) $equipment->qty;
         $formerDeteriorated = (float) ($equipment->deteriorated_qty ?? 0);
@@ -114,8 +89,21 @@ class EquipmentController extends Controller
      */
     public function destroy(string $id)
     {
-        $equipment = Equipment::find($id);
-        $equipment->delete();
+        Equipment::findOrFail($id)->delete();
         return back();
+    }
+
+    /**
+     * Champs autorisés pour un équipement.
+     */
+    private function validated(Request $request): array
+    {
+        return $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'unit' => ['nullable', 'string', 'max:30'],
+            'price' => ['nullable', 'numeric', 'min:0'],
+            'qty' => ['nullable', 'numeric', 'min:0'],
+            'deteriorated_qty' => ['nullable', 'numeric', 'min:0'],
+        ]);
     }
 }

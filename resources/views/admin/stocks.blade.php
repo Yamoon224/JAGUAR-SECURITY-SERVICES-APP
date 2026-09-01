@@ -149,11 +149,11 @@
             </div>
 
             <div class="tab-pane fade" id="tab-inventory" role="tabpanel">
-                @php $grandValue = 0; @endphp
                 <div class="table-responsive">
                     <table class="table table-bordered w-100 align-middle">
                         <thead>
                             <tr class="table-dark">
+                                <td>#</td>
                                 <th>@lang('lang.equipment', ['param'=>''])</th>
                                 <th class="text-end">@lang('lang.price')</th>
                                 <th class="text-end">@lang('lang.total_qty')</th>
@@ -164,53 +164,30 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($inventory as $categoryName => $items)
+                            @forelse ($inventory as $equipment)
                                 @php
-                                    $catQty = 0; $catAllocated = 0; $catDeteriorated = 0; $catAvailable = 0; $catValue = 0;
+                                    $allocated = $equipment->dotations->sum('qty');
+                                    $available = $equipment->available_qty;
                                 @endphp
-                                <tr class="table-secondary">
-                                    <td colspan="7" class="fw-bold text-uppercase">
-                                        <i class="bx bx-bookmark"></i> {{ $categoryName }} <span class="text-muted">({{ $items->count() }})</span>
-                                    </td>
-                                </tr>
-                                @foreach ($items as $equipment)
-                                    @php
-                                        $allocated = $equipment->dotations->sum('qty');
-                                        $deteriorated = $equipment->deteriorated_qty ?? 0;
-                                        $available = $equipment->available_qty;
-                                        $value = $available * $equipment->price;
-                                        $catQty += $equipment->qty; $catAllocated += $allocated;
-                                        $catDeteriorated += $deteriorated; $catAvailable += $available; $catValue += $value;
-                                        $grandValue += $value;
-                                    @endphp
-                                    <tr @class(['table-warning' => $available <= 0])>
-                                        <td>{{ $equipment->name }}</td>
-                                        <td class="text-end">{{ moneyFormat($equipment->price) }}</td>
-                                        <td class="text-end">{{ $equipment->qty }} {{ $equipment->unit }}</td>
-                                        <td class="text-end">{{ $allocated }} {{ $equipment->unit }}</td>
-                                        <td class="text-end">{{ $deteriorated }} {{ $equipment->unit }}</td>
-                                        <td class="text-end {{ $available <= 0 ? 'text-danger fw-semibold' : '' }}">{{ $available }} {{ $equipment->unit }}</td>
-                                        <td class="text-end">{{ moneyFormat($value) }}</td>
-                                    </tr>
-                                @endforeach
-                                <tr class="fw-semibold">
-                                    <td class="text-end">@lang('lang.subtotal')</td>
-                                    <td></td>
-                                    <td class="text-end">{{ $catQty }}</td>
-                                    <td class="text-end">{{ $catAllocated }}</td>
-                                    <td class="text-end">{{ $catDeteriorated }}</td>
-                                    <td class="text-end">{{ $catAvailable }}</td>
-                                    <td class="text-end">{{ moneyFormat($catValue) }}</td>
+                                <tr @class(['table-warning' => $available <= 0])>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $equipment->name }}</td>
+                                    <td class="text-end">{{ moneyFormat($equipment->price) }}</td>
+                                    <td class="text-end">{{ $equipment->qty }} {{ $equipment->unit }}</td>
+                                    <td class="text-end">{{ $allocated }} {{ $equipment->unit }}</td>
+                                    <td class="text-end">{{ ($equipment->deteriorated_qty ?? 0) }} {{ $equipment->unit }}</td>
+                                    <td class="text-end {{ $available <= 0 ? 'text-danger fw-semibold' : '' }}">{{ $available }} {{ $equipment->unit }}</td>
+                                    <td class="text-end">{{ moneyFormat($available * $equipment->price) }}</td>
                                 </tr>
                             @empty
-                                <tr><td colspan="7" class="text-center">@lang('lang.no_stock_movement')</td></tr>
+                                <tr><td colspan="8" class="text-center">@lang('lang.no_available_stock')</td></tr>
                             @endforelse
                         </tbody>
                         @if($inventory->isNotEmpty())
                         <tfoot>
                             <tr class="table-dark fw-bold">
-                                <td colspan="6" class="text-end">@lang('lang.stock_value') @lang('lang.total')</td>
-                                <td class="text-end">{{ moneyFormat($grandValue) }}</td>
+                                <td colspan="7" class="text-end">@lang('lang.stock_value') @lang('lang.total')</td>
+                                <td class="text-end">{{ moneyFormat($inventoryValue) }}</td>
                             </tr>
                         </tfoot>
                         @endif
@@ -224,7 +201,6 @@
                         <thead class="table-light">
                             <tr>
                                 <td>#</td>
-                                <th>@lang('lang.category', ['param'=>''])</th>
                                 <th>@lang('lang.equipment', ['param'=>''])</th>
                                 <th class="text-end">@lang('lang.total_qty')</th>
                                 <th class="text-end">@lang('lang.allocated_qty')</th>
@@ -236,7 +212,6 @@
                             @forelse ($availableEquipments as $equipment)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $equipment->category?->name ?? '—' }}</td>
                                 <td>{{ $equipment->name }}</td>
                                 <td class="text-end">{{ $equipment->qty." ".$equipment->unit }}</td>
                                 <td class="text-end">{{ $equipment->dotations->sum('qty')." ".$equipment->unit }}</td>
@@ -244,7 +219,7 @@
                                 <td class="text-end text-success fw-semibold">{{ $equipment->available_qty." ".$equipment->unit }}</td>
                             </tr>
                             @empty
-                            <tr><td colspan="7" class="text-center">@lang('lang.no_available_stock')</td></tr>
+                            <tr><td colspan="6" class="text-center">@lang('lang.no_available_stock')</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -257,25 +232,23 @@
                         <thead>
                             <tr>
                                 <td>#</td>
-                                <th>@lang('lang.category', ['param'=>''])</th>
                                 <th>@lang('lang.equipment', ['param'=>''])</th>
-                                <th>@lang('lang.qty')</th>
-                                <th>@lang('lang.available')</th>
-                                <th>@lang('lang.deteriorated_qty')</th>
+                                <th class="text-end">@lang('lang.qty')</th>
+                                <th class="text-end">@lang('lang.available')</th>
+                                <th class="text-end">@lang('lang.deteriorated_qty')</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($depletedEquipments as $equipment)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $equipment->category?->name }}</td>
                                 <td>{{ $equipment->name }}</td>
-                                <td>{{ $equipment->qty." ".$equipment->unit }}</td>
-                                <td class="text-danger">{{ $equipment->available_qty." ".$equipment->unit }}</td>
-                                <td>{{ ($equipment->deteriorated_qty ?? 0)." ".$equipment->unit }}</td>
+                                <td class="text-end">{{ $equipment->qty." ".$equipment->unit }}</td>
+                                <td class="text-end text-danger">{{ $equipment->available_qty." ".$equipment->unit }}</td>
+                                <td class="text-end">{{ ($equipment->deteriorated_qty ?? 0)." ".$equipment->unit }}</td>
                             </tr>
                             @empty
-                            <tr><td colspan="6" class="text-center">@lang('lang.no_depleted_stock')</td></tr>
+                            <tr><td colspan="5" class="text-center">@lang('lang.no_depleted_stock')</td></tr>
                             @endforelse
                         </tbody>
                     </table>

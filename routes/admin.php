@@ -10,7 +10,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PrintController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DotationController;
 use App\Http\Controllers\EmployeeController;
@@ -63,7 +62,6 @@ Route::get('/prints/wifi', [PrintController::class, 'getQrcodeWifi'])->name('pri
 
 Route::prefix('admin')->middleware(['auth', 'verified', 'lang'])->group(function () {
     Route::get('/prints/operations/report', [PrintController::class, 'getOperationsReport'])->name('prints.operations.report');
-    Route::get('/prints/categories/report', [PrintController::class, 'getCategoriesReport'])->name('prints.categories.report');
     Route::get('/prints/dotations/report', [PrintController::class, 'getDotationsReport'])->name('prints.dotations.report');
     Route::get('/prints/equipments/report', [PrintController::class, 'getEquipmentsReport'])->name('prints.equipments.report');
     Route::get('/prints/inventory/report', [PrintController::class, 'getInventoryReport'])->name('prints.inventory.report');
@@ -111,7 +109,6 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'lang'])->group(function
     Route::resource('employees', EmployeeController::class);
     Route::resource('dotations', DotationController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('customers', CustomerController::class);
-    Route::resource('categories', CategoryController::class);
     Route::resource('applicants', ApplicantController::class);
     Route::resource('equipments', EquipmentController::class);
     Route::resource('purchases', PurchaseController::class);

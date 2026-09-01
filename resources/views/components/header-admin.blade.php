@@ -127,13 +127,13 @@
                                     
                                     @if(isRightAccess([1, 5]))
                                     <div class="col">
-                                        <a href="{{ route('categories.index') }}">
+                                        <a href="{{ route('equipments.index') }}">
                                             <div class="app-box text-center">
-                                                <div class="app-icon"><i class="bx bx-table bx-sm"></i></div>
-                                                <div class="app-name"><p class="mb-0 mt-1">@lang('lang.category', ['param'=>'s'])</p></div>
+                                                <div class="app-icon"><i class="bx bx-customize bx-sm"></i></div>
+                                                <div class="app-name"><p class="mb-0 mt-1">@lang('lang.equipment', ['param'=>'s'])</p></div>
                                             </div>
                                         </a>
-                                    </div>     
+                                    </div>
                                     @endif
                                 </div>        
                             </div>

@@ -46,6 +46,16 @@ class Equipment extends BaseModel
 		return $this->belongsTo(Category::class);
 	}
 
+	/**
+	 * La gestion des catégories a été retirée : tout équipement est rattaché
+	 * à une catégorie technique unique, pour respecter la contrainte de clé
+	 * étrangère de la table `equipment`.
+	 */
+	public static function defaultCategoryId(): int
+	{
+		return Category::withoutGlobalScopes()->firstOrCreate(['name' => 'Général'])->id;
+	}
+
 	public function dotations()
 	{
 		return $this->hasMany(Dotation::class);

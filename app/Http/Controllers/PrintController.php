@@ -9,7 +9,6 @@ use App\Models\Leaf;
 use App\Models\Mail;
 use App\Models\Meet;
 use App\Models\Dotation;
-use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Employee;
 use App\Models\Equipment;
@@ -849,27 +848,6 @@ class PrintController extends Controller
         return 'Autres';
     }
 
-    public static function getCategoriesReport()
-    {
-        $categories = Category::orderBy('name')->get();
-
-        self::initSimpleReport('Rapport Categories');
-        self::renderTableSection(
-            'Categories',
-            ['#', 'Nom', 'Date creation'],
-            [20, 110, 60],
-            $categories->map(fn ($item) => [
-                $item->id,
-                $item->name,
-                optional($item->created_at)->format('d/m/Y'),
-            ])->toArray(),
-            'Aucune categorie disponible.'
-        );
-
-        self::$obj->Output();
-        exit;
-    }
-
     /**
      * Export des dotations, filtrable par période
      * (jour / semaine / mois / trimestre / semestre / année), au format PDF ou CSV.
@@ -878,7 +856,7 @@ class PrintController extends Controller
     {
         [$from, $to, $periodLabel] = self::resolvePeriod($request);
 
-        $query = Dotation::with(['employee.affectations.customer', 'equipment.category'])
+        $query = Dotation::with(['employee.affectations.customer', 'equipment'])
             ->orderByDesc('created_at');
 
         if ($from && $to) {
@@ -899,8 +877,8 @@ class PrintController extends Controller
 
         self::renderTableSection(
             'Dotations',
-            ['#', 'Date', 'Employe', 'Matricule', 'Fonction', 'Equipement', 'Categorie', 'Qte'],
-            [8, 20, 42, 24, 28, 34, 22, 12],
+            ['#', 'Date', 'Employe', 'Matricule', 'Fonction', 'Equipement', 'Qte'],
+            [8, 22, 46, 26, 34, 40, 14],
             $dotations->map(fn ($item) => [
                 $item->id,
                 optional($item->created_at)->format('d/m/Y'),
@@ -908,7 +886,6 @@ class PrintController extends Controller
                 optional($item->employee)->matricule,
                 optional($item->employee)->position,
                 optional($item->equipment)->name,
-                optional(optional($item->equipment)->category)->name,
                 $item->qty . ' ' . (optional($item->equipment)->unit ?? ''),
             ])->toArray(),
             'Aucune dotation sur la periode.'
@@ -985,7 +962,7 @@ class PrintController extends Controller
             fputcsv($out, [], ';');
             fputcsv($out, [
                 '#', 'Date', 'Heure', 'Prenom', 'Nom', 'Matricule', 'Fonction', 'Telephone',
-                'Site d\'affectation', 'Equipement', 'Categorie', 'Quantite', 'Unite',
+                'Site d\'affectation', 'Equipement', 'Quantite', 'Unite',
             ], ';');
 
             foreach ($dotations as $item) {
@@ -1006,7 +983,6 @@ class PrintController extends Controller
                     optional($employee)->phone,
                     $site,
                     optional($item->equipment)->name,
-                    optional(optional($item->equipment)->category)->name,
                     $item->qty,
                     optional($item->equipment)->unit,
                 ], ';');
@@ -1017,42 +993,25 @@ class PrintController extends Controller
     }
 
     /**
-     * Inventaire détaillé des équipements, classé par catégorie, avec
-     * sous-totaux par catégorie et valeur totale du stock disponible (PDF).
+     * Inventaire détaillé des équipements + valeur totale du stock disponible (PDF).
      */
     public static function getInventoryReport()
     {
-        $grouped = Equipment::with('category', 'dotations')
-            ->orderBy('name')
-            ->get()
-            ->sortBy(fn ($e) => [optional($e->category)->name ?? 'zzz', $e->name])
-            ->groupBy(fn ($e) => optional($e->category)->name ?? 'Sans categorie');
+        $equipments = Equipment::with('dotations')->orderBy('name')->get();
 
-        self::initSimpleReport('Inventaire detaille par categorie');
+        self::initSimpleReport('Inventaire detaille');
 
-        $headers = ['Equipement', 'Prix', 'Qte totale', 'Dotee', 'Deterioree', 'Disponible', 'Valeur (GNF)'];
-        $widths  = [54, 22, 22, 18, 20, 20, 34]; // total 190
+        $headers = ['#', 'Equipement', 'Prix', 'Qte totale', 'Dotee', 'Deterioree', 'Disponible', 'Valeur (GNF)'];
+        $widths  = [8, 48, 22, 22, 18, 20, 20, 32]; // total 190
 
-        if ($grouped->isEmpty()) {
+        if ($equipments->isEmpty()) {
             self::$obj->SetFont('Arial', 'I', 10);
             self::$obj->Cell(190, 8, utf8_decode('Aucun equipement enregistre.'), 1, 1, 'C');
             self::$obj->Output();
             exit;
         }
 
-        $grandValue = 0.0;
-
-        foreach ($grouped as $categoryName => $items) {
-            if (self::$obj->GetY() > 245) {
-                self::$obj->AddPage();
-            }
-
-            self::$obj->Ln(2);
-            self::$obj->SetFont('Arial', 'B', 10);
-            self::$obj->SetFillColor(40, 40, 40);
-            self::$obj->SetTextColor(255, 255, 255);
-            self::$obj->Cell(190, 7, self::textCell(mb_strtoupper((string) $categoryName, 'UTF-8') . '  (' . $items->count() . ')', 90), 1, 1, 'L', true);
-
+        $printHeaders = function () use ($headers, $widths) {
             self::$obj->SetFont('Arial', 'B', 8);
             self::$obj->SetFillColor(224, 215, 215);
             self::$obj->SetTextColor(0, 0, 0);
@@ -1060,59 +1019,55 @@ class PrintController extends Controller
                 self::$obj->Cell($widths[$i], 6, self::textCell($header, 18), 1, 0, 'C', true);
             }
             self::$obj->Ln();
+        };
 
-            $catQty = $catAlloc = $catDeter = $catAvail = $catValue = 0.0;
+        $printHeaders();
 
-            self::$obj->SetFont('Arial', '', 8);
-            foreach ($items as $equipment) {
-                if (self::$obj->GetY() > 272) {
-                    self::$obj->AddPage();
-                    self::$obj->SetFont('Arial', 'B', 8);
-                    self::$obj->SetFillColor(224, 215, 215);
-                    foreach ($headers as $i => $header) {
-                        self::$obj->Cell($widths[$i], 6, self::textCell($header, 18), 1, 0, 'C', true);
-                    }
-                    self::$obj->Ln();
-                    self::$obj->SetFont('Arial', '', 8);
-                }
+        $totQty = $totAlloc = $totDeter = $totAvail = $totValue = 0.0;
 
-                $alloc = (float) $equipment->dotations->sum('qty');
-                $deter = (float) ($equipment->deteriorated_qty ?? 0);
-                $avail = (float) $equipment->available_qty;
-                $value = $avail * (float) $equipment->price;
-
-                $catQty += (float) $equipment->qty;
-                $catAlloc += $alloc;
-                $catDeter += $deter;
-                $catAvail += $avail;
-                $catValue += $value;
-                $grandValue += $value;
-
-                self::$obj->Cell($widths[0], 6, self::textCell($equipment->name, 32), 1, 0, 'L');
-                self::$obj->Cell($widths[1], 6, self::textCell(number_format((float) $equipment->price, 0, ',', ' '), 14), 1, 0, 'R');
-                self::$obj->Cell($widths[2], 6, self::textCell($equipment->qty . ' ' . $equipment->unit, 12), 1, 0, 'R');
-                self::$obj->Cell($widths[3], 6, self::textCell(self::numTrim($alloc), 10), 1, 0, 'R');
-                self::$obj->Cell($widths[4], 6, self::textCell(self::numTrim($deter), 10), 1, 0, 'R');
-                self::$obj->Cell($widths[5], 6, self::textCell(self::numTrim($avail), 10), 1, 0, 'R');
-                self::$obj->Cell($widths[6], 6, self::textCell(number_format($value, 0, ',', ' '), 18), 1, 1, 'R');
+        self::$obj->SetFont('Arial', '', 8);
+        foreach ($equipments as $i => $equipment) {
+            if (self::$obj->GetY() > 272) {
+                self::$obj->AddPage();
+                $printHeaders();
+                self::$obj->SetFont('Arial', '', 8);
             }
 
-            self::$obj->SetFont('Arial', 'B', 8);
-            self::$obj->Cell($widths[0], 6, self::textCell('Sous-total ' . $categoryName, 30), 1, 0, 'R');
-            self::$obj->Cell($widths[1], 6, '', 1, 0);
-            self::$obj->Cell($widths[2], 6, self::textCell(self::numTrim($catQty), 12), 1, 0, 'R');
-            self::$obj->Cell($widths[3], 6, self::textCell(self::numTrim($catAlloc), 10), 1, 0, 'R');
-            self::$obj->Cell($widths[4], 6, self::textCell(self::numTrim($catDeter), 10), 1, 0, 'R');
-            self::$obj->Cell($widths[5], 6, self::textCell(self::numTrim($catAvail), 10), 1, 0, 'R');
-            self::$obj->Cell($widths[6], 6, self::textCell(number_format($catValue, 0, ',', ' '), 18), 1, 1, 'R');
+            $alloc = (float) $equipment->dotations->sum('qty');
+            $deter = (float) ($equipment->deteriorated_qty ?? 0);
+            $avail = (float) $equipment->available_qty;
+            $value = $avail * (float) $equipment->price;
+
+            $totQty += (float) $equipment->qty;
+            $totAlloc += $alloc;
+            $totDeter += $deter;
+            $totAvail += $avail;
+            $totValue += $value;
+
+            self::$obj->Cell($widths[0], 6, self::textCell((string) ($i + 1), 6), 1, 0, 'R');
+            self::$obj->Cell($widths[1], 6, self::textCell($equipment->name, 30), 1, 0, 'L');
+            self::$obj->Cell($widths[2], 6, self::textCell(number_format((float) $equipment->price, 0, ',', ' '), 14), 1, 0, 'R');
+            self::$obj->Cell($widths[3], 6, self::textCell($equipment->qty . ' ' . $equipment->unit, 12), 1, 0, 'R');
+            self::$obj->Cell($widths[4], 6, self::textCell(self::numTrim($alloc), 10), 1, 0, 'R');
+            self::$obj->Cell($widths[5], 6, self::textCell(self::numTrim($deter), 10), 1, 0, 'R');
+            self::$obj->Cell($widths[6], 6, self::textCell(self::numTrim($avail), 10), 1, 0, 'R');
+            self::$obj->Cell($widths[7], 6, self::textCell(number_format($value, 0, ',', ' '), 18), 1, 1, 'R');
         }
+
+        self::$obj->SetFont('Arial', 'B', 8);
+        self::$obj->Cell($widths[0] + $widths[1] + $widths[2], 6, self::textCell('TOTAL', 20), 1, 0, 'R');
+        self::$obj->Cell($widths[3], 6, self::textCell(self::numTrim($totQty), 12), 1, 0, 'R');
+        self::$obj->Cell($widths[4], 6, self::textCell(self::numTrim($totAlloc), 10), 1, 0, 'R');
+        self::$obj->Cell($widths[5], 6, self::textCell(self::numTrim($totDeter), 10), 1, 0, 'R');
+        self::$obj->Cell($widths[6], 6, self::textCell(self::numTrim($totAvail), 10), 1, 0, 'R');
+        self::$obj->Cell($widths[7], 6, self::textCell(number_format($totValue, 0, ',', ' '), 18), 1, 1, 'R');
 
         self::$obj->Ln(3);
         self::$obj->SetFont('Arial', 'B', 10);
         self::$obj->SetFillColor(40, 40, 40);
         self::$obj->SetTextColor(255, 255, 255);
         self::$obj->Cell(156, 8, utf8_decode('VALEUR TOTALE DU STOCK DISPONIBLE (GNF)'), 1, 0, 'R', true);
-        self::$obj->Cell(34, 8, self::textCell(number_format($grandValue, 0, ',', ' '), 20), 1, 1, 'R', true);
+        self::$obj->Cell(34, 8, self::textCell(number_format($totValue, 0, ',', ' '), 20), 1, 1, 'R', true);
         self::$obj->SetTextColor(0, 0, 0);
 
         self::$obj->Output();
@@ -1129,19 +1084,19 @@ class PrintController extends Controller
 
     public static function getEquipmentsReport()
     {
-        $equipments = Equipment::with('category', 'dotations')->orderBy('name')->get();
+        $equipments = Equipment::with('dotations')->orderBy('name')->get();
 
         self::initSimpleReport('Rapport Equipements');
         self::renderTableSection(
             'Equipements',
-            ['#', 'Nom', 'Categorie', 'Qte totale', 'Qte dispo'],
-            [10, 64, 52, 32, 32],
+            ['#', 'Nom', 'Unite', 'Qte totale', 'Qte dispo'],
+            [10, 88, 28, 32, 32],
             $equipments->map(fn ($item) => [
                 $item->id,
                 $item->name,
-                optional($item->category)->name,
-                (int) $item->qty,
-                (int) $item->available_qty,
+                $item->unit,
+                self::numTrim((float) $item->qty),
+                self::numTrim((float) $item->available_qty),
             ])->toArray(),
             'Aucun equipement disponible.'
         );
@@ -1305,9 +1260,8 @@ class PrintController extends Controller
         self::$obj->Cell(190, 6, utf8_decode('Filtre contrat: ' . $contractType), 0, 1, 'C');
         self::$obj->Ln(2);
 
-        $categories = Category::orderBy('name')->get();
         $dotations = Dotation::with('employee', 'equipment')->orderByDesc('id')->get();
-        $equipments = Equipment::with('category')->orderBy('name')->get();
+        $equipments = Equipment::orderBy('name')->get();
         $leaves = Leaf::with('employee')->orderByDesc('id')->get();
         $suspensions = Suspension::with('employee')->orderByDesc('id')->get();
         $licenciements = Licenciement::with('employee')->orderByDesc('id')->get();
@@ -1333,18 +1287,6 @@ class PrintController extends Controller
         $cdiContracts = $contracts->where('contract', 'CDI');
 
         self::renderTableSection(
-            'Categories',
-            ['#', 'Nom', 'Date creation'],
-            [20, 110, 60],
-            $categories->map(fn ($item) => [
-                $item->id,
-                $item->name,
-                optional($item->created_at)->format('d/m/Y'),
-            ])->toArray(),
-            'Aucune categorie disponible.'
-        );
-
-        self::renderTableSection(
             'Dotations',
             ['#', 'Employe', 'Equipement', 'Quantite', 'Date'],
             [10, 68, 50, 22, 40],
@@ -1360,13 +1302,13 @@ class PrintController extends Controller
 
         self::renderTableSection(
             'Equipements',
-            ['#', 'Nom', 'Categorie', 'Quantite', 'Prix'],
-            [10, 70, 48, 22, 40],
+            ['#', 'Nom', 'Unite', 'Quantite', 'Prix'],
+            [10, 88, 24, 28, 40],
             $equipments->map(fn ($item) => [
                 $item->id,
                 $item->name,
-                optional($item->category)->name,
-                (int) $item->qty,
+                $item->unit,
+                self::numTrim((float) $item->qty),
                 moneyFormat((float) $item->price),
             ])->toArray(),
             'Aucun equipement disponible.'

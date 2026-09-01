@@ -61,7 +61,7 @@ class DotationController extends Controller
         $dotations = $employee->dotations()->with('equipment')->latest()->get();
         $equipments = $this->availableEquipments();
         $employees = Employee::where('deleted', 0)->orderBy('name')->get();
-        $allEquipments = Equipment::with('category', 'dotations')->get();
+        $allEquipments = Equipment::with('dotations')->get();
 
         return view('admin.dotation', compact('employee', 'dotations', 'equipments', 'employees', 'allEquipments'));
     }
@@ -201,6 +201,6 @@ class DotationController extends Controller
      */
     private function availableEquipments()
     {
-        return Equipment::with('category', 'dotations')->get()->filter(fn ($equipment) => $equipment->available_qty > 0)->values();
+        return Equipment::with('dotations')->get()->filter(fn ($equipment) => $equipment->available_qty > 0)->values();
     }
 }

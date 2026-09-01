@@ -1,8 +1,9 @@
 <x-admin-layout>
 
 <div class="page-breadcrumb d-none d-sm-flex align-items-center">
+    <h6 class="breadcrumb-title pe-3 text-uppercase">@lang('lang.equipment', ['param'=>'s'])</h6>
     <div class="ms-auto">
-        <a class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#equipment-add"><i class="bx bx-user-plus"></i> @lang('lang.new_equipment')</a>
+        <a class="btn btn-sm btn-dark" href="{{ route('purchases.index') }}"><i class="bx bx-cart-add"></i> @lang('lang.new_equipment')</a>
         <a class="btn btn-sm btn-danger" href="{{ route('prints.equipments.report') }}" target="_blank"><i class="bx bx-printer"></i> PDF @lang('lang.equipment', ['param'=>'s'])</a>
     </div>
 </div>
@@ -27,45 +28,43 @@
                             <thead>
                                 <tr>
                                     <td>#</td>
-                                    <th>@lang('lang.category', ['param'=>''])</th>
                                     <th>@lang('lang.name')</th>
-                                    <th>@lang('lang.price')</th>
-                                    <th>@lang('lang.qty')</th>
-                                    <th>@lang('lang.available')</th>
-                                    <th>@lang('lang.action', ['param'=>'s'])</th>
+                                    <th class="text-end">@lang('lang.price')</th>
+                                    <th class="text-end">@lang('lang.qty')</th>
+                                    <th class="text-end">@lang('lang.available')</th>
+                                    <th class="text-end">@lang('lang.action', ['param'=>'s'])</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($equipments as $item)
+                                @forelse ($equipments as $item)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $item->category?->name ?? '—' }}</td>
                                     <td>{{ $item->name }}</td>
-                                    <td>{{ $item->price }}</td>
-                                    <td>{{ $item->qty." ".$item->unit }}</td>
-                                    <td>{{ $item->available_qty." ".$item->unit }}</td>
-                                    <td>
-                                        <a data-bs-toggle="modal" data-bs-target="#equipment{{ $item->id }}" class="btn btn-sm btn-primary" title="Editer les informations" style="display: inline-block">
+                                    <td class="text-end">{{ moneyFormat($item->price) }}</td>
+                                    <td class="text-end">{{ $item->qty." ".$item->unit }}</td>
+                                    <td class="text-end {{ $item->available_qty <= 0 ? 'text-danger fw-semibold' : '' }}">{{ $item->available_qty." ".$item->unit }}</td>
+                                    <td class="text-end text-nowrap">
+                                        <a data-bs-toggle="modal" data-bs-target="#equipment{{ $item->id }}" class="btn btn-sm btn-outline-primary" title="@lang('lang.edit')">
                                             <i class="bx bx-edit-alt"></i>
                                         </a>
-                                        <x-equipment-edit :categories="$categories" :equipment="$item" />
-            
+                                        <x-equipment-edit :equipment="$item" />
+
                                         <form action="{{ route('equipments.destroy', $item->id) }}" method="POST" style="display: inline-block">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="btn btn-sm btn-danger" title="Supprimer cette catégorie"><i class="bx bx-trash"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger" title="@lang('lang.delete')" onclick="return confirm('Confirmez-Vous cette suppression')"><i class="bx bx-trash"></i></button>
                                         </form>
                                     </td>
                                 </tr>
-                                @endforeach
+                                @empty
+                                <tr><td colspan="6" class="text-center text-muted py-4">Aucun équipement — ajoutez-en un via un approvisionnement.</td></tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
-                </div>     
-            </div> 
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
-<x-equipment-add :categories="$categories" />
 </x-admin-layout>

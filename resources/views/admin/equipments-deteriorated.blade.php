@@ -26,7 +26,6 @@
                             <thead>
                                 <tr>
                                     <td>#</td>
-                                    <th>@lang('lang.category', ['param'=>''])</th>
                                     <th>@lang('lang.name')</th>
                                     <th>@lang('lang.qty')</th>
                                     <th>@lang('lang.deteriorated_qty')</th>
@@ -37,20 +36,19 @@
                                 @forelse ($equipments as $item)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $item->category?->name ?? '—' }}</td>
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->qty." ".$item->unit }}</td>
-                                    <td>{{ $item->deteriorated_qty." ".$item->unit }}</td>
+                                    <td class="text-danger">{{ $item->deteriorated_qty." ".$item->unit }}</td>
                                     <td>
-                                        <a data-bs-toggle="modal" data-bs-target="#equipment{{ $item->id }}" class="btn btn-sm btn-primary" title="Editer les informations" style="display: inline-block">
+                                        <a data-bs-toggle="modal" data-bs-target="#equipment{{ $item->id }}" class="btn btn-sm btn-outline-primary" title="@lang('lang.edit')">
                                             <i class="bx bx-edit-alt"></i>
                                         </a>
-                                        <x-equipment-edit :categories="$categories" :equipment="$item" />
+                                        <x-equipment-edit :equipment="$item" />
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="text-center">Aucun équipement détérioré</td>
+                                    <td colspan="5" class="text-center">Aucun équipement détérioré</td>
                                 </tr>
                                 @endforelse
                             </tbody>

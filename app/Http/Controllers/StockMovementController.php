@@ -14,7 +14,7 @@ class StockMovementController extends Controller
      */
     public function index(Request $request)
     {
-        $equipments = Equipment::with('category', 'dotations')->orderBy('name')->get();
+        $equipments = Equipment::with('dotations')->orderBy('name')->get();
 
         $movements = StockMovement::with(['equipment', 'employee'])
             ->when($request->filled('equipment_id'), fn ($q) => $q->where('equipment_id', $request->integer('equipment_id')))
@@ -23,10 +23,8 @@ class StockMovementController extends Controller
             ->paginate(25)
             ->withQueryString();
 
-        // Inventaire détaillé, classé par catégorie.
-        $inventory = $equipments
-            ->sortBy(fn ($equipment) => [optional($equipment->category)->name ?? 'zzz', $equipment->name])
-            ->groupBy(fn ($equipment) => optional($equipment->category)->name ?? 'Sans catégorie');
+        // Inventaire détaillé.
+        $inventory = $equipments->sortBy('name')->values();
 
         $depletedEquipments = $equipments->filter(fn ($equipment) => $equipment->is_depleted)->values();
         $availableEquipments = $equipments->filter(fn ($equipment) => ! $equipment->is_depleted)
@@ -44,6 +42,8 @@ class StockMovementController extends Controller
 
         $reasons = StockMovement::REASON_LABELS;
 
-        return view('admin.stocks', compact('movements', 'equipments', 'inventory', 'availableEquipments', 'depletedEquipments', 'stats', 'reasons'));
+        $inventoryValue = $inventory->sum(fn ($equipment) => (float) $equipment->available_qty * (float) $equipment->price);
+
+        return view('admin.stocks', compact('movements', 'equipments', 'inventory', 'inventoryValue', 'availableEquipments', 'depletedEquipments', 'stats', 'reasons'));
     }
 }

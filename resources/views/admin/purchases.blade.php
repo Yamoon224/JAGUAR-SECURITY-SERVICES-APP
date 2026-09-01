@@ -87,9 +87,26 @@
             var hint = scope.querySelector('.purchase-stock-hint');
             if (!select || !qtyInput || !hint) return;
 
+            // Bloc "nouvel équipement"
+            var newBlock = scope.querySelector('.purchase-new-equipment');
+            var newName = scope.querySelector('.purchase-new-name');
+            if (newBlock) {
+                var isNew = select.value === '__new__';
+                newBlock.classList.toggle('d-none', !isNew);
+                if (newName) newName.required = isNew;
+            }
+
             var opt = select.options[select.selectedIndex];
             var available = opt ? parseFloat(opt.getAttribute('data-available')) : NaN;
             var unit = opt ? (opt.getAttribute('data-unit') || '') : '';
+
+            if (select.value === '__new__') {
+                var q = parseFloat(qtyInput.value);
+                hint.innerHTML = (!isNaN(q) && q > 0)
+                    ? 'Stock initial : <strong class="text-success">' + fmt(q) + '</strong>'
+                    : '';
+                return;
+            }
 
             if (isNaN(available)) { hint.textContent = ''; return; }
 

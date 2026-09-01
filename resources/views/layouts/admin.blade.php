@@ -184,8 +184,8 @@
 
 				   	<p class="mb-1 mt-3">@lang('lang.logistic', ['param'=>''])</p>
 				   	<div class="list-group">
-						<a href="{{ route('categories.index') }}" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bx-sm bx-user-x'></i>@lang('lang.category', ['param'=>'s'])</a>
-                		<a href="{{ route('equipments.index') }}" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bx-sm bx-user-x'></i>@lang('lang.equipment', ['param'=>'s'])</a>
+                		<a href="{{ route('equipments.index') }}" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bx-sm bx-customize'></i>@lang('lang.equipment', ['param'=>'s'])</a>
+                		<a href="{{ route('stocks.index') }}" class="list-group-item list-group-item-action align-items-center d-flex gap-2 py-1"><i class='bx bx-sm bx-archive'></i>@lang('lang.logistic_archive')</a>
 				   	</div>
 
 				   	<p class="mb-1 mt-3">@lang('lang.secretary')</p>

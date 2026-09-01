@@ -8,16 +8,30 @@
             <form method="POST" action="{{ route('purchases.store') }}">
                 @csrf
                 <div class="modal-body">
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label class="form-label mb-1 fw-semibold"><i class="bx bx-customize"></i> @lang('lang.equipment', ['param'=>'']) <span class="text-danger">*</span></label>
                         <select class="form-select purchase-equipment" name="equipment_id" required>
                             <option value="" selected>@lang('lang.equipment', ['param'=>'']) *</option>
+                            <option value="__new__">➕ @lang('lang.new_equipment')</option>
                             @foreach ($equipments as $item)
                                 <option value="{{ $item->id }}" data-available="{{ $item->available_qty }}" data-unit="{{ $item->unit }}">
                                     {{ $item->name." | ".$item->available_qty." ".$item->unit." en stock" }}
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+
+                    <div class="purchase-new-equipment d-none">
+                        <div class="row g-2 mb-3">
+                            <div class="col-8">
+                                <label class="form-label mb-1 fw-semibold">@lang('lang.name') <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control purchase-new-name" name="new_name" placeholder="@lang('lang.name')">
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label mb-1 fw-semibold">@lang('lang.unit')</label>
+                                <input type="text" class="form-control" name="new_unit" placeholder="pcs, L…">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mb-2">
