@@ -78,6 +78,7 @@
                 <div class="menu-title">@lang('lang.logistic', ['param'=>"s"])</div>
             </a>
             <ul>
+                <li> <a href="{{ route('categories.index') }}"><i class='bx bx-bookmarks'></i>@lang('lang.category', ['param'=>'s'])</a></li>
                 <li> <a href="{{ route('dotations.index') }}"><i class='bx bx-user-plus'></i>@lang('lang.material_dotation')</a></li>
                 <li> <a href="{{ route('purchases.index') }}"><i class='bx bx-cart'></i>@lang('lang.material_supply')</a></li>
                 <li> <a href="{{ route('fuelings.index') }}"><i class='bx bx-gas-pump'></i>@lang('lang.fueling', ['param'=>'s'])</a></li>
@@ -124,12 +125,6 @@
             <a href="{{ route('users.index') }}">
                 <div class="parent-icon"><i class='bx bx-group'></i></div>
                 <div class="menu-title">@lang('lang.user', ['param'=>'s'])</div>
-            </a>
-        </li>
-        <li>
-            <a href="{{ route('categories.index') }}">
-                <div class="parent-icon"><i class='bx bx-bookmarks'></i></div>
-                <div class="menu-title">@lang('lang.category', ['param'=>'s'])</div>
             </a>
         </li>
         @endif
