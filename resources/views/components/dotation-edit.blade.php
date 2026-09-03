@@ -28,7 +28,7 @@
                                 <option value="{{ $item->id }}" title="{{ $item->available_qty }}"
                                     {{ $isCurrent ? 'selected' : '' }}
                                     {{ (!$isCurrent && $item->available_qty <= 0) ? 'disabled' : '' }}>
-                                    {{ $item->name." | ".$item->available_qty." ".$item->unit." disponible(s)" }}{{ $item->available_qty <= 0 ? ' — épuisé' : '' }}
+                                    {{ $item->name." | ".$item->available_qty." disponible(s)" }}{{ $item->available_qty <= 0 ? ' — épuisé' : '' }}
                                 </option>
                             @endforeach
                         </select>

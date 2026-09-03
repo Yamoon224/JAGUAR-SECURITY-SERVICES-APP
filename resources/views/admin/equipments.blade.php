@@ -41,8 +41,8 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $item->name }}</td>
                                     <td class="text-end">{{ moneyFormat($item->price) }}</td>
-                                    <td class="text-end">{{ $item->qty." ".$item->unit }}</td>
-                                    <td class="text-end {{ $item->available_qty <= 0 ? 'text-danger fw-semibold' : '' }}">{{ $item->available_qty." ".$item->unit }}</td>
+                                    <td class="text-end">{{ $item->qty }}</td>
+                                    <td class="text-end {{ $item->available_qty <= 0 ? 'text-danger fw-semibold' : '' }}">{{ $item->available_qty }}</td>
                                     <td class="text-end text-nowrap">
                                         <a data-bs-toggle="modal" data-bs-target="#equipment{{ $item->id }}" class="btn btn-sm btn-outline-primary" title="@lang('lang.edit')">
                                             <i class="bx bx-edit-alt"></i>

@@ -420,7 +420,7 @@
                                                     <th scope="row">{{ $loop->iteration }}</th>
                                                     <td>{{ $item->created_at }}</td>
                                                     <td>{{ $item->equipment?->name }}</td>
-                                                    <td>{{ $item->qty." ".$item->equipment?->unit }}</td>
+                                                    <td>{{ $item->qty }}</td>
                                                     <td>            
                                                         <form action="{{ route('dotations.destroy', $item->id) }}" method="POST" style="display: inline-block">
                                                             @csrf

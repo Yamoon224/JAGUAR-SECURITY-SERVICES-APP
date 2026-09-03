@@ -134,8 +134,8 @@
                                     @endif
                                 </td>
                                 <td>{{ $item->reason_label }}</td>
-                                <td>{{ $item->quantity }} {{ $item->equipment?->unit }}</td>
-                                <td>{{ $item->stock_after }} {{ $item->equipment?->unit }}</td>
+                                <td>{{ $item->quantity }}</td>
+                                <td>{{ $item->stock_after }}</td>
                                 <td>{{ $item->employee ? $item->employee->firstname.' '.$item->employee->name : '—' }}</td>
                                 <td class="small text-muted">{{ $item->note }}</td>
                             </tr>
@@ -173,10 +173,10 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $equipment->name }}</td>
                                     <td class="text-end">{{ moneyFormat($equipment->price) }}</td>
-                                    <td class="text-end">{{ $equipment->qty }} {{ $equipment->unit }}</td>
-                                    <td class="text-end">{{ $allocated }} {{ $equipment->unit }}</td>
-                                    <td class="text-end">{{ ($equipment->deteriorated_qty ?? 0) }} {{ $equipment->unit }}</td>
-                                    <td class="text-end {{ $available <= 0 ? 'text-danger fw-semibold' : '' }}">{{ $available }} {{ $equipment->unit }}</td>
+                                    <td class="text-end">{{ $equipment->qty }}</td>
+                                    <td class="text-end">{{ $allocated }}</td>
+                                    <td class="text-end">{{ ($equipment->deteriorated_qty ?? 0) }}</td>
+                                    <td class="text-end {{ $available <= 0 ? 'text-danger fw-semibold' : '' }}">{{ $available }}</td>
                                     <td class="text-end">{{ moneyFormat($available * $equipment->price) }}</td>
                                 </tr>
                             @empty
@@ -213,10 +213,10 @@
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $equipment->name }}</td>
-                                <td class="text-end">{{ $equipment->qty." ".$equipment->unit }}</td>
-                                <td class="text-end">{{ $equipment->dotations->sum('qty')." ".$equipment->unit }}</td>
-                                <td class="text-end">{{ ($equipment->deteriorated_qty ?? 0)." ".$equipment->unit }}</td>
-                                <td class="text-end text-success fw-semibold">{{ $equipment->available_qty." ".$equipment->unit }}</td>
+                                <td class="text-end">{{ $equipment->qty }}</td>
+                                <td class="text-end">{{ $equipment->dotations->sum('qty') }}</td>
+                                <td class="text-end">{{ ($equipment->deteriorated_qty ?? 0) }}</td>
+                                <td class="text-end text-success fw-semibold">{{ $equipment->available_qty }}</td>
                             </tr>
                             @empty
                             <tr><td colspan="6" class="text-center">@lang('lang.no_available_stock')</td></tr>
@@ -243,9 +243,9 @@
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $equipment->name }}</td>
-                                <td class="text-end">{{ $equipment->qty." ".$equipment->unit }}</td>
-                                <td class="text-end text-danger">{{ $equipment->available_qty." ".$equipment->unit }}</td>
-                                <td class="text-end">{{ ($equipment->deteriorated_qty ?? 0)." ".$equipment->unit }}</td>
+                                <td class="text-end">{{ $equipment->qty }}</td>
+                                <td class="text-end text-danger">{{ $equipment->available_qty }}</td>
+                                <td class="text-end">{{ ($equipment->deteriorated_qty ?? 0) }}</td>
                             </tr>
                             @empty
                             <tr><td colspan="5" class="text-center">@lang('lang.no_depleted_stock')</td></tr>

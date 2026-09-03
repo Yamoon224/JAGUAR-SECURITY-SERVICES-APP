@@ -14,21 +14,15 @@
                     </div>
                     @endif
 
-                    {{-- Nom et unité toujours saisis : un nom déjà connu réutilise sa fiche et cumule la quantité. --}}
-                    <div class="row g-2 mb-3">
-                        <div class="col-8">
-                            <label class="form-label mb-1 fw-semibold"><i class="bx bx-customize"></i> @lang('lang.name') <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control purchase-name" name="name" value="{{ old('name') }}" placeholder="@lang('lang.name') *" list="purchase-known-names" autocomplete="off" required>
-                            <datalist id="purchase-known-names">
-                                @foreach ($equipments as $item)
-                                <option value="{{ $item->name }}"></option>
-                                @endforeach
-                            </datalist>
-                        </div>
-                        <div class="col-4">
-                            <label class="form-label mb-1 fw-semibold">@lang('lang.unit') <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="unit" value="{{ old('unit') }}" placeholder="pcs, L…" required>
-                        </div>
+                    {{-- Nom toujours saisi : un nom déjà connu réutilise sa fiche et cumule la quantité. --}}
+                    <div class="mb-3">
+                        <label class="form-label mb-1 fw-semibold"><i class="bx bx-customize"></i> @lang('lang.name') <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control purchase-name" name="name" value="{{ old('name') }}" placeholder="@lang('lang.name') *" list="purchase-known-names" autocomplete="off" required>
+                        <datalist id="purchase-known-names">
+                            @foreach ($equipments as $item)
+                            <option value="{{ $item->name }}"></option>
+                            @endforeach
+                        </datalist>
                     </div>
 
                     <div class="mb-2">
@@ -38,7 +32,7 @@
                             <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-plus'></i></span>
                         </div>
                         <small class="text-muted purchase-stock-hint d-block mt-1" data-mode="new"></small>
-                        <script type="application/json" class="purchase-known-equipments">@json($equipments->map(fn ($item) => ['name' => $item->name, 'available' => (float) $item->available_qty, 'unit' => $item->unit])->values(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)</script>
+                        <script type="application/json" class="purchase-known-equipments">@json($equipments->map(fn ($item) => ['name' => $item->name, 'available' => (float) $item->available_qty])->values(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)</script>
                     </div>
 
                     <div class="mb-3">

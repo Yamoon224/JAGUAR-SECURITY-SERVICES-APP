@@ -60,7 +60,7 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y H:i') }}</td>
                                 <td>{{ $item->equipment?->name }}</td>
-                                <td>{{ $item->qty." ".$item->equipment?->unit }}</td>
+                                <td>{{ $item->qty }}</td>
                                 <td>
                                     @if(isRightAccess([1, 5]))
                                     <a data-bs-toggle="modal" data-bs-target="#dotation{{ $item->id }}" class="btn btn-sm btn-primary" title="@lang('lang.edit')" style="display:inline-block">

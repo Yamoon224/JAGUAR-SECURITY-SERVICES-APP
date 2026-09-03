@@ -107,7 +107,6 @@ class EquipmentController extends Controller
     {
         return $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'unit' => ['nullable', 'string', 'max:30'],
             'price' => ['nullable', 'numeric', 'min:0'],
             'qty' => ['nullable', 'numeric', 'min:0'],
             'deteriorated_qty' => ['nullable', 'numeric', 'min:0'],

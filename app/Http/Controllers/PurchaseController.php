@@ -24,9 +24,9 @@ class PurchaseController extends Controller
 
     /**
      * Enregistre un approvisionnement. Le formulaire ne propose plus de
-     * sélectionner un équipement : le nom et l'unité sont toujours saisis.
-     * Un nom déjà connu réutilise sa fiche et vient cumuler la quantité ;
-     * sinon la fiche est créée.
+     * sélectionner un équipement : le nom est toujours saisi. Un nom déjà
+     * connu réutilise sa fiche et vient cumuler la quantité ; sinon la
+     * fiche est créée.
      */
     public function store(Request $request)
     {
@@ -34,7 +34,6 @@ class PurchaseController extends Controller
         // le modal « Nouvel Achat » ne doit réagir qu'à sa propre validation.
         $data = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
-            'unit' => ['required', 'string', 'max:30'],
             'qty' => ['required', 'numeric', 'min:0.01'],
             'price' => ['required', 'numeric', 'min:0'],
             'purchased_at' => ['required', 'date'],
@@ -47,15 +46,10 @@ class PurchaseController extends Controller
             if ($isNew) {
                 $equipment = Equipment::create([
                     'name' => trim($data['name']),
-                    'unit' => $data['unit'],
                     'price' => $data['price'],
                     'qty' => 0,
                     'category_id' => Equipment::defaultCategoryId(),
                 ]);
-            } elseif (blank($equipment->unit)) {
-                // Fiche existante laissée sans unité : on la complète, sans
-                // jamais écraser le nom, l'unité ou le prix déjà en place.
-                $equipment->update(['unit' => $data['unit']]);
             }
 
             $purchase = Purchase::create([

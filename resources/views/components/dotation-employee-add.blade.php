@@ -20,7 +20,7 @@
                         <select class="form-select" name="equipment_id" required>
                             <option value="" selected>@lang('lang.equipment', ['param'=>'']) *</option>
                             @foreach ($equipments as $item)
-                                <option value="{{ $item->id }}" title="{{ $item->available_qty }}">{{ $item->name." | ".$item->available_qty." ".$item->unit." disponible(s)" }}</option>
+                                <option value="{{ $item->id }}" title="{{ $item->available_qty }}">{{ $item->name." | ".$item->available_qty." disponible(s)" }}</option>
                             @endforeach
                         </select>
                     </div>

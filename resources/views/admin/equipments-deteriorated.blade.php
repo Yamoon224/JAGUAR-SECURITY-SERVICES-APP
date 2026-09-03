@@ -37,8 +37,8 @@
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $item->name }}</td>
-                                    <td>{{ $item->qty." ".$item->unit }}</td>
-                                    <td class="text-danger">{{ $item->deteriorated_qty." ".$item->unit }}</td>
+                                    <td>{{ $item->qty }}</td>
+                                    <td class="text-danger">{{ $item->deteriorated_qty }}</td>
                                     <td>
                                         <a data-bs-toggle="modal" data-bs-target="#equipment{{ $item->id }}" class="btn btn-sm btn-outline-primary" title="@lang('lang.edit')">
                                             <i class="bx bx-edit-alt"></i>

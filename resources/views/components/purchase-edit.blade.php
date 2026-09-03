@@ -14,8 +14,8 @@
                         <select class="form-select purchase-equipment" name="equipment_id" required>
                             <option value="">@lang('lang.equipment', ['param'=>'']) *</option>
                             @foreach ($equipments as $item)
-                                <option value="{{ $item->id }}" data-available="{{ $item->available_qty }}" data-unit="{{ $item->unit }}" {{ $purchase->equipment_id == $item->id ? 'selected' : '' }}>
-                                    {{ $item->name." | ".$item->available_qty." ".$item->unit." en stock" }}
+                                <option value="{{ $item->id }}" data-available="{{ $item->available_qty }}" {{ $purchase->equipment_id == $item->id ? 'selected' : '' }}>
+                                    {{ $item->name." | ".$item->available_qty." en stock" }}
                                 </option>
                             @endforeach
                         </select>

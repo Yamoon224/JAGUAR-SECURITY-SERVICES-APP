@@ -41,7 +41,7 @@
                                     <td>{{ $purchases->firstItem() + $loop->index }}</td>
                                     <td>{{ \Carbon\Carbon::parse($item->purchased_at)->format('d/m/Y') }}</td>
                                     <td>{{ $item->equipment?->name }}</td>
-                                    <td>{{ $item->qty." ".$item->equipment?->unit }}</td>
+                                    <td>{{ $item->qty }}</td>
                                     <td>{{ moneyFormat($item->price) }}</td>
                                     <td>{{ moneyFormat($item->price * $item->qty) }}</td>
                                     <td>

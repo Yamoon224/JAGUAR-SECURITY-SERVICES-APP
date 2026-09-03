@@ -886,7 +886,7 @@ class PrintController extends Controller
                 optional($item->employee)->matricule,
                 optional($item->employee)->position,
                 optional($item->equipment)->name,
-                $item->qty . ' ' . (optional($item->equipment)->unit ?? ''),
+                $item->qty,
             ])->toArray(),
             'Aucune dotation sur la periode.'
         );
@@ -962,7 +962,7 @@ class PrintController extends Controller
             fputcsv($out, [], ';');
             fputcsv($out, [
                 '#', 'Date', 'Heure', 'Prenom', 'Nom', 'Matricule', 'Fonction', 'Telephone',
-                'Site d\'affectation', 'Equipement', 'Quantite', 'Unite',
+                'Site d\'affectation', 'Equipement', 'Quantite',
             ], ';');
 
             foreach ($dotations as $item) {
@@ -984,7 +984,6 @@ class PrintController extends Controller
                     $site,
                     optional($item->equipment)->name,
                     $item->qty,
-                    optional($item->equipment)->unit,
                 ], ';');
             }
 
@@ -1047,7 +1046,7 @@ class PrintController extends Controller
             self::$obj->Cell($widths[0], 6, self::textCell((string) ($i + 1), 6), 1, 0, 'R');
             self::$obj->Cell($widths[1], 6, self::textCell($equipment->name, 30), 1, 0, 'L');
             self::$obj->Cell($widths[2], 6, self::textCell(number_format((float) $equipment->price, 0, ',', ' '), 14), 1, 0, 'R');
-            self::$obj->Cell($widths[3], 6, self::textCell($equipment->qty . ' ' . $equipment->unit, 12), 1, 0, 'R');
+            self::$obj->Cell($widths[3], 6, self::textCell(self::numTrim((float) $equipment->qty), 12), 1, 0, 'R');
             self::$obj->Cell($widths[4], 6, self::textCell(self::numTrim($alloc), 10), 1, 0, 'R');
             self::$obj->Cell($widths[5], 6, self::textCell(self::numTrim($deter), 10), 1, 0, 'R');
             self::$obj->Cell($widths[6], 6, self::textCell(self::numTrim($avail), 10), 1, 0, 'R');
@@ -1089,12 +1088,11 @@ class PrintController extends Controller
         self::initSimpleReport('Rapport Equipements');
         self::renderTableSection(
             'Equipements',
-            ['#', 'Nom', 'Unite', 'Qte totale', 'Qte dispo'],
-            [10, 88, 28, 32, 32],
+            ['#', 'Nom', 'Qte totale', 'Qte dispo'],
+            [10, 116, 32, 32],
             $equipments->map(fn ($item) => [
                 $item->id,
                 $item->name,
-                $item->unit,
                 self::numTrim((float) $item->qty),
                 self::numTrim((float) $item->available_qty),
             ])->toArray(),
@@ -1302,12 +1300,11 @@ class PrintController extends Controller
 
         self::renderTableSection(
             'Equipements',
-            ['#', 'Nom', 'Unite', 'Quantite', 'Prix'],
-            [10, 88, 24, 28, 40],
+            ['#', 'Nom', 'Quantite', 'Prix'],
+            [10, 112, 28, 40],
             $equipments->map(fn ($item) => [
                 $item->id,
                 $item->name,
-                $item->unit,
                 self::numTrim((float) $item->qty),
                 moneyFormat((float) $item->price),
             ])->toArray(),

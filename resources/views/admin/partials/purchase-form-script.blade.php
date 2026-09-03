@@ -49,10 +49,9 @@
                     return;
                 }
 
-                var unit = match.unit || '';
-                hint.innerHTML = 'Fiche existante — disponible : <strong>' + fmt(match.available) + ' ' + unit + '</strong>'
+                hint.innerHTML = 'Fiche existante — disponible : <strong>' + fmt(match.available) + '</strong>'
                     + ((!isNaN(added) && added > 0)
-                        ? ' &rarr; après cumul : <strong class="text-success">' + fmt(match.available + added) + ' ' + unit + '</strong>'
+                        ? ' &rarr; après cumul : <strong class="text-success">' + fmt(match.available + added) + '</strong>'
                         : '');
                 return;
             }
@@ -60,11 +59,10 @@
             // Correction d'un achat existant : on rappelle le stock en place.
             var opt = select.options[select.selectedIndex];
             var available = opt ? parseFloat(opt.getAttribute('data-available')) : NaN;
-            var selectedUnit = opt ? (opt.getAttribute('data-unit') || '') : '';
 
             hint.innerHTML = isNaN(available)
                 ? ''
-                : 'Disponible actuel : <strong>' + fmt(available) + ' ' + selectedUnit + '</strong>';
+                : 'Disponible actuel : <strong>' + fmt(available) + '</strong>';
         };
 
         var onChange = function (e) {

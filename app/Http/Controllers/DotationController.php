@@ -178,8 +178,6 @@ class DotationController extends Controller
                 $available += (float) $current->qty;
             }
 
-            $unit = trim((string) $equipment->unit);
-
             if ($available <= 0) {
                 $validator->errors()->add('equipment_id',
                     "L'équipement « {$equipment->name} » est épuisé : aucune unité disponible pour une dotation.");
@@ -189,7 +187,7 @@ class DotationController extends Controller
 
             if ((float) $request->input('qty') > $available) {
                 $validator->errors()->add('qty',
-                    "Stock insuffisant : {$available} {$unit} disponible(s) pour « {$equipment->name} ».");
+                    "Stock insuffisant : {$available} disponible(s) pour « {$equipment->name} ».");
             }
         });
 

@@ -13,15 +13,9 @@
                         <label class="form-label mb-1 fw-semibold"><i class="bx bx-purchase-tag"></i> @lang('lang.name') <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" name="name" value="{{ $equipment->name }}" required>
                     </div>
-                    <div class="row g-3 mb-3">
-                        <div class="col-6">
-                            <label class="form-label mb-1 fw-semibold"><i class="bx bx-money"></i> @lang('lang.price')</label>
-                            <input type="number" class="form-control" name="price" value="{{ $equipment->price }}" min="0" step="0.01">
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label mb-1 fw-semibold">@lang('lang.unit')</label>
-                            <input type="text" class="form-control" name="unit" value="{{ $equipment->unit }}">
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label mb-1 fw-semibold"><i class="bx bx-money"></i> @lang('lang.price')</label>
+                        <input type="number" class="form-control" name="price" value="{{ $equipment->price }}" min="0" step="0.01">
                     </div>
                     <div class="row g-3">
                         <div class="col-6">

@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property float $price
  * @property float $qty
  * @property float $deteriorated_qty
- * @property string $unit
+ * @property string|null $unit  Conservée en base, plus saisie ni affichée.
  * @property int $category_id
  * @property Carbon $created_at
  * @property Carbon $updated_at
