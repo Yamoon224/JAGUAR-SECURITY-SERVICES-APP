@@ -14,7 +14,14 @@ class EquipmentController extends Controller
      */
     public function index()
     {
-        $equipments = Equipment::with('dotations')->orderBy('name')->get();
+        // Les derniers approvisionnements en tête ; les équipements jamais
+        // achetés (max nul) ferment la liste, par ordre alphabétique.
+        $equipments = Equipment::with('dotations')
+            ->withMax('purchases', 'purchased_at')
+            ->orderByDesc('purchases_max_purchased_at')
+            ->orderBy('name')
+            ->get();
+
         return view('admin.equipments', compact('equipments'));
     }
 
