@@ -1,66 +1,42 @@
 <script>
-    // NB : les selects "équipement" sont transformés en Select2, qui notifie le
-    // changement via jQuery.trigger('change'). Un addEventListener natif sur
-    // document ne reçoit pas ces évènements : tout passe donc par jQuery.
-    jQuery(function ($) {
-        var NEW = '__new__';
-
+    (function () {
         var fmt = function (n) {
             return (Math.round(n * 100) / 100).toString().replace('.', ',');
         };
 
         var refresh = function (scope) {
-            var $scope = $(scope);
-            var $select = $scope.find('.purchase-equipment');
-            var $qty = $scope.find('.purchase-qty');
-            var $hint = $scope.find('.purchase-stock-hint');
-            if (!$select.length || !$qty.length) return;
+            var qtyInput = scope.querySelector('.purchase-qty');
+            var hint = scope.querySelector('.purchase-stock-hint');
+            if (!qtyInput || !hint) return;
 
-            var isNew = $select.val() === NEW;
-
-            // Champs "nouvel équipement" : affichés et exigés uniquement en mode
-            // création, pour que le navigateur ne bloque pas un champ masqué.
-            var $block = $scope.find('.purchase-new-equipment');
-            $block.toggleClass('d-none', !isNew);
-            $scope.find('.purchase-new-name').prop('required', isNew).prop('disabled', !isNew);
-            $scope.find('.purchase-new-unit').prop('disabled', !isNew);
-
-            if (!$hint.length) return;
-
-            var added = parseFloat($qty.val());
-
-            if (isNew) {
-                $hint.html(added > 0 ? 'Stock initial : <strong class="text-success">' + fmt(added) + '</strong>' : '');
+            // Nouvel achat : l'équipement est toujours créé, la quantité
+            // saisie constitue donc son stock initial. Pas de select ici.
+            var select = scope.querySelector('.purchase-equipment');
+            if (!select) {
+                var initial = parseFloat(qtyInput.value);
+                hint.innerHTML = (!isNaN(initial) && initial > 0)
+                    ? 'Stock initial : <strong class="text-success">' + fmt(initial) + '</strong>'
+                    : '';
                 return;
             }
 
-            var $opt = $select.find('option:selected');
-            var available = parseFloat($opt.attr('data-available'));
-            var unit = $opt.attr('data-unit') || '';
+            // Correction d'un achat existant : on rappelle le stock en place.
+            var opt = select.options[select.selectedIndex];
+            var available = opt ? parseFloat(opt.getAttribute('data-available')) : NaN;
+            var unit = opt ? (opt.getAttribute('data-unit') || '') : '';
 
-            if (isNaN(available)) { $hint.text(''); return; }
+            hint.innerHTML = isNaN(available)
+                ? ''
+                : 'Disponible actuel : <strong>' + fmt(available) + ' ' + unit + '</strong>';
+        };
 
-            if ($hint.attr('data-mode') === 'new' && added > 0) {
-                $hint.html('Disponible : <strong>' + fmt(available) + ' ' + unit +
-                    '</strong> &rarr; après approvisionnement : <strong class="text-success">' +
-                    fmt(available + added) + ' ' + unit + '</strong>');
-            } else {
-                $hint.html('Disponible actuel : <strong>' + fmt(available) + ' ' + unit + '</strong>');
+        var onChange = function (e) {
+            if (e.target.matches('.purchase-equipment, .purchase-qty')) {
+                refresh(e.target.closest('.modal') || document);
             }
         };
-
-        var scopeOf = function (el) {
-            var $modal = $(el).closest('.modal');
-            return $modal.length ? $modal : $(document);
-        };
-
-        $(document)
-            .on('change select2:select', '.purchase-equipment', function () { refresh(scopeOf(this)); })
-            .on('input change', '.purchase-qty', function () { refresh(scopeOf(this)); })
-            .on('shown.bs.modal', '.modal', function () { refresh(this); });
-
-        // Ouverture initiale : le modal d'ajout est réaffiché après une erreur
-        // de validation, l'état doit correspondre à la saisie restaurée.
-        $('.purchase-equipment').each(function () { refresh(scopeOf(this)); });
-    });
+        document.addEventListener('input', onChange);
+        document.addEventListener('change', onChange); // Select2 déclenche "change"
+        document.addEventListener('shown.bs.modal', function (e) { refresh(e.target); });
+    })();
 </script>

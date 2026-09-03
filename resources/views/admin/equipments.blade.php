@@ -68,7 +68,7 @@
     </div>
 </div>
 
-<x-purchase-add :equipments="$equipments" />
+<x-purchase-add />
 
 @push('js-view')
 @include('admin.partials.purchase-form-script')

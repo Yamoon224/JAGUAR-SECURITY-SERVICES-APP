@@ -8,12 +8,10 @@ use App\Models\StockMovement;
 use App\Services\StockLedger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class PurchaseController extends Controller
 {
-    /** Valeur du select équipement pour « créer un nouvel équipement ». */
-    private const NEW_EQUIPMENT = '__new__';
-
     /**
      * Display a listing of the resource.
      */
@@ -25,58 +23,46 @@ class PurchaseController extends Controller
     }
 
     /**
-     * Enregistre un approvisionnement : soit sur un équipement existant, soit
-     * en créant l'équipement à la volée (formulaire fusionné avec « nouvel
-     * équipement »).
+     * Enregistre un approvisionnement. Chaque achat crée sa propre fiche
+     * équipement : le formulaire ne propose plus de sélectionner un
+     * équipement existant, le nom et l'unité sont toujours saisis.
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'equipment_id' => ['required', 'string'],
-            'new_name' => ['required_if:equipment_id,' . self::NEW_EQUIPMENT, 'nullable', 'string', 'max:255'],
-            'new_unit' => ['nullable', 'string', 'max:30'],
+        // Sac d'erreurs dédié : la page porte aussi les formulaires d'édition,
+        // le modal « Nouvel Achat » ne doit réagir qu'à sa propre validation.
+        $data = Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:255'],
+            'unit' => ['required', 'string', 'max:30'],
             'qty' => ['required', 'numeric', 'min:0.01'],
             'price' => ['required', 'numeric', 'min:0'],
             'purchased_at' => ['required', 'date'],
-        ], [
-            'equipment_id.required' => "Choisissez un équipement ou « Nouvel Equipement ».",
-            'new_name.required_if' => "Saisissez le nom du nouvel équipement.",
-        ]);
+        ])->validateWithBag('purchaseAdd');
 
-        $isNew = $data['equipment_id'] === self::NEW_EQUIPMENT;
-
-        if (! $isNew && ! Equipment::whereKey($data['equipment_id'])->exists()) {
-            return back()->withErrors(['equipment_id' => "Équipement introuvable."])->withInput();
-        }
-
-        DB::transaction(function () use ($data, $isNew) {
-            if ($isNew) {
-                $equipmentId = Equipment::create([
-                    'name' => $data['new_name'],
-                    'unit' => $data['new_unit'] ?? null,
-                    'price' => $data['price'],
-                    'qty' => 0,
-                    'category_id' => Equipment::defaultCategoryId(),
-                ])->id;
-            } else {
-                $equipmentId = (int) $data['equipment_id'];
-            }
+        DB::transaction(function () use ($data) {
+            $equipment = Equipment::create([
+                'name' => $data['name'],
+                'unit' => $data['unit'],
+                'price' => $data['price'],
+                'qty' => 0,
+                'category_id' => Equipment::defaultCategoryId(),
+            ]);
 
             $purchase = Purchase::create([
-                'equipment_id' => $equipmentId,
+                'equipment_id' => $equipment->id,
                 'qty' => $data['qty'],
                 'price' => $data['price'],
                 'purchased_at' => $data['purchased_at'],
             ]);
 
-            Equipment::whereKey($equipmentId)->increment('qty', $data['qty']);
+            Equipment::whereKey($equipment->id)->increment('qty', $data['qty']);
 
             StockLedger::record(
-                Equipment::findOrFail($equipmentId),
+                $equipment->refresh(),
                 StockMovement::IN,
-                $isNew ? StockMovement::REASON_OPENING : StockMovement::REASON_SUPPLY,
+                StockMovement::REASON_OPENING,
                 $data['qty'],
-                ['note' => ($isNew ? 'Nouvel équipement — approvisionnement' : 'Approvisionnement') . " #{$purchase->id}"]
+                ['note' => "Nouvel équipement — approvisionnement #{$purchase->id}"]
             );
         });
 
