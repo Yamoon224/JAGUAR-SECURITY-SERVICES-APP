@@ -23,9 +23,10 @@ class PurchaseController extends Controller
     }
 
     /**
-     * Enregistre un approvisionnement. Chaque achat crée sa propre fiche
-     * équipement : le formulaire ne propose plus de sélectionner un
-     * équipement existant, le nom et l'unité sont toujours saisis.
+     * Enregistre un approvisionnement. Le formulaire ne propose plus de
+     * sélectionner un équipement : le nom et l'unité sont toujours saisis.
+     * Un nom déjà connu réutilise sa fiche et vient cumuler la quantité ;
+     * sinon la fiche est créée.
      */
     public function store(Request $request)
     {
@@ -40,13 +41,22 @@ class PurchaseController extends Controller
         ])->validateWithBag('purchaseAdd');
 
         DB::transaction(function () use ($data) {
-            $equipment = Equipment::create([
-                'name' => $data['name'],
-                'unit' => $data['unit'],
-                'price' => $data['price'],
-                'qty' => 0,
-                'category_id' => Equipment::defaultCategoryId(),
-            ]);
+            $equipment = $this->equipmentNamed($data['name']);
+            $isNew = $equipment === null;
+
+            if ($isNew) {
+                $equipment = Equipment::create([
+                    'name' => trim($data['name']),
+                    'unit' => $data['unit'],
+                    'price' => $data['price'],
+                    'qty' => 0,
+                    'category_id' => Equipment::defaultCategoryId(),
+                ]);
+            } elseif (blank($equipment->unit)) {
+                // Fiche existante laissée sans unité : on la complète, sans
+                // jamais écraser le nom, l'unité ou le prix déjà en place.
+                $equipment->update(['unit' => $data['unit']]);
+            }
 
             $purchase = Purchase::create([
                 'equipment_id' => $equipment->id,
@@ -60,13 +70,22 @@ class PurchaseController extends Controller
             StockLedger::record(
                 $equipment->refresh(),
                 StockMovement::IN,
-                StockMovement::REASON_OPENING,
+                $isNew ? StockMovement::REASON_OPENING : StockMovement::REASON_SUPPLY,
                 $data['qty'],
-                ['note' => "Nouvel équipement — approvisionnement #{$purchase->id}"]
+                ['note' => ($isNew ? 'Nouvel équipement — approvisionnement' : 'Approvisionnement') . " #{$purchase->id}"]
             );
         });
 
         return back();
+    }
+
+    /**
+     * Fiche équipement portant ce nom, insensible à la casse et aux espaces
+     * de bord, afin qu'un même article ne se dédouble pas à chaque achat.
+     */
+    private function equipmentNamed(string $name): ?Equipment
+    {
+        return Equipment::whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($name))])->first();
     }
 
     /**
