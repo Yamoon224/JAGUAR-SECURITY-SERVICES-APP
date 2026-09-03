@@ -1,55 +1,66 @@
 <script>
-    (function () {
+    // NB : les selects "équipement" sont transformés en Select2, qui notifie le
+    // changement via jQuery.trigger('change'). Un addEventListener natif sur
+    // document ne reçoit pas ces évènements : tout passe donc par jQuery.
+    jQuery(function ($) {
+        var NEW = '__new__';
+
         var fmt = function (n) {
             return (Math.round(n * 100) / 100).toString().replace('.', ',');
         };
 
         var refresh = function (scope) {
-            var select = scope.querySelector('.purchase-equipment');
-            var qtyInput = scope.querySelector('.purchase-qty');
-            var hint = scope.querySelector('.purchase-stock-hint');
-            if (!select || !qtyInput || !hint) return;
+            var $scope = $(scope);
+            var $select = $scope.find('.purchase-equipment');
+            var $qty = $scope.find('.purchase-qty');
+            var $hint = $scope.find('.purchase-stock-hint');
+            if (!$select.length || !$qty.length) return;
 
-            // Bloc "nouvel équipement"
-            var newBlock = scope.querySelector('.purchase-new-equipment');
-            var newName = scope.querySelector('.purchase-new-name');
-            if (newBlock) {
-                var isNew = select.value === '__new__';
-                newBlock.classList.toggle('d-none', !isNew);
-                if (newName) newName.required = isNew;
-            }
+            var isNew = $select.val() === NEW;
 
-            var opt = select.options[select.selectedIndex];
-            var available = opt ? parseFloat(opt.getAttribute('data-available')) : NaN;
-            var unit = opt ? (opt.getAttribute('data-unit') || '') : '';
+            // Champs "nouvel équipement" : affichés et exigés uniquement en mode
+            // création, pour que le navigateur ne bloque pas un champ masqué.
+            var $block = $scope.find('.purchase-new-equipment');
+            $block.toggleClass('d-none', !isNew);
+            $scope.find('.purchase-new-name').prop('required', isNew).prop('disabled', !isNew);
+            $scope.find('.purchase-new-unit').prop('disabled', !isNew);
 
-            if (select.value === '__new__') {
-                var q = parseFloat(qtyInput.value);
-                hint.innerHTML = (!isNaN(q) && q > 0)
-                    ? 'Stock initial : <strong class="text-success">' + fmt(q) + '</strong>'
-                    : '';
+            if (!$hint.length) return;
+
+            var added = parseFloat($qty.val());
+
+            if (isNew) {
+                $hint.html(added > 0 ? 'Stock initial : <strong class="text-success">' + fmt(added) + '</strong>' : '');
                 return;
             }
 
-            if (isNaN(available)) { hint.textContent = ''; return; }
+            var $opt = $select.find('option:selected');
+            var available = parseFloat($opt.attr('data-available'));
+            var unit = $opt.attr('data-unit') || '';
 
-            var added = parseFloat(qtyInput.value);
-            if (hint.getAttribute('data-mode') === 'new' && !isNaN(added) && added > 0) {
-                hint.innerHTML = 'Disponible : <strong>' + fmt(available) + ' ' + unit +
+            if (isNaN(available)) { $hint.text(''); return; }
+
+            if ($hint.attr('data-mode') === 'new' && added > 0) {
+                $hint.html('Disponible : <strong>' + fmt(available) + ' ' + unit +
                     '</strong> &rarr; après approvisionnement : <strong class="text-success">' +
-                    fmt(available + added) + ' ' + unit + '</strong>';
+                    fmt(available + added) + ' ' + unit + '</strong>');
             } else {
-                hint.innerHTML = 'Disponible actuel : <strong>' + fmt(available) + ' ' + unit + '</strong>';
+                $hint.html('Disponible actuel : <strong>' + fmt(available) + ' ' + unit + '</strong>');
             }
         };
 
-        var onChange = function (e) {
-            if (e.target.matches('.purchase-equipment, .purchase-qty')) {
-                refresh(e.target.closest('.modal') || document);
-            }
+        var scopeOf = function (el) {
+            var $modal = $(el).closest('.modal');
+            return $modal.length ? $modal : $(document);
         };
-        document.addEventListener('input', onChange);
-        document.addEventListener('change', onChange); // Select2 déclenche "change"
-        document.addEventListener('shown.bs.modal', function (e) { refresh(e.target); });
-    })();
+
+        $(document)
+            .on('change select2:select', '.purchase-equipment', function () { refresh(scopeOf(this)); })
+            .on('input change', '.purchase-qty', function () { refresh(scopeOf(this)); })
+            .on('shown.bs.modal', '.modal', function () { refresh(this); });
+
+        // Ouverture initiale : le modal d'ajout est réaffiché après une erreur
+        // de validation, l'état doit correspondre à la saisie restaurée.
+        $('.purchase-equipment').each(function () { refresh(scopeOf(this)); });
+    });
 </script>

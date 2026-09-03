@@ -38,6 +38,9 @@ class PurchaseController extends Controller
             'qty' => ['required', 'numeric', 'min:0.01'],
             'price' => ['required', 'numeric', 'min:0'],
             'purchased_at' => ['required', 'date'],
+        ], [
+            'equipment_id.required' => "Choisissez un équipement ou « Nouvel Equipement ».",
+            'new_name.required_if' => "Saisissez le nom du nouvel équipement.",
         ]);
 
         $isNew = $data['equipment_id'] === self::NEW_EQUIPMENT;
