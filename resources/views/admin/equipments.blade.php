@@ -3,7 +3,7 @@
 <div class="page-breadcrumb d-none d-sm-flex align-items-center">
     <h6 class="breadcrumb-title pe-3 text-uppercase">@lang('lang.equipment', ['param'=>'s'])</h6>
     <div class="ms-auto">
-        <a class="btn btn-sm btn-dark" href="{{ route('purchases.index') }}"><i class="bx bx-cart-add"></i> @lang('lang.new_equipment')</a>
+        <a class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#purchase-add"><i class="bx bx-cart-add"></i> @lang('lang.new_purchase')</a>
         <a class="btn btn-sm btn-danger" href="{{ route('prints.equipments.report') }}" target="_blank"><i class="bx bx-printer"></i> PDF @lang('lang.equipment', ['param'=>'s'])</a>
     </div>
 </div>
@@ -67,4 +67,10 @@
         </div>
     </div>
 </div>
+
+<x-purchase-add :equipments="$equipments" />
+
+@push('js-view')
+@include('admin.partials.purchase-form-script')
+@endpush
 </x-admin-layout>
