@@ -3,7 +3,7 @@
 <div class="d-sm-flex align-items-center flex-wrap gap-2">
     <h6 class="breadcrumb-title pe-3 text-uppercase mb-0">@lang('lang.material_dotation')</h6>
     <div class="ms-auto d-flex align-items-center flex-wrap gap-2">
-        @if(isRightAccess([1, 5]))
+        @if(isRightAccess([1, 7]))
         <a class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#dotation-add"><i class="bx bx-user-plus"></i> @lang('lang.new_dotation')</a>
         @endif
 
