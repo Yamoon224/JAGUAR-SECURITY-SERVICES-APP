@@ -6,6 +6,7 @@ use App\Models\Employee;
 use App\Models\Affectation;
 use App\Models\Licenciement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LicenciementController extends Controller
 {
@@ -32,11 +33,20 @@ class LicenciementController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->except('_token');
-        $employee = Employee::find($data['employee_id']);
-        $employee->update(['deleted'=>1]);
-        Affectation::where('employee_id', $employee->id)->get()->each->delete();
-        Licenciement::create($data);
+        $data = $request->validate([
+            'employee_ids' => ['required', 'array', 'min:1'],
+            'employee_ids.*' => ['exists:employees,id'],
+            'reason' => ['required', 'string'],
+        ]);
+
+        DB::transaction(function () use ($data) {
+            foreach (array_unique($data['employee_ids']) as $employeeId) {
+                Employee::whereKey($employeeId)->update(['deleted' => 1]);
+                Affectation::where('employee_id', $employeeId)->get()->each->delete();
+                Licenciement::create(['employee_id' => $employeeId, 'reason' => $data['reason']]);
+            }
+        });
+
         return back();
     }
 

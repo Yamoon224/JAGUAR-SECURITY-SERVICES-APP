@@ -92,7 +92,8 @@ Route::prefix('admin')->middleware(['auth', 'verified', 'lang'])->group(function
     Route::post('/bills/monthly', [BillController::class, 'getByMonthly'])->name('bills.monthly');
     Route::post('/payments/monthly', [PaymentController::class, 'getByMonthly'])->name('payments.monthly');
     Route::post('/dash', [Controller::class, 'dash'])->name('dash');
-    Route::post('/employees/search', [EmployeeController::class, 'getSearch'])->name('employees.search');
+    Route::get('/employees/lookup', [EmployeeController::class, 'lookup'])->name('employees.lookup');
+    Route::post('/employees/search',[EmployeeController::class, 'getSearch'])->name('employees.search');
     Route::post('/dotations/search', [DotationController::class, 'search'])->name('dotations.search');
     Route::get('/dotations/{employee}/history', [DotationController::class, 'history'])->name('dotations.history');
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Models\Leaf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class LeafController extends Controller
@@ -24,9 +25,17 @@ class LeafController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $this->validated($request);
-        Employee::whereKey($data['employee_id'])->update(['isleaved' => 1]);
-        Leaf::create($data);
+        $data = $this->validated($request, true);
+        $employeeIds = array_unique($data['employee_ids']);
+        unset($data['employee_ids']);
+
+        DB::transaction(function () use ($data, $employeeIds) {
+            foreach ($employeeIds as $employeeId) {
+                Employee::whereKey($employeeId)->update(['isleaved' => 1]);
+                Leaf::create($data + ['employee_id' => $employeeId]);
+            }
+        });
+
         return back();
     }
 
@@ -56,10 +65,13 @@ class LeafController extends Controller
      * (nom, prénom, matricule, motif, période accordée). Pour les congés
      * sanitaires ou touristiques, la destination est obligatoire.
      */
-    private function validated(Request $request): array
+    private function validated(Request $request, bool $bulk = false): array
     {
-        return $request->validate([
-            'employee_id' => ['required', 'exists:employees,id'],
+        $employeeRules = $bulk
+            ? ['employee_ids' => ['required', 'array', 'min:1'], 'employee_ids.*' => ['exists:employees,id']]
+            : ['employee_id' => ['required', 'exists:employees,id']];
+
+        return $request->validate($employeeRules + [
             'begin' => ['required', 'date'],
             'end' => ['required', 'date', 'after_or_equal:begin'],
             'reason' => ['required', 'string'],

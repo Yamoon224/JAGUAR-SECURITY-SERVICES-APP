@@ -6,6 +6,7 @@ use App\Models\Employee;
 use App\Models\Affectation;
 use App\Models\Suspension;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SuspensionController extends Controller
 {
@@ -32,10 +33,26 @@ class SuspensionController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->except('_token');
-        Suspension::create($data);
-        $affectation = Affectation::firstWhere('employee_id', $data['employee_id']);
-        $affectation->delete();
+        $data = $request->validate([
+            'employee_ids' => ['required', 'array', 'min:1'],
+            'employee_ids.*' => ['exists:employees,id'],
+            'reason' => ['required', 'string'],
+            'duration' => ['required', 'integer', 'min:1'],
+            'unit' => ['required', 'string'],
+        ]);
+
+        DB::transaction(function () use ($data) {
+            foreach (array_unique($data['employee_ids']) as $employeeId) {
+                Suspension::create([
+                    'employee_id' => $employeeId,
+                    'reason' => $data['reason'],
+                    'duration' => $data['duration'],
+                    'unit' => $data['unit'],
+                ]);
+                Affectation::where('employee_id', $employeeId)->get()->each->delete();
+            }
+        });
+
         return back();
     }
 

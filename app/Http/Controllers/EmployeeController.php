@@ -188,4 +188,28 @@ class EmployeeController extends Controller
             ->get();
         return view('admin.search_employees', compact('employees'));
     }
+
+    /**
+     * Recherche JSON (matricule, email, téléphone, nom, prénom) des employés actifs.
+     */
+    public function lookup(Request $request)
+    {
+        $key = trim((string) $request->input('search'));
+
+        if (mb_strlen($key) < 2) {
+            return response()->json([]);
+        }
+
+        return Employee::where('deleted', 0)
+            ->where(function ($query) use ($key) {
+                $query->where('matricule', 'LIKE', "%{$key}%")
+                    ->orWhere('email', 'LIKE', "%{$key}%")
+                    ->orWhere('phone', 'LIKE', "%{$key}%")
+                    ->orWhere('name', 'LIKE', "%{$key}%")
+                    ->orWhere('firstname', 'LIKE', "%{$key}%");
+            })
+            ->orderBy('name')
+            ->limit(50)
+            ->get(['id', 'matricule', 'name', 'firstname', 'phone', 'email']);
+    }
 }
