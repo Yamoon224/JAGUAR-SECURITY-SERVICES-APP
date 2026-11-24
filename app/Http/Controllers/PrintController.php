@@ -1483,16 +1483,30 @@ class PrintController extends Controller
         // === MAIN TEXT ===
         self::$obj->SetFont('Arial', '', 11);
         self::$obj->SetX(15);
-        self::$obj->MultiCell(180, 7, utf8_decode(
-            'Je soussigne, Monsieur TOURE Moussa, PDG de JAGUAR SECURITY SERVICES SARL, ' .
+        $hasLeft = request('status') === 'left';
+        $startAt = !empty($employee->contract_start_at)
+            ? Carbon::parse($employee->contract_start_at)->format('d/m/Y')
+            : 'date non renseignee';
+
+        $endRaw = request('end_date') ?: $employee->contract_end_at;
+        $endAt  = !empty($endRaw) ? Carbon::parse($endRaw)->format('d/m/Y') : null;
+
+        $intro = 'Je soussigne, Monsieur TOURE Moussa, PDG de JAGUAR SECURITY SERVICES SARL, ' .
             'certifie que M./Mme ' . $employee->firstname . ' ' . $employee->name .
-            ', matricule ' . $employee->matricule .
-            ', a occupe le poste de ' . $employee->position .
-            ' au sein de notre entreprise depuis le ' .
-            (!empty($employee->contract_start_at)
-                ? Carbon::parse($employee->contract_start_at)->format('d/m/Y')
-                : 'date non renseignee') . '.'
-        ), 0, 'J');
+            ', matricule ' . $employee->matricule . ', ';
+
+        if ($hasLeft) {
+            $body = 'a occupe le poste de ' . $employee->position .
+                ' au sein de notre entreprise du ' . $startAt .
+                ($endAt ? ' au ' . $endAt : '') .
+                ', et a quitte l\'entreprise libre de tout engagement.';
+        } else {
+            $body = 'occupe le poste de ' . $employee->position .
+                ' au sein de notre entreprise depuis le ' . $startAt .
+                ' et y est toujours en activite a ce jour.';
+        }
+
+        self::$obj->MultiCell(180, 7, utf8_decode($intro . $body), 0, 'J');
 
         self::$obj->Ln(8);
         self::$obj->SetX(15);

@@ -27,6 +27,7 @@ class StoreApplicantRequest extends FormRequest
             'firstname' => ['required', 'string', 'max:80'],
             'address' => ['required', 'string', 'max:255'],
             'affiliate' => ['nullable', 'string', 'max:255'],
+            'birthdate' => ['required', 'date', 'before:today'],
             'phone' => [
                 'required', 'string', 'max:20',
                 Rule::unique('applicants', 'phone')->where(fn ($q) => $q->where('deleted', 0)),

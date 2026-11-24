@@ -21,6 +21,9 @@
                         <th>@lang('lang.firstname') & @lang('lang.name')</th>
                         <th>@lang('lang.phone_id')</th>
                         <th>@lang('lang.address')</th>
+                        <th>Date de naissance</th>
+                        <th>@lang('lang.affiliate')</th>
+                        <th>@lang('lang.photo')</th>
                         <th>@lang('lang.application_id')</th>
                         <th>Type</th>
                         <th>@lang('lang.status')</th>
@@ -35,10 +38,21 @@
                         <td>{{ $item->firstname." ".$item->name }}</td>
                         <td>{{ $item->phone }}</td>
                         <td>{{ $item->address }}</td>
+                        <td>{{ $item->birthdate ? \Carbon\Carbon::parse($item->birthdate)->format('d/m/Y') : '-' }}</td>
+                        <td>{{ $item->affiliate ?: '-' }}</td>
+                        <td>
+                            @if($item->photo)
+                            <a href="{{ asset('storage/'.$item->photo) }}" target="_blank"><img src="{{ asset('storage/'.$item->photo) }}" alt="photo" width="40" height="40" class="rounded-circle" style="object-fit: cover"></a>
+                            @else - @endif
+                        </td>
                         <td>{{ $item->applicationid }}</td>
                         <td>{{ $item->recruitment_id != 0 ? date('d/m/Y H:i:s', strtotime($item->created_at)) : 'Ajouté' }}</td>
                         <td>{{ $item->status }}</td>
-                        <td><a href="{{ asset('storage/'.$item->path) }}" class="btn btn-sm btn-dark"><i class="bx bx-folder-plus"></i></a></td>
+                        <td>
+                            @if($item->path)
+                            <a href="{{ asset('storage/'.$item->path) }}" target="_blank" class="btn btn-sm btn-dark"><i class="bx bx-folder-plus"></i></a>
+                            @else - @endif
+                        </td>
                         <td>
                             @if($item->status == 'inprogress')
                             <a data-bs-toggle="modal" data-bs-target="#applicant{{ $item->id }}" class="btn btn-sm btn-primary" title="Editer les informations" style="display: inline-block">

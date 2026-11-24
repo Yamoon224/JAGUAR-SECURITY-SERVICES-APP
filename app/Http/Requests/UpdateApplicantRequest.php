@@ -26,6 +26,7 @@ class UpdateApplicantRequest extends FormRequest
             'firstname' => ['required', 'string', 'max:80'],
             'phone' => ['required', 'string', 'max:20'],
             'address' => ['required', 'string'],
+            'birthdate' => ['nullable', 'date', 'before:today'],
         ];
     }
 }

@@ -488,7 +488,14 @@
                                 </div>
                                 <div class="d-grid gap-2 col-lg-6">
                                     <a href="{{ route('prints.salary.receipt', $employee->id) }}" target="_blank" class="btn btn-outline-dark"><i class='bx bx-file'></i> Bulletin du mois en cours</a>
-                                    <a href="{{ route('prints.work.attestation', $employee->id) }}" target="_blank" class="btn btn-outline-dark"><i class='bx bx-certification'></i> Générer l’attestation de travail</a>
+                                    <form action="{{ route('prints.work.attestation', $employee->id) }}" method="GET" target="_blank" class="d-grid gap-2">
+                                        <select name="status" class="form-select" onchange="this.form.end_date.classList.toggle('d-none', this.value !== 'left')">
+                                            <option value="active">Travaille toujours dans l’entreprise</option>
+                                            <option value="left">A quitté l’entreprise</option>
+                                        </select>
+                                        <input type="date" name="end_date" class="form-control d-none" value="{{ optional($employee->contract_end_at)->format('Y-m-d') }}" title="Date de fin">
+                                        <button type="submit" class="btn btn-outline-dark"><i class='bx bx-certification'></i> Générer l’attestation de travail</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>

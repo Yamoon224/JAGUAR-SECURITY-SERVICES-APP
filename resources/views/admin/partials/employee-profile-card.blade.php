@@ -43,8 +43,11 @@
             <a href="{{ route('prints.contract.employee', $employee->id) }}" target="_blank" class="btn btn-outline-secondary">
                 <i class="bx bx-file-blank"></i> Contrat de travail
             </a>
-            <a href="{{ route('prints.work.attestation', $employee->id) }}" target="_blank" class="btn btn-outline-success">
-                <i class="bx bx-certification"></i> Attestation de travail
+            <a href="{{ route('prints.work.attestation', ['id' => $employee->id, 'status' => 'active']) }}" target="_blank" class="btn btn-outline-success">
+                <i class="bx bx-certification"></i> Attestation (en poste)
+            </a>
+            <a href="{{ route('prints.work.attestation', ['id' => $employee->id, 'status' => 'left']) }}" target="_blank" class="btn btn-outline-success">
+                <i class="bx bx-certification"></i> Attestation (a quitté)
             </a>
         </div>
         @endif

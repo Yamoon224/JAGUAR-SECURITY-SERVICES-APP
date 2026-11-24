@@ -103,7 +103,15 @@
                         <input type="text" class="form-control @error('address') is-invalid @enderror" id="address" name="address" value="{{ old('address') }}" placeholder="Ville, commune, quartier" required>
                     </div>
                 </div>
-                <div class="col-12">
+                <div class="col-md-6">
+                    <label for="birthdate" class="form-label">Date de naissance <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bx bx-calendar"></i></span>
+                        <input type="date" class="form-control @error('birthdate') is-invalid @enderror" id="birthdate" name="birthdate" value="{{ old('birthdate') }}" max="{{ now()->subDay()->format('Y-m-d') }}" required>
+                    </div>
+                    @error('birthdate')<div class="text-danger small">{{ $message }}</div>@enderror
+                </div>
+                <div class="col-md-6">
                     <label for="affiliate" class="form-label">@lang('lang.affiliate')</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bx bx-group"></i></span>

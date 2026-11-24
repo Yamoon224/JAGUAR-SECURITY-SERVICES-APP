@@ -5,7 +5,7 @@
                 <h5 class="modal-title text-white"><i class="bx bx-user-plus"></i> @lang('lang.applicant', ['param'=>''])</h5>
                 <a class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"></a>
             </div>
-            <form method="POST" action="{{ route('applicants.update', $applicant->id) }}">
+            <form method="POST" action="{{ route('applicants.update', $applicant->id) }}" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
@@ -26,6 +26,15 @@
                             <div class="position-relative input-icon mb-3">
                                 <input type="text" class="form-control" name="address" value="{{ $applicant->address }}" placeholder="@lang('lang.address') *" required>
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-map'></i></span>
+                            </div>
+                            <div class="position-relative input-icon mb-3">
+                                <input type="text" class="form-control" name="affiliate" value="{{ $applicant->affiliate }}" placeholder="@lang('lang.affiliate')">
+                                <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-group'></i></span>
+                            </div>
+                            <label for="">Date de naissance</label>
+                            <div class="position-relative input-icon mb-3">
+                                <input type="date" class="form-control" name="birthdate" value="{{ $applicant->birthdate ? \Carbon\Carbon::parse($applicant->birthdate)->format('Y-m-d') : '' }}">
+                                <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-calendar'></i></span>
                             </div>
                             <label for="">@lang('lang.photo')</label>
                             <div class="position-relative input-icon mb-3">

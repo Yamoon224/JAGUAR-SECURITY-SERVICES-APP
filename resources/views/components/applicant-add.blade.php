@@ -30,6 +30,11 @@
                                 <input type="text" class="form-control" name="affiliate" placeholder="@lang('lang.affiliate') *" required>
                                 <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-map'></i></span>
                             </div>
+                            <label for="">Date de naissance *</label>
+                            <div class="position-relative input-icon mb-3">
+                                <input type="date" class="form-control" name="birthdate" required>
+                                <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-calendar'></i></span>
+                            </div>
                             <label for="">@lang('lang.photo')</label>
                             <div class="position-relative input-icon mb-3">
                                 <input type="file" class="form-control" name="photo">

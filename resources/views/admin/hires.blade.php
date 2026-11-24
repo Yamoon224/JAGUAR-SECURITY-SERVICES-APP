@@ -16,6 +16,9 @@
                         <th>@lang('lang.firstname') & @lang('lang.name')</th>
                         <th>@lang('lang.phone_id')</th>
                         <th>@lang('lang.address')</th>
+                        <th>Date de naissance</th>
+                        <th>@lang('lang.affiliate')</th>
+                        <th>@lang('lang.photo')</th>
                         <th>@lang('lang.application_id')</th>
                         <th>@lang('lang.date')</th>
                     </tr>
@@ -27,6 +30,13 @@
                         <td>{{ $item->firstname." ".$item->name }}</td>
                         <td>{{ $item->phone }}</td>
                         <td>{{ $item->address }}</td>
+                        <td>{{ $item->birthdate ? \Carbon\Carbon::parse($item->birthdate)->format('d/m/Y') : '-' }}</td>
+                        <td>{{ $item->affiliate ?: '-' }}</td>
+                        <td>
+                            @if($item->photo)
+                            <a href="{{ asset('storage/'.$item->photo) }}" target="_blank"><img src="{{ asset('storage/'.$item->photo) }}" alt="photo" width="40" height="40" class="rounded-circle" style="object-fit: cover"></a>
+                            @else - @endif
+                        </td>
                         <td>{{ $item->applicationid }}</td>
                         <td>{{ date('d/m/Y H:i:s', strtotime($item->updated_at)) }}</td>
                     </tr>
