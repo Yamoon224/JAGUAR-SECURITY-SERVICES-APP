@@ -25,7 +25,7 @@
                         <th>@lang('lang.affiliate')</th>
                         <th>@lang('lang.photo')</th>
                         <th>@lang('lang.application_id')</th>
-                        <th>Type</th>
+                        <th>Statut de recruté</th>
                         <th>@lang('lang.status')</th>
                         <th>@lang('lang.application_file')</th>
                         <th>@lang('lang.action', ['param'=>'s'])</th>
@@ -46,7 +46,7 @@
                             @else - @endif
                         </td>
                         <td>{{ $item->applicationid }}</td>
-                        <td>{{ $item->recruitment_id != 0 ? date('d/m/Y H:i:s', strtotime($item->created_at)) : 'Recruté' }}</td>
+                        <td>{{ $item->recruitment_id != 0 ? date('d/m/Y H:i:s', strtotime($item->created_at)) : '-' }}</td>
                         <td>
                             @if($item->status == 'inprogress')
                             <span class="badge bg-warning text-dark"><i class="bx bx-time-five"></i> En cours</span>
