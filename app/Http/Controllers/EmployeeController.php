@@ -94,7 +94,9 @@ class EmployeeController extends Controller
         $data['photo'] = $applicant->photo;
         $data['matricule'] = str_replace("N° DOSSIER", 'JAGUAR24', $applicant->applicationid);;
         $data['address'] = $applicant->address;
-        
+        $data['affiliate'] = $applicant->affiliate;
+        $data['birthdate'] = $applicant->birthdate;
+
         $isMatricule = Employee::firstWhere('matricule', $data['matricule']);
         if($isMatricule) 
             $data['matricule'] = 'JAGUAR23 0'.(Str::substr(Employee::max('matricule'), 10, 3) + 1);

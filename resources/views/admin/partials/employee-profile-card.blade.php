@@ -15,6 +15,18 @@
                 <span class="text-secondary">{{ $employee->phone }}</span>
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                <h6 class="mb-0"><i class="bx bx-map"></i> Quartier</h6>
+                <span class="text-secondary">{{ $employee->address ?: '-' }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                <h6 class="mb-0"><i class="bx bx-group"></i> Filiation</h6>
+                <span class="text-secondary">{{ $employee->affiliate ?: '-' }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                <h6 class="mb-0"><i class="bx bx-calendar"></i> Naissance</h6>
+                <span class="text-secondary">{{ $employee->birthdate ? \Carbon\Carbon::parse($employee->birthdate)->format('d/m/Y') : '-' }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
                 <h6 class="mb-0"><i class="bx bx-envelope"></i></h6>
                 <span class="text-secondary">{{ $employee->email }}</span>
             </li>

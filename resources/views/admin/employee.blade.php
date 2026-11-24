@@ -70,6 +70,27 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <label class="form-label mb-1">Quartier</label>
+                                    <div class="position-relative input-icon">
+                                        <input type="text" class="form-control" name="address" placeholder="Ville, commune, quartier" value="{{ $employee->address }}">
+                                        <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-map'></i></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label mb-1">@lang('lang.affiliate')</label>
+                                    <div class="position-relative input-icon">
+                                        <input type="text" class="form-control" name="affiliate" placeholder="Nom du père / de la mère" value="{{ $employee->affiliate }}">
+                                        <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-group'></i></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label mb-1">Date de naissance</label>
+                                    <div class="position-relative input-icon">
+                                        <input type="date" class="form-control" name="birthdate" value="{{ $employee->birthdate ? \Carbon\Carbon::parse($employee->birthdate)->format('Y-m-d') : '' }}">
+                                        <span class="position-absolute top-50 translate-middle-y"><i class='bx bx-calendar'></i></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
                                     <label class="form-label mb-1">@lang('lang.email')</label>
                                     <div class="position-relative input-icon">
                                         <input type="email" class="form-control" name="email" placeholder="@lang('lang.email')" value="{{ $employee->email }}">
