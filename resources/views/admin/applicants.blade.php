@@ -46,8 +46,14 @@
                             @else - @endif
                         </td>
                         <td>{{ $item->applicationid }}</td>
-                        <td>{{ $item->recruitment_id != 0 ? date('d/m/Y H:i:s', strtotime($item->created_at)) : 'Ajouté' }}</td>
-                        <td>{{ $item->status }}</td>
+                        <td>{{ $item->recruitment_id != 0 ? date('d/m/Y H:i:s', strtotime($item->created_at)) : 'Recruté' }}</td>
+                        <td>
+                            @if($item->status == 'inprogress')
+                            <span class="badge bg-warning text-dark"><i class="bx bx-time-five"></i> En cours</span>
+                            @else
+                            {{ $item->status }}
+                            @endif
+                        </td>
                         <td>
                             @if($item->path)
                             <a href="{{ asset('storage/'.$item->path) }}" target="_blank" class="btn btn-sm btn-dark"><i class="bx bx-folder-plus"></i></a>
